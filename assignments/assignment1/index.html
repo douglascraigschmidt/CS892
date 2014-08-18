@@ -10,12 +10,33 @@ bgcolor="#ffffff">
 <HR>
 <h3>MapApp (Assignment 1)</h3>
 
-<H4>Overview</H4>
+<H4>Getting Started</H4>
+
+Before you start with Assignment 1 you'll need to do the following
+things:
+
+<UL>
+
+<LI> Download and install Eclipse for Android. Instructions for doing
+this are available in the MOOC <A
+HREF="https://class.coursera.org/androidapps101-001/lecture">Creative,
+Serious and Playful Science of Android Apps</A>, which requires
+enrolling in that MOOC. <P>
+
+<LI> Setup an account on <A
+HREF="https://about.gitlab.com/">GitLab</a>, which is explained in a
+video by Mike Walker.
+
+</UL>
+
+<HR width=50% align=left><P>
+<H4>Overview of the MapApp Assignment</H4>
 
 The purpose of this assignment is to give you experience using Eclipse
 to develop a simple Android application that displays a map given a
-pair of latitude and longitude coordinates.  The application works as
-follows:<P>
+pair of latitude and longitude coordinates.
+
+The application works as follows:<P>
 
 <UL>
 
@@ -70,7 +91,8 @@ the input please display helpful error messages via Android <A
 HREF="http://developer.android.com/guide/topics/ui/notifiers/toasts.html">Toasts</A>. <P>
 
 <LI> The activity that displays the map must be started via an intent
-and must not be written by you. </UL>
+and must not be written by you, e.g., the Browser app will handle
+URI's with the prefix <CODE>http://maps.google.com</CODE>.  </UL>
 
 The entire layout of the application must be structured by the
 contents of the Android resource files described via XML, i.e., you
@@ -93,7 +115,7 @@ Your <CODE>MapAppActivity</CODE> class should inherit from a parent
 class called LifecycleLoggingActivity that defines the associated hook
 methods to perform this logging, as follows:
 
-<CODE>
+<PRE><CODE>
 public class LifecycleLoggingActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) { 
       ...
@@ -123,9 +145,7 @@ public class LifecycleLoggingActivity extends Activity {
       // @@ TODO: you fill in here. 
     }
 }
-</CODE><P>
-
-
+</PRE></CODE><P>
 
 <P><HR width=50% align=left><P>
 <H4>Additional Work for Graduate Students</H4>
@@ -139,24 +159,42 @@ credit) must do the following additional work:
 user doesn't provide any.  By default, these values should point to
 Vanderbilt University. <P>
 
-<LI> Try to use the <CODE>geo:</CODE> URI intent solution, which
+<LI> First try to use the <CODE>geo:</CODE> URI intent solution, which
 should work if you're running on an Android phone (I recommend using
 the approach described <A
 HREF="http://developer.android.com/training/basics/intents/sending.html#Verify">here</A>
 to see if this works).  If the <CODE>geo:</CODE> URI intent doesn't
-work properly then use the <CODE>http://maps.google.com</CODE> URI
-intent instead. <P>
+work (e.g., if there is no app configured to handle it) then use the
+<CODE>http://maps.google.com</CODE> URI intent instead, which launches
+the Browser app. <P>
 
 </UL>
 
 <P><HR width=50% align=left><P>
+<H4>Skeleton Code</H4>
+
+Skeleton code for this assignment is available from my <A
+HREF="https://github.com/douglascraigschmidt/CS282/tree/master/assignments/assignment1/A1-Android">GitHub</a>
+account.  Once you've setup your <A
+HREF="https://about.gitlab.com/">GitLab</a> account you can pull this
+skeleton code in your repository, read it carefully, and complete the
+"TODO" markers. The additional work required by graduate students is
+clearly marked. <P>
+
+<HR width=50% align=left><P>
 <H4>Concluding Remarks</H4>
 
-Information useful for learning how to write this application is
-available in the <A HREf="http://commonsware.com/warescription">the
-Busy Coder's Guide to Android Development</A> textbook.  I recommend
-you read this material.  It's also helpful to work through the various
-tutorials in that book. <P>
+The MapApp is intentionally designed to be easy to help you get
+familiar with installing/using Eclipse and Android. Information useful
+for learning how to write this application is available in Week 2 of
+the MOOC <A
+HREF="https://class.coursera.org/android-001/lecture">Programming
+Mobile Applications for Android Handheld Systems</a>, which requires
+you to register for this MOOC. Likewise, the <A
+HREf="http://commonsware.com/warescription">the Busy Coder's Guide to
+Android Development</A> textbook.  I recommend you read this material.
+It's also helpful to work through the various tutorials in that
+book. <P>
 
 If you find it extremely hard to complete this assignment you may not
 be ready to take this class.  If this is the case, I recommend you
