@@ -1,4 +1,4 @@
-package edu.vuum.mocca;
+package edu.vanderbilt.semaphore;
 
 // These imports are needed for students taking this class for
 // graduate credit.

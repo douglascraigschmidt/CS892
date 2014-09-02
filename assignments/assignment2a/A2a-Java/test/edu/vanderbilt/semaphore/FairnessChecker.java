@@ -1,4 +1,4 @@
-package edu.vuum.mocca;
+package edu.vanderbilt.semaphore;
 
 import java.util.List;
 import java.util.ArrayList;

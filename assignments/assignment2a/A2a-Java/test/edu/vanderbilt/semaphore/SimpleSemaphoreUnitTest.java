@@ -1,4 +1,4 @@
-package edu.vuum.mocca;
+package edu.vanderbilt.semaphore;
 
 import static org.junit.Assert.*;
 
