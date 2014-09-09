@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({SimpleAtomicLongUnitTest.class,
-               SimpleSemaphoreUnitTest.class})
+               FairSimpleSemaphoreUnitTest.class,
+               UnfairSimpleSemaphoreUnitTest.class})
 public class AllTests {
 }
