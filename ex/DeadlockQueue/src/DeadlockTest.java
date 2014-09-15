@@ -7,29 +7,28 @@
  */
 class DeadlockTest {
     /**
-     * Transfer the contents of src to dest in a synchronized manner
-     * (since SimpleQueue doesn't have internal synchronization).
-     */
-    public static void transfer(SimpleQueue<String> src,
-                                SimpleQueue<String> dest)
-        throws InterruptedException {
-        // Acquire the locks for src and dest.
-        synchronized(src) {
-            synchronized(dest) {
-                // Remove each element from src and put it into dest.
-                while(!src.isEmpty()) {
-                    dest.put(src.take());
-                }
-            }
-        }
-    }
-
-    /**
      * @class TransferRunnable
      * 
      * @brief Helper class that's passed a parameter to a Thread.
      */
     static class TransferRunnable implements Runnable {
+        /**
+         * Transfer contents of src to dest in a synchronized manner since
+         * SimpleQueue lacks have internal synchronization.
+         */
+        public static void transfer(SimpleQueue<String> src,
+                                    SimpleQueue<String> dest)
+            throws InterruptedException {
+            // Acquire the locks for src and dest.
+            synchronized(src) {
+                synchronized(dest) {
+                    // Remove each element from src and put it into dest.
+                    while(!src.isEmpty()) 
+                        dest.put(src.take());
+                }
+            }
+        }
+
         /**
          * First instance of the SimpleQueue.
          */
@@ -63,8 +62,8 @@ class DeadlockTest {
         public void run() {
             try {
                 for (int i = 0; i < mIterations; ++i)
-                    DeadlockTest.transfer(mAQueue,
-                                               mBQueue);
+                    TransferRunnable.transfer(mAQueue,
+                                              mBQueue);
             } catch (Exception e) {
                 System.out.println("caught exception");
             }
