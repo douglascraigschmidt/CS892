@@ -23,7 +23,12 @@ public class FairSimpleSemaphoreUnitTest {
    /** 
      * Keep track of if a runtime exception occurs
      */
-    boolean mFailed = false;
+    volatile boolean mFailed = false;
+    
+    /**
+     * Keep track of if a thread is interrupted.
+     */
+    volatile boolean mInterrupted = false;
     
     @Test
     public void testSimpleSemaphore() {
@@ -77,6 +82,48 @@ public class FairSimpleSemaphoreUnitTest {
         simpleSemaphore.acquire();
         assertEquals(simpleSemaphore.availablePermits(), 1);
     }
+    
+    @Test
+    public void testNegativePermits() throws InterruptedException {
+    	SimpleSemaphore simpleSemaphore =
+    			new SimpleSemaphore(-1, true);
+    	assertEquals(simpleSemaphore.availablePermits(), -1);
+    	simpleSemaphore.release();
+    	assertEquals(simpleSemaphore.availablePermits(), 0);
+    	simpleSemaphore.release();
+    	assertEquals(simpleSemaphore.availablePermits(), 1);
+    	simpleSemaphore.acquire();
+    	assertEquals(simpleSemaphore.availablePermits(), 0);
+    	
+    	final SimpleSemaphore simpleSemaphore2 = new SimpleSemaphore(-1, true);
+    	
+    	// This thread should block indefinitely.
+    	Thread t = new Thread(new Runnable() {
+    		@Override
+    		public void run() {
+    			try {
+					simpleSemaphore2.acquire();
+				} catch (InterruptedException e) {
+					return;
+				}
+    			
+    			// If we get here, something went wrong.
+    			mFailed = true;
+    		}
+    	});
+    	
+    	// Start the thread.
+    	t.start();
+    	
+    	// Wait two seconds.
+    	t.join(2000);
+    	
+    	// The thread we were waiting on should never have returned.
+    	assertFalse(mFailed);
+    	
+    	// Interrupt the thread, if it hasn't been already.
+    	t.interrupt();    	
+    }
    
     @Test
     public void testConcurrentAccess() {
@@ -103,9 +150,16 @@ public class FairSimpleSemaphoreUnitTest {
 				public void run() {
 						Random rand = new Random();
 						for (int i = 0; i < ACCESS_COUNT; ++i) {
-	                        // Acquire a permit from the semaphore.
-	                        semaphore.acquireUninterruptibly();
-	                        
+		                    
+							try { 
+								// Acquire a permit from the semaphore.
+		                        semaphore.acquire();
+		                    }
+		                    catch (InterruptedException e) {
+		                    	mInterrupted = true;
+		                    	return;
+		                    }
+		                    
 	                        // Increment the number of threads that have a permit.
 	                        long running = runningThreads.incrementAndGet();
 	                        
@@ -149,6 +203,8 @@ public class FairSimpleSemaphoreUnitTest {
 			}
     	
     	assertFalse(mFailed);
+    	assertFalse("One of the threads was interrupted while calling acquire(). This shouldn't "
+    			+ "happen (even if your Semaphore is wrong).", mInterrupted);
     }
     
     @Test
@@ -171,12 +227,19 @@ public class FairSimpleSemaphoreUnitTest {
     	for (int i = 0; i < MAX_THREADS; ++i) {
             Thread t = new Thread (new Runnable () {
                     public void run () {
-                        for (int i = 0;
+                    	for (int i = 0;
                              i < (MAX_THREADS - 1);
                              ++i) {
-                            // Attempt to get a permit.
-                            simpleSemaphore.acquireUninterruptibly();    				
-	    				
+                            
+                    		try {    
+                    			// Attempt to get a permit.
+                    			simpleSemaphore.acquire();    				
+                    		}
+                    		catch (InterruptedException e) {
+                    			mInterrupted = true;
+                    			return;
+                    		}
+                    		
                             // Once we've acquired a permit, check to
                             // make sure that we were next in line to
                             // receive a permit.
@@ -232,5 +295,9 @@ public class FairSimpleSemaphoreUnitTest {
     	
     	// Check if we failed.
     	assertTrue(!mFailed);
+    	
+    	// Check if anyone was interrupted.
+    	assertFalse("One of the threads was interrupted while calling acquire(). This shouldn't "
+    			+ "happen (even if your Semaphore is wrong).", mInterrupted);
     }
 }
