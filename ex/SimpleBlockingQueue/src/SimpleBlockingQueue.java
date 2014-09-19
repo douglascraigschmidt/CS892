@@ -17,39 +17,100 @@ class SimpleBlockingQueue<E> implements BlockingQueue<E> {
     /**
      * The queue consists of a List of E's.
      */
-    private List<E> mList = new ArrayList<E>();
+    final private List<E> mList;
 
     /**
-     * True if the queue is empty.
+     * The maximum capacity of the queue or Integer.MAX_VALUE if none.
      */
-    public synchronized boolean isEmpty() {
-        return mList.size() == 0;
+    private final int mCapacity;
+
+    /**
+     * Create a SimpleBlocking queue with a capacity of
+     * Integer.MAX_VALUE.
+     */
+    public SimpleBlockingQueue() {
+        this(Integer.MAX_VALUE);
     }
 
     /**
-     * Add a new E to the end of the queue, blocking until there's room.
+     * Create a SimpleBlocking queue with the given capacity.
      */
-    public synchronized void put(E msg) throws InterruptedException {
-        mList.add(msg);
-        notifyAll();
+    public SimpleBlockingQueue(int capacity) {
+        if (capacity <= 0) 
+            throw new IllegalArgumentException();
+        mCapacity = capacity;
+        mList = new ArrayList<E>();
+    }
+
+    /**
+     * Add a new E to the end of the queue, blocking if necessary for
+     * space to become available.
+     */
+    public void put(E e) throws InterruptedException {
+        synchronized(this) {
+            if (e == null)
+                throw new NullPointerException();
+
+            // Wait until the queue is not full.
+            while (isFull()) {
+                System.out.println("BLOCKING ON PUT()");
+                wait();
+            }
+
+            // Add e to the ArrayList.
+            mList.add(e);
+            
+            // Notify that the queue may have changed state, e.g., "no
+            // longer empty".
+            notifyAll();
+        }
     } 
 
     /**
      * Remove the E at the front of the queue, blocking until there's
      * something in the queue.
      */
-    public synchronized E take() throws InterruptedException {
-        while (mList.isEmpty())
-            wait();
+    public E take() throws InterruptedException {
+        synchronized(this) {
+            // Wait until the queue is not empty.
+            while (mList.isEmpty()) {
+                System.out.println("BLOCKING ON TAKE()");
+                wait();
+            }
 
-        return mList.remove(0);
+            final E e = mList.remove(0);
+        
+            // Notify that the queue may have changed state, e.g., "no
+            // longer full".
+            notifyAll();
+            return e;
+        }
     } 
 
     /**
      * Returns the number of elements in this queue.
      */
-    public synchronized int size() {
-        return mList.size();
+    public int size() {
+        synchronized(this) {
+            return mList.size();
+        }
+    }
+
+    /**
+     * Returns true if the queue is empty, else false.
+     */
+    public boolean isEmpty() {
+        synchronized(this) {
+            return mList.size() == 0;
+        }
+    }
+
+    /**
+     * Returns true if the queue is full, else false.  Since this
+     * isn't a public method it assumes the monitor lock is held.
+     */
+    private boolean isFull() {
+        return mList.size() == mCapacity;
     }
 
     /**
@@ -71,6 +132,30 @@ class SimpleBlockingQueue<E> implements BlockingQueue<E> {
     }
     public int remainingCapacity() {
         return 0;
+    }
+    public E poll() {
+        return null;
+    }
+    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+        return take();
+    }
+    public E peek() {
+        return null;
+    }
+    public boolean offer(E e) {
+        return false;
+    }
+    public boolean offer(E e, long timeout, TimeUnit unit) {
+        try {
+            put(e);
+        }
+        catch (InterruptedException ex) {
+            // Just swallow this exception for this simple (buggy) test.
+        }
+        return true;
+    }
+    public boolean add(E e) {
+        return false;
     }
     public E element() {
         return null;
@@ -102,9 +187,3 @@ class SimpleBlockingQueue<E> implements BlockingQueue<E> {
         return null;
     }
 }
-
-
-
-
-
-

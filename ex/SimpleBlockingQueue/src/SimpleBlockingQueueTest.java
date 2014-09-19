@@ -13,14 +13,19 @@ public class SimpleBlockingQueueTest
     /**
      * Maximum number of iterations.
      */
-    private static int mMaxIterations = 100;
+    private final static int mMaxIterations = 100;
+
+    /**
+     * Maximum size of the queue.
+     */
+    private final static int mQueueSize = 10;
 
     /**
      * Main entry point that tests the SimpleQueue class.
      */
     public static void main(String argv[]) {
         final SimpleBlockingQueue<String> simpleQueue =
-            new SimpleBlockingQueue<String>();
+            new SimpleBlockingQueue<String>(mQueueSize);
 
         try {
             // Create a producer thread.
