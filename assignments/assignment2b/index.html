@@ -76,8 +76,15 @@ by opening Window -> Android Virtual Device Manager. <P>
 
 The program will be considered "correct" if it successfully completes
 a simulation of N Palantiri and M Beings without crashing or throwing
-any exceptions.  When a Being is running it's colored Green. Likewise,
-when a Palantir is in use it's colored Red. A "correct" simulation
+any exceptions. The Palantir and Beings are color coded to represent
+their state: <P>
+
+<UL>
+<LI> <B>Beings</B> - Green means gazing, Red means waiting, and Yellow means idle.<P>
+<LI> <B>Palantir</B> - Green means not in use, Red means in use.<P>
+</UL>
+
+When a Palantir is in use it's colored Red. A "correct" simulation
 should restrict the number of gazing Beings to the number of
 Palantiri. In other words, if there are four Palantiri in the
 simulation, then only four green dots should ever be present on the
@@ -89,8 +96,10 @@ receive a Palantir. However, there's an intentional race condition
 inherent in the fairness checker, i.e., two threads may release a
 Palantir at almost the same time. The thread that releases the
 Palantir first will not necessarily be the first Thread to block on a
-call to PalantirManager.acquirePalantir().  If this race condition
-occurs the color of the Being will change to yellow. <P>
+call to PalantirManager.acquirePalantir(). If the fairness checker
+believes that the PalantirManager is acting unfairly, it will become
+yellow to signal a warning that it may not be fair. This is only a
+warning because the race condition may create a false negative. <P>
 
 <P><HR width=50% align=left><P>
 <H4>Additional Work for Graduate Students</H4>
