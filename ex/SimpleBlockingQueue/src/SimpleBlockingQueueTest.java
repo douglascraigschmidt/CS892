@@ -1,11 +1,12 @@
 import java.util.concurrent.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 
 /**
  * @class SimpleBlockingQueueTest
  * 
- * @brief Test program for the SimpleQueue that induces race
+ * @brief Test program for the SimpleBlockingQueue that induces race
  *        conditions due to lack of synchronization.
  */
 public class SimpleBlockingQueueTest
@@ -13,12 +14,18 @@ public class SimpleBlockingQueueTest
     /**
      * Maximum number of iterations.
      */
-    private final static int mMaxIterations = 100;
+    private final static int mMaxIterations = 100000;
 
     /**
      * Maximum size of the queue.
      */
     private final static int mQueueSize = 10;
+
+    /**
+     * Count the number of iterations.
+     */
+    private final static AtomicInteger mCount =
+        new AtomicInteger(0);
 
     /**
      * @class ProducerThread
@@ -30,14 +37,14 @@ public class SimpleBlockingQueueTest
         /**
          * This queue is shared with the consumer.
          */
-        private final BQ mBlockingQueue;
+        private final BQ mQueue;
         
         /**
-         * Constructor initializes the SimpleBlockingQueue data
+         * Constructor initializes the BlockingQueue data
          * member.
          */
         ProducerThread(BQ blockingQueue) {
-            mBlockingQueue = blockingQueue;
+            mQueue = blockingQueue;
         }
 
         /**
@@ -46,10 +53,12 @@ public class SimpleBlockingQueueTest
          */
         public void run(){ 
             try {
-                for(int i = 0; i < mMaxIterations; i++)
-                    // Calls the put() method, which blocks if the
-                    // queue is full.
-                    mBlockingQueue.put(Integer.toString(i)); 
+                for(int i = 0; i < mMaxIterations; i++) {
+                    mCount.incrementAndGet();
+
+                    // Calls the put() method.
+                    mQueue.put(Integer.toString(i));
+                }
             } catch (InterruptedException e) {
                 System.out.println("InterruptedException caught");
             }
@@ -67,13 +76,13 @@ public class SimpleBlockingQueueTest
         /**
          * This queue is shared with the producer.
          */
-        private final BQ mBlockingQueue;
+        private final BQ mQueue;
         
         /**
          * Constructor initializes the BlockingQueue data member.
          */
         ConsumerThread(BQ blockingQueue) {
-            mBlockingQueue = blockingQueue;
+            mQueue = blockingQueue;
         }
 
         /**
@@ -81,35 +90,51 @@ public class SimpleBlockingQueueTest
          * Strings from a producer Thread via a shared BlockingQueue.
          */
         public void run(){ 
+            Object s = null;
             try {
-                for(int i = 0; i < mMaxIterations; i++)
-                    // Calls the take() method, which blocks if the
-                    // queue is empty.
-                    System.out.println(mBlockingQueue.take());
+                for(int i = 0; i < mMaxIterations; i++) {
+                    // Calls the take() method.
+                    s = mQueue.take();
+
+                    mCount.decrementAndGet();
+
+                    if((i % (mMaxIterations / 10)) == 0)
+                        System.out.println(s);
+                }
             } catch (InterruptedException e) {
                 System.out.println("InterruptedException caught");
             }
+            System.out.println("Final size of the queue is " 
+                               + mQueue.size()
+                               + "\nmCount is "
+                               + mCount.get()
+                               + "\nFinal value is "
+                               + s);
         }
     }
 
     /**
-     * Main entry point that tests the SimpleQueue class.
+     * Main entry point that tests the SimpleBlockingQueue class.
      */
     public static void main(String argv[]) {
-        final SimpleBlockingQueue<String> simpleBlockingQueue =
+        final SimpleBlockingQueue<String> simpleQueue =
             new SimpleBlockingQueue<String>(mQueueSize);
 
         try {
             // Create a ProducerThread.
             Thread producer =
-                new ProducerThread(simpleBlockingQueue);
+                new ProducerThread(simpleQueue);
         
             // Create a ConsumerThread.
             Thread consumer =
-                new ConsumerThread(simpleBlockingQueue);
+                new ConsumerThread(simpleQueue);
 
             // Run both Threads concurrently.
             producer.start();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {}
+
             consumer.start();
 
             // Wait for both Threads to stop.

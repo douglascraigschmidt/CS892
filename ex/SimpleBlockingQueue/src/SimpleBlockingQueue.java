@@ -53,7 +53,7 @@ class SimpleBlockingQueue<E> implements BlockingQueue<E> {
 
             // Wait until the queue is not full.
             while (isFull()) {
-                System.out.println("BLOCKING ON PUT()");
+                // System.out.println("BLOCKING ON PUT()");
                 wait();
             }
 
@@ -74,7 +74,7 @@ class SimpleBlockingQueue<E> implements BlockingQueue<E> {
         synchronized(this) {
             // Wait until the queue is not empty.
             while (mList.isEmpty()) {
-                System.out.println("BLOCKING ON TAKE()");
+                // System.out.println("BLOCKING ON TAKE()");
                 wait();
             }
 

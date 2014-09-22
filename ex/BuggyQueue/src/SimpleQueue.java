@@ -20,6 +20,29 @@ class SimpleQueue<E> implements BlockingQueue<E> {
     private List<E> mList = new ArrayList<E>();
 
     /**
+     * The maximum capacity of the queue or Integer.MAX_VALUE if none.
+     */
+    private final int mCapacity;
+
+    /**
+     * Create a SimpleBlocking queue with a capacity of
+     * Integer.MAX_VALUE.
+     */
+    public SimpleQueue() {
+        this(Integer.MAX_VALUE);
+    }
+
+    /**
+     * Create a SimpleBlocking queue with the given capacity.
+     */
+    public SimpleQueue(int capacity) {
+        if (capacity <= 0) 
+            throw new IllegalArgumentException();
+        mCapacity = capacity;
+        mList = new ArrayList<E>();
+    }
+
+    /**
      * True if the queue is empty.
      */
     public boolean isEmpty() {
@@ -27,17 +50,28 @@ class SimpleQueue<E> implements BlockingQueue<E> {
     }
 
     /**
+     * Returns true if the queue is full, else false.
+     */
+    private boolean isFull() {
+        return mList.size() == mCapacity;
+    }
+
+    /**
      * Add a new E to the end of the queue.
      */
     public void put(E msg) throws InterruptedException {
-        mList.add(msg);
+        if (isFull() == false)
+            mList.add(msg);
     } 
 
     /**
      * Remove the E at the front of the queue.
      */
     public E take() throws InterruptedException {
-        return mList.remove(0);
+        if (isEmpty() == false)
+            return mList.remove(0);
+        else
+        	return null;
     } 
 
     /**

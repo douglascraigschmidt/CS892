@@ -1,5 +1,6 @@
 import java.util.concurrent.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 
 /**
@@ -16,6 +17,17 @@ public class BuggyQueueTest
     private final static int mMaxIterations = 1000000;
 
     /**
+     * Maximum size of the queue.
+     */
+    private final static int mQueueSize = 10;
+
+    /**
+     * Count the number of iterations.
+     */
+    private final static AtomicInteger mCount =
+        new AtomicInteger(0);
+
+    /**
      * @class ProducerThread
      *
      * @brief This producer runs in a separate Java Thread and passes
@@ -25,14 +37,14 @@ public class BuggyQueueTest
         /**
          * This queue is shared with the consumer.
          */
-        private final BQ mBlockingQueue;
+        private final BQ mQueue;
         
         /**
          * Constructor initializes the BlockingQueue data
          * member.
          */
         ProducerThread(BQ blockingQueue) {
-            mBlockingQueue = blockingQueue;
+            mQueue = blockingQueue;
         }
 
         /**
@@ -41,10 +53,12 @@ public class BuggyQueueTest
          */
         public void run(){ 
             try {
-                for(int i = 0; i < mMaxIterations; i++)
-                    // Calls the put() method, which blocks if the
-                    // queue is full.
-                    mBlockingQueue.put(Integer.toString(i)); 
+                for(int i = 0; i < mMaxIterations; i++) {
+                    mCount.incrementAndGet();
+
+                    // Calls the put() method.
+                    mQueue.put(Integer.toString(i));
+                }
             } catch (InterruptedException e) {
                 System.out.println("InterruptedException caught");
             }
@@ -62,13 +76,13 @@ public class BuggyQueueTest
         /**
          * This queue is shared with the producer.
          */
-        private final BQ mBlockingQueue;
+        private final BQ mQueue;
         
         /**
          * Constructor initializes the BlockingQueue data member.
          */
         ConsumerThread(BQ blockingQueue) {
-            mBlockingQueue = blockingQueue;
+            mQueue = blockingQueue;
         }
 
         /**
@@ -76,18 +90,26 @@ public class BuggyQueueTest
          * Strings from a producer Thread via a shared BlockingQueue.
          */
         public void run(){ 
+            Object s = null;
             try {
                 for(int i = 0; i < mMaxIterations; i++) {
-                    // Calls the take() method, which blocks if the
-                    // queue is empty.
-                    Object s = mBlockingQueue.take();
-
-                    if((i % (mMaxIterations / 100)) == 0)
-                        System.out.println(s);
+                    // Calls the take() method.
+                    s = mQueue.take();
+                    
+                    mCount.decrementAndGet();
+                    
+                    if((i % (mMaxIterations / 10)) == 0)
+                        System.out.println(s == null ? "<null>" : s);
                 }
             } catch (InterruptedException e) {
                 System.out.println("InterruptedException caught");
             }
+            System.out.println("Final size of the queue is " 
+                               + mQueue.size()
+                               + "\nmCount is "
+                               + mCount.get()
+                               + "\nFinal value is "
+                               + s);
         }
     }
 
@@ -96,7 +118,7 @@ public class BuggyQueueTest
      */
     public static void main(String argv[]) {
         final SimpleQueue<String> simpleQueue =
-            new SimpleQueue<String>();
+            new SimpleQueue<String>(); // (mQueueSize);
 
         try {
             // Create a ProducerThread.
