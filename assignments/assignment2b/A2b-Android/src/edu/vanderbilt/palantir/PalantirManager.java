@@ -92,8 +92,30 @@ public class PalantirManager {
      * Each palantir's id will be its position in the list.
      */
     public static List<Palantir> generatePalantiri(int size) {
-        // @@ TODO - you fill in here. (replacing return null);
-    	return null;
+    	// Create a list to hold the generated Palantiri.
+        List<Palantir> palantiri = new ArrayList<Palantir>();		
+
+        // Create a new Random number generators.
+        final Random rand = new Random();
+
+        // Create and add each new Palantir into the list.
+        for (int i = 0; i < size; ++i) {
+            final int id = i;
+
+            palantiri.add(new Palantir() {
+                    @Override
+                    public void gaze() throws InterruptedException {
+                    	Thread.sleep(rand.nextInt(4000) + 1000);
+                    }
+
+                    @Override
+                    public int getId() {
+                        return id;
+                    }
+                });
+        }
+        
+        return palantiri;
     }
 }
 
