@@ -1,7 +1,7 @@
 package edu.vanderbilt.palantir;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -32,7 +32,7 @@ public class PalantirManager {
      * boolean, which indicates whether or not the palantir is
      * currently in use.
      */
-    protected HashMap<Palantir, Boolean> mPalantiri = null;
+    protected ConcurrentHashMap<Palantir, Boolean> mPalantiri = null;
 
     /**
      * Create a resource manager for the palantiri passed as a
