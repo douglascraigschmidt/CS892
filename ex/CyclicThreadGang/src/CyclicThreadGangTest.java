@@ -1,9 +1,8 @@
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.CountDownLatch;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  * @class CyclicThreadGangTest
@@ -23,7 +22,8 @@ public class CyclicThreadGangTest {
      * @brief Customizes the CyclicThreadGang framework to concurrently
      *        search arrays of Strings for an array of words to find.
      */
-    static public class SearchCyclicThreadGang extends CyclicThreadGang<String> {
+    static public class SearchCyclicThreadGang 
+                  extends CyclicThreadGang<String, String> {
         /**
          * Input to search.
          */
@@ -36,6 +36,14 @@ public class CyclicThreadGangTest {
          */
         private int mCount;
         
+        /**
+         * The barrier that's used to coordinate each cycle, i.e.,
+         * each Thread must await on mBarrier for all the other
+         * Threads to complete their processing before they all
+         * attempt to move to the next cycle en masse.
+         */
+        protected CyclicBarrier mBarrier;
+
         /**
          * Controls when the framework exits.
          */
@@ -60,7 +68,7 @@ public class CyclicThreadGangTest {
          * searched concurrently by the gang of Threads.
          */
         @Override
-        protected List<String> makeNextInputList() {
+            protected List<String> makeNextInputList() {
             if (mCount-- > 0) 
                 return Arrays.asList(mInputStrings[mCount]);
             else 
@@ -73,7 +81,7 @@ public class CyclicThreadGangTest {
          * input to process.
          */
         @Override
-        protected Runnable makeBarrierAction() {
+            protected Runnable makeBarrierAction() {
             return new Runnable() {
                 public void run() {
                     mInputList = makeNextInputList();
@@ -81,6 +89,47 @@ public class CyclicThreadGangTest {
                         System.out.println("@@@@@ Started next cycle @@@@@");
                 }
             };
+        }
+
+        /**
+         * Each Thread in the gang uses a call to CyclicBarrier
+         * await() to wait for all the other Threads to complete their
+         * current cycle.
+         */
+        protected boolean awaitNextCycle() {
+            try {
+                mBarrier.await();
+                return true;
+            } catch (InterruptedException ex) {
+                return false;
+            } catch (BrokenBarrierException ex) {
+                return false;
+            }
+        }
+
+        /**
+         * Hook method that initiates the gang of Threads.
+         */
+        protected void initiateThreadGang(int size) {
+            // Create a CyclicBarrier whose (1) "parties" count
+            // corresponds to each element in the input List and (2)
+            // barrier action (if any) is initialized via the
+            // makeBarrierAction() hook method.
+            mBarrier = new CyclicBarrier(size,
+                                         makeBarrierAction());
+
+            // Create and start a Thread for each element in the input
+            // List - each Thread performs the processing designated
+            // by the doWorkInBackgroundThread() hook method.
+            for (int i = 0; i < size; ++i)
+                new Thread(makeWorker(i)).start();
+        }
+
+        /**
+         * Hook method that processes the results.
+         */
+        protected void processResults(String results) {
+            printDebugging(results);
         }
 
         /**
@@ -92,15 +141,14 @@ public class CyclicThreadGangTest {
                 for (int i = inputData.indexOf(word, 0);
                      i != -1;
                      i = inputData.indexOf(word, i + word.length()))
-                    if (diagnosticsEnabled)
-                        System.out.println("in thread " 
-                                           + Thread.currentThread().getId()
-                                           + " "
-                                           + word
-                                           + " was found at offset "
-                                           + i
-                                           + " in string "
-                                           + inputData);
+                    processResults("in thread " 
+                                   + Thread.currentThread().getId()
+                                   + " "
+                                   + word
+                                   + " was found at offset "
+                                   + i
+                                   + " in string "
+                                   + inputData);
             return true;
         }
 
@@ -109,7 +157,7 @@ public class CyclicThreadGangTest {
          * exit latch and returns true, else returns false.
          */
         @Override
-        protected boolean done() {
+            protected boolean done() {
             if (mInputList == null) {
                 mExitLatch.countDown();
                 return true;
@@ -122,12 +170,20 @@ public class CyclicThreadGangTest {
          * Waits on an exit latch for the gang of Threads to exit.
          */
         @Override
-        protected void awaitDone() {
+            protected void awaitDone() {
             try {
                 mExitLatch.await();
             } catch (InterruptedException e) {
             }
         }
+    }
+
+    /**
+     * Print debugging output if @code diagnosticsEnabled is true.
+     */
+    static void printDebugging(String output) {
+        if (diagnosticsEnabled)
+            System.out.println(output);
     }
 
     /**

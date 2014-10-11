@@ -10,21 +10,13 @@ import java.util.concurrent.BrokenBarrierException;
  *        of elements E for one or more cycles, where each cycle is
  *        controlled via a CyclicBarrier.
  */
-public abstract class CyclicThreadGang<E> implements Runnable {
+public abstract class CyclicThreadGang<E, R> implements Runnable {
     /**
      * The input list that's processed, which can be changed for each
      * cycle via the @code makeNextInputList() factory method.
      */
     protected List<E> mInputList;
     
-    /**
-     * The barrier that's used to coordinate each cycle, i.e., each
-     * Thread must await on mBarrier for all the other Threads to
-     * complete their processing before they all attempt to move to
-     * the next cycle en masse.
-     */
-    protected CyclicBarrier mBarrier;
-
     /**
      * Factory method that makes the next List of input to be
      * processed concurrently by the gang of Threads.
@@ -63,17 +55,18 @@ public abstract class CyclicThreadGang<E> implements Runnable {
      * other Threads to complete their current cycle.  Returns true if
      * the wait was successfuly or false if an exception occurs.
      */
-    protected boolean awaitNextCycle() {
-        try {
-            mBarrier.await();
-            return true;
-        } catch (InterruptedException ex) {
-            return false;
-        } catch (BrokenBarrierException ex) {
-            return false;
-        }
-    }
+    protected abstract boolean awaitNextCycle();
         
+    /**
+     * Hook method that initiates the gang of Threads.
+     */
+    protected abstract void initiateThreadGang(int inputSize);
+
+    /**
+     * Hook method that can be used to process the results.
+     */
+    protected abstract void processResults(R results);
+
     /**
      * Template method that runs all the Threads in the gang.  It
      * first calls the makeNextInputList() hook method to get the
@@ -91,20 +84,9 @@ public abstract class CyclicThreadGang<E> implements Runnable {
     public void run() {
         // Get initial List of input data to process.
         mInputList = makeNextInputList();
-        final int size = mInputList.size();
 
-        // Create a CyclicBarrier whose (1) "parties" count
-        // corresponds to each element in the input List and (2)
-        // barrier action (if any) is initialized via the
-        // makeBarrierAction() hook method).
-        mBarrier = new CyclicBarrier(size,
-                                     makeBarrierAction());
-
-        // Create and start a Thread for each element in the input
-        // List - each Thread performs the processing designated by
-        // the doWorkInBackgroundThread() hook method.
-        for (int i = 0; i < size; ++i)
-            new Thread(makeWorker(i)).start();
+        // Invoke this hook method to initialize the gang of Threads.
+        initiateThreadGang(mInputList.size());
 
         // Wait for the processing in all worker Threads to complete
         // before returning to the caller.
