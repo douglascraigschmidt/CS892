@@ -1,4 +1,4 @@
-import java.util.concurrent.CountDownLatch;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,12 +14,13 @@ public abstract class OneShotThreadGang<E> implements Runnable {
      * the @code makeInputList() factory method.
      */
     protected final List<E> mInputList;
-    
-    /**
-     * CountDownLatch that's used to coordinate the processing
-     * threads.
+
+   /**
+     * Constructor initializes the input List.
      */
-    protected CountDownLatch mBarrier;
+    OneShotThreadGang(List<E> inputList) {
+        mInputList = inputList;
+    }
 
     /**
      * Hook method that performs work a background Thread.  Returns
@@ -29,59 +30,50 @@ public abstract class OneShotThreadGang<E> implements Runnable {
     public abstract boolean doWorkInBackground(E inputData);
 
     /**
-     * Constructor initializes the input List.
+     * Hook method that can be used as an exit barrier to wait for the
+     * gang of Threads to exit.
      */
-    OneShotThreadGang(List<E> inputList) {
-        mInputList = inputList;
-    }
+    protected abstract void awaitDone();
 
     /**
-     * Template method that runs all the Threads in the gang.  It
-     * first calls the makeInputList() hook method to get the
-     * initial input List.  It then creates a CyclicBarrier whose
-     * "parties" count corresponds to each element in the input List
-     * and whose barrier action (if any) is initialized via the
-     * makeBarrierAction() hook method).  Next it creates and starts a
-     * new Thread that performs the processing designated by the
-     * makeWorker() hook method for each element in the input List.
-     * Finally, it calls the awaitDone() hook method to wait for all
-     * the processing to complete.
+     * Hook method called when a worker Thread is done.
+     */
+    protected abstract void workerDone();
+    
+    /**
+     * Hook method that initiates the gang of Threads.
+     */
+    protected abstract void initiateThreadGang(int inputSize);
+
+    /**
+     * Template method that runs all the Threads in the gang.  
      */
     @Override
     public void run() {
-        final int size = mInputList.size();
+        // Invoke this hook method to initialize the gang of Threads.
+        initiateThreadGang(mInputList.size());
 
-        // Create a CountDownLatch whose count corresponds to each
-        // element in the input List.
-        mBarrier = new CountDownLatch(size);
-
-        // Create and start a Thread for each element in the input
-        // List - each Thread performs the processing designated by
-        // the doWorkInBackgroundThread() hook method.
-        for (int i = 0; i < size; ++i)
-            new Thread(makeWorker(i)).start();
-
-        try {
-            // Wait for all the background Threads to exit.
-            mBarrier.await();
-        } catch (InterruptedException e) {
-        }
+        // Invoke this hook method to wait for all the Threads to
+        // exit.
+        awaitDone();
     }
 
     /**
-     * Factory method that creates a Runnable worker to process the
-     * current contents of the input list.
+     * Factory method that creates a Runnable worker that will process
+     * one node of the input List (at location @code index) in a
+     * background Thread.
      */
     protected Runnable makeWorker(final int index) {
         return new Runnable() {
+
             // This method runs in background Thread.
             public void run() {
                 // Process the input data in a background Thread.
-
                 doWorkInBackground(mInputList.get(index));
 
-                // Indicate that this Thread is finished.
-                mBarrier.countDown();
+
+                // Indicate this worker Thread is finished.
+                workerDone();
             }
         };
     }
