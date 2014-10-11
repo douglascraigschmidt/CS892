@@ -8,7 +8,7 @@ import java.util.List;
  *        Threads that concurrently process input from a generic List
  *        of elements E for a single cycle.
  */
-public abstract class OneShotThreadGang<E> implements Runnable {
+public abstract class OneShotThreadGang<E, R> implements Runnable {
     /**
      * The input list that's processed, which can be initialized via
      * the @code makeInputList() factory method.
@@ -34,6 +34,11 @@ public abstract class OneShotThreadGang<E> implements Runnable {
      * gang of Threads to exit.
      */
     protected abstract void awaitDone();
+
+    /**
+     * Hook method that can be used to process results.
+     */
+    protected abstract void processResults(R results);
 
     /**
      * Hook method called when a worker Thread is done.
