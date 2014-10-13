@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,6 +15,20 @@ public abstract class ThreadGang<E, R> implements Runnable {
     protected volatile List<E> mInputList = null;
 
     /**
+     * Set the List to use as input.
+     */
+    protected void setInputList(List<E> inputList) {
+        mInputList = inputList;
+    }
+
+    /**
+     * Get the List to use as input.
+     */
+    protected List<E> getInputList() {
+        return mInputList;
+    }
+
+    /**
      * Factory method that makes the next List of input to be
      * processed concurrently by the gang of Threads.
      */
@@ -27,16 +40,6 @@ public abstract class ThreadGang<E, R> implements Runnable {
      * background Thread from continuing to run).
      */
     public abstract boolean doWorkInBackground(E inputData);
-
-    /**
-     * Factory method that creates the barrier action for the
-     * CyclicBarrier, which is typically used to get the next List of
-     * input data to process concurrently.  Can return null if there's
-     * no barrier action.
-     */
-    protected Runnable makeBarrierAction() {
-        return null;
-    }
 
     /**
      * Hook method that returns true when all processing in a cycle is
@@ -62,11 +65,12 @@ public abstract class ThreadGang<E, R> implements Runnable {
     /**
      * Hook method called when a worker Thread is done.  Can be used
      * in conjunction with a one-shop or cyclic barrier to wait for
-     * all the other Threads to complete their current cycle.  Returns
-     * true if the wait was successfuly or false if an exception
-     * occurs.
+     * all the other Threads to complete their current cycle.  Is
+     * passed the index of the work that's done.  Returns true if the
+     * wait was successfuly or throws the IndexOutOfBoundsException if
+     * the item has been removed.
      */
-    protected void workerDone() {
+    protected void workerDone(int index) throws IndexOutOfBoundsException {
         // No-op.
     }
     
@@ -82,10 +86,10 @@ public abstract class ThreadGang<E, R> implements Runnable {
     public void run() {
         // Invoke hook method to get initial List of input data to
         // process.
-        mInputList = makeNextInputList();
+        setInputList (makeNextInputList());
 
         // Invoke hook method to initialize the gang of Threads.
-        initiateThreadGang(mInputList.size());
+        initiateThreadGang(getInputList().size());
 
         // Invoke hook method to wait for all the Threads to exit.
         awaitDone();
@@ -103,14 +107,26 @@ public abstract class ThreadGang<E, R> implements Runnable {
             public void run() {
 
                 do {
-                    // Process the input data in a background Thread.
-                    if (doWorkInBackground(mInputList.get(index)) == false)
+                    E element;
+                    try {
+                        element = getInputList().get(index);
+                    } catch (IndexOutOfBoundsException e) {
+                        // Bail out.
+                        return;
+                    }
+
+                    // Process input data element.
+                    if (doWorkInBackground(element) == false)
                         return;
                     else
-                        // Indicate the worker Thread is done with
-                        // this cycle, which can block on an exit
-                        // barrier.
-                        workerDone();
+                        try {
+                            // Indicate the worker Thread is done with
+                            // this cycle, which can block on an exit
+                            // barrier.
+                            workerDone(index);
+                        } catch (IndexOutOfBoundsException e) {
+                            return;
+                        }
 
                     // Keep running until instructed to stop.
                 } while (cycleDone() == false);
