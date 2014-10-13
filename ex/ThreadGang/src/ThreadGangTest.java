@@ -322,9 +322,10 @@ public class ThreadGangTest {
     /**
      * @class SearchCyclicThreadGang
      *
-     * @brief Customizes the SearchThreadGangCommon framework to to
-     *        continue to search a fixed number of words/Threads
-     *        concurrently until there's no more input to process.
+     * @brief Customizes the SearchThreadGangCommon framework to
+     *        continue searching a fixed number of input Strings via a
+     *        fixed number of Threads until there's no more input to
+     *        process.
      */
     static public class SearchCyclicThreadGang 
                   extends SearchThreadGangCommon {
@@ -347,6 +348,8 @@ public class ThreadGangTest {
         SearchCyclicThreadGang(String[] wordsToFind) {
             // Pass input to search to superclass constructor.
             super(wordsToFind);
+
+            mCount = mFixedNumberOfInputStrings.length;
 
             // Initialize the exit latch to 1, which causes
             // awaitThreadGangDone() to block until the test is finished.
