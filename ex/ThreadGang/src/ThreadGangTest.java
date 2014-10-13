@@ -1,13 +1,13 @@
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-// import java.util.concurrent.Phaser;
+import java.util.concurrent.Phaser;
 
 /**
  * @class ThreadGangTest
@@ -92,10 +92,9 @@ public class ThreadGangTest {
          * searched concurrently by the one-shot Threads gangs.
          */
         @Override
-        protected List<String> makeNextInputList() {
+        protected Vector<String> getNextInput() {
             if (mCount-- > 0) 
-                return Collections.synchronizedList
-                    (Arrays.asList(mOneShotInputStrings[mCount]));
+                return new Vector<String>(Arrays.asList(mOneShotInputStrings[mCount]));
             else 
                 return null;
         }
@@ -173,7 +172,8 @@ public class ThreadGangTest {
          * Hook method that initiates the gang of Threads.
          */
         protected void initiateThreadGang(int size) {
-            // This List holds the Threads so they can be joined in awaitDone().
+            // This List holds the Threads so they can be joined in
+            // awaitThreadGangDone().
             mWorkerThreads = new LinkedList<Thread>();
 
             // Create and start a Thread for each element in the input
@@ -190,7 +190,7 @@ public class ThreadGangTest {
          * Hook method that uses calls to Thread.join() as an exit
          * barrier to wait for the gang of Threads to exit.
          */
-        protected void awaitDone() {
+        protected void awaitThreadGangDone() {
             try {
                 for (Thread thread : mWorkerThreads)
                     thread.join();
@@ -250,7 +250,7 @@ public class ThreadGangTest {
          * Hook method that uses the CountDownLatch as an exit barrier
          * to wait for the gang of Threads to exit.
          */
-        protected void awaitDone() {
+        protected void awaitThreadGangDone() {
             try {
                 mBarrier.await();
             } catch (InterruptedException e) {
@@ -305,7 +305,7 @@ public class ThreadGangTest {
          * pool and waits for all the Threads to exit before
          * returning.
          */
-        protected void awaitDone() {
+        protected void awaitThreadGangDone() {
             // This call waits until the existing queue of Runnables
             // is processed by the Thread pool before shutting down.
             mExecutorService.shutdown();
@@ -349,7 +349,7 @@ public class ThreadGangTest {
             super(wordsToFind);
 
             // Initialize the exit latch to 1, which causes
-            // awaitDone() to block until the test is finished.
+            // awaitThreadGangDone() to block until the test is finished.
             mExitLatch = new CountDownLatch(1);
         }
 
@@ -358,10 +358,9 @@ public class ThreadGangTest {
          * searched concurrently by the gang of Threads.
          */
         @Override
-        protected List<String> makeNextInputList() {
+        protected Vector<String> getNextInput() {
             if (mCount-- > 0) 
-                return Collections.synchronizedList
-                    (Arrays.asList(mFixedNumberOfInputStrings[mCount]));
+                return new Vector<String>(Arrays.asList(mFixedNumberOfInputStrings[mCount]));
             else 
                 return null;
         }
@@ -391,8 +390,8 @@ public class ThreadGangTest {
                 (size,
                  new Runnable() {
                      public void run() {
-                         setInputList(makeNextInputList());
-                         if (getInputList() != null)
+                         setVector(getNextInput());
+                         if (getVector() != null)
                              printDebugging("@@@@@ Started next cycle @@@@@");
                      }
                  });
@@ -406,22 +405,22 @@ public class ThreadGangTest {
 
         /**
          * When there's no more input data to process release the exit
-         * latch and returns true, else returns false.
+         * latch and returns false, else returns true.
          */
         @Override
-        protected boolean cycleDone() {
-            if (getInputList() == null) {
+        protected boolean runNextCycle() {
+            if (getVector() == null) {
                 mExitLatch.countDown();
-                return true;
+                return false;
             } else
-            	return false;
+            	return true;
         }
 
         /**
          * Waits on an exit latch for the gang of Threads to exit.
          */
         @Override
-        protected void awaitDone() {
+        protected void awaitThreadGangDone() {
             try {
                 mExitLatch.await();
             } catch (InterruptedException e) {
@@ -444,7 +443,7 @@ public class ThreadGangTest {
          * Threads to complete their processing before they all
          * attempt to move to the next cycle en masse.
          */
-        // protected Phaser mPhaser;
+        protected Phaser mPhaser;
 
         /**
          * Indicate that the size of the mInputList has changed, which
@@ -472,7 +471,7 @@ public class ThreadGangTest {
             mCount = mVariableNumberOfInputStrings.length;
 
             // Initialize the exit latch to 1, which causes
-            // awaitDone() to block until the test is finished.
+            // awaitThreadGangDone() to block until the test is finished.
             mExitLatch = new CountDownLatch(1);
         }
 
@@ -481,10 +480,9 @@ public class ThreadGangTest {
          * searched concurrently by the gang of Threads.
          */
         @Override
-        protected List<String> makeNextInputList() {
+        protected Vector<String> getNextInput() {
             if (mCount-- > 0) 
-                return Collections.synchronizedList
-                    (Arrays.asList(mVariableNumberOfInputStrings[mCount]));
+                return new Vector<String>(Arrays.asList(mVariableNumberOfInputStrings[mCount]));
             else 
                 return null;
         }
@@ -495,24 +493,23 @@ public class ThreadGangTest {
         protected void initiateThreadGang(int size) {
             // Create a Phaser that controls how the Threads
             // synchronize on a dynamically reconfigurable barrier.
-            /*
             mPhaser = new Phaser() {
                     // Perform the actions upon impending phase advance.
                     protected boolean onAdvance(int phase,
                                                 int registeredParties) {
                         // Record the old input size to see if we need
                         // to reconfigure or not.
-                        int oldSize = getInputList().size();
+                        int oldSize = getVector().size();
 
                         // Get the new input.
-                        setInputList(makeNextInputList());
+                        setVector(getNextInput());
 
                         // Bail out if there's no input or no
                         // registered parties.
-                        if (getInputList() == null || registeredParties == 0)
+                        if (getVector() == null || registeredParties == 0)
                             return true;
                         else {
-                            int newSize = getInputList().size();
+                            int newSize = getVector().size();
                             printDebugging("@@@@@ Started next cycle with "
                                            + newSize
                                            + " compared with "
@@ -548,7 +545,6 @@ public class ThreadGangTest {
                         }
                     }
                 };
-            */
             // Create and start a Thread for each element in the input
             // List - each Thread performs the processing designated
             // by the doWorkInBackgroundThread() hook method.
@@ -562,7 +558,6 @@ public class ThreadGangTest {
          * Threads to complete their current cycle.
          */
         protected void workerDone(int index) throws IndexOutOfBoundsException {
-            /*
             boolean throwException = false;
             try {
                 // Wait until all other Threads are done with their
@@ -580,7 +575,7 @@ public class ThreadGangTest {
                         // needed, i.e., due to the input List
                         // shrinking relative to the previous input
                         // List.
-                        if (index >= getInputList().size()) {
+                        if (index >= getVector().size()) {
                             // Remove ourselves from the count of
                             // parties that will wait on this Phaser.
                             mPhaser.arriveAndDeregister();
@@ -601,7 +596,6 @@ public class ThreadGangTest {
             // to exit.
             if (throwException)
                 throw new IndexOutOfBoundsException();                
-            */
         }
 
         /**
@@ -612,7 +606,7 @@ public class ThreadGangTest {
         protected Runnable makeWorker(final int index) {
             // Register ourselves with the Phaser so we're included in
             // the list of registered parties.
-            // mPhaser.register();
+            mPhaser.register();
             
             // Forward the rest of the processing to the superclass's
             // makeWorker() factory method.
@@ -621,21 +615,21 @@ public class ThreadGangTest {
 
         /**
          * When there's no more input data to process releases the
-         * exit latch and returns true, else returns false.
+         * exit latch and returns false, else returns true.
          */
         @Override
-        protected boolean cycleDone() {
-            if (getInputList() == null) {
+        protected boolean runNextCycle() {
+            if (getVector() == null) {
                 mExitLatch.countDown();
-                return true;
+                return false;
             } else
-            	return false;
+            	return true;
         }
 
         /**
          * Waits on an exit latch for the gang of Threads to exit.
          */
-        protected void awaitDone() {
+        protected void awaitThreadGangDone() {
             try {
                 mExitLatch.await();
             } catch (InterruptedException e) {
@@ -721,11 +715,9 @@ public class ThreadGangTest {
         makeThreadGang(wordList, CYCLIC).run();
         printDebugging("Ending CYCLIC");
 
-        /*
         printDebugging("Starting PHASER");
         makeThreadGang(wordList, PHASER).run();
         printDebugging("Ending PHASER");
-        */
 
         printDebugging("Ending ThreadGangTest");
     }

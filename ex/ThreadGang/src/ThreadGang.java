@@ -1,45 +1,43 @@
-import java.util.List;
+import java.util.Vector;
 
 /**
  * @class ThreadGang
  *
  * @brief Defines a framework for spawning and running a "gang" of
- *        Threads that concurrently process input from a generic List
- *        of elements E for one or more cycles.
+ *        Threads that concurrently process input from a generic
+ *        Vector of elements E for one or more cycles.
  */
 public abstract class ThreadGang<E, R> implements Runnable {
     /**
-     * The input list that's processed, which can be initialized via
+     * The input Vector that's processed, which can be initialized via
      * the @code makeInputList() factory method.
      */
-    protected volatile List<E> mInputList = null;
+    protected volatile Vector<E> mInput = null;
 
     /**
-     * Set the List to use as input.
+     * Set the Vector to use as input.
      */
-    protected void setInputList(List<E> inputList) {
-        mInputList = inputList;
+    protected void setVector(Vector<E> input) {
+        mInput = input;
     }
 
     /**
-     * Get the List to use as input.
+     * Get the Vector to use as input.
      */
-    protected List<E> getInputList() {
-        return mInputList;
+    protected Vector<E> getVector() {
+        return mInput;
     }
 
     /**
-     * Factory method that makes the next List of input to be
+     * Factory method that makes the next Vector of input to be
      * processed concurrently by the gang of Threads.
      */
-    protected abstract List<E> makeNextInputList();
+    protected abstract Vector<E> getNextInput();
 
     /**
-     * Hook method that performs work a background Thread.  Returns
-     * true if all goes well, else false (which will stop the
-     * background Thread from continuing to run).
+     * Hook method that initiates the gang of Threads.
      */
-    public abstract boolean doWorkInBackground(E inputData);
+    protected abstract void initiateThreadGang(int inputSize);
 
     /**
      * Hook method that returns true when all processing in a cycle is
@@ -47,20 +45,15 @@ public abstract class ThreadGang<E, R> implements Runnable {
      * true, which makes this a one-shot ThreadGang unless this method
      * is overridden.
      */
-    protected boolean cycleDone() {
-        return true;
+    protected boolean runNextCycle() {
+        return false;
     }
 
     /**
      * Hook method that can be used as an exit barrier to wait for the
      * gang of Threads to exit.
      */
-    protected abstract void awaitDone();
-
-    /**
-     * Hook method that can be used to process results.
-     */
-    protected abstract void processResults(R results);
+    protected abstract void awaitThreadGangDone();
 
     /**
      * Hook method called when a worker Thread is done.  Can be used
@@ -75,29 +68,36 @@ public abstract class ThreadGang<E, R> implements Runnable {
     }
     
     /**
-     * Hook method that initiates the gang of Threads.
+     * Hook method that performs work a background Thread.  Returns
+     * true if all goes well, else false (which will stop the
+     * background Thread from continuing to run).
      */
-    protected abstract void initiateThreadGang(int inputSize);
+    public abstract boolean doWorkInBackground(E inputData);
 
     /**
-     * Template method that runs all the Threads in the gang.  
+     * Hook method that can be used to process results.
+     */
+    protected abstract void processResults(R results);
+
+    /**
+     * Template method that creates/runs all the Threads in the gang.  
      */
     @Override
     public void run() {
-        // Invoke hook method to get initial List of input data to
+        // Invoke hook method to get initial Vector of input data to
         // process.
-        setInputList (makeNextInputList());
+        setVector (getNextInput());
 
         // Invoke hook method to initialize the gang of Threads.
-        initiateThreadGang(getInputList().size());
+        initiateThreadGang(getVector().size());
 
         // Invoke hook method to wait for all the Threads to exit.
-        awaitDone();
+        awaitThreadGangDone();
     }
 
     /**
      * Factory method that creates a Runnable worker that will process
-     * one node of the input List (at location @code index) in a
+     * one node of the input Vector (at location @code index) in a
      * background Thread.
      */
     protected Runnable makeWorker(final int index) {
@@ -107,29 +107,25 @@ public abstract class ThreadGang<E, R> implements Runnable {
             public void run() {
 
                 do {
-                    E element;
                     try {
-                        element = getInputList().get(index);
-                    } catch (IndexOutOfBoundsException e) {
-                        // Bail out.
-                        return;
-                    }
+                        // Get the input data element associated with
+                        // this index.
+                        E element = getVector().get(index);
 
-                    // Process input data element.
-                    if (doWorkInBackground(element) == false)
-                        return;
-                    else
-                        try {
+                        // Process input data element.
+                        if (doWorkInBackground(element) == false)
+                            return;
+                        else
                             // Indicate the worker Thread is done with
                             // this cycle, which can block on an exit
                             // barrier.
                             workerDone(index);
-                        } catch (IndexOutOfBoundsException e) {
+                    } catch (IndexOutOfBoundsException e) {
                             return;
-                        }
+                    }
 
                     // Keep running until instructed to stop.
-                } while (cycleDone() == false);
+                } while (runNextCycle());
             }
         };
     }
