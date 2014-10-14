@@ -40,12 +40,11 @@ public abstract class ThreadGang<E, R> implements Runnable {
     protected abstract void initiateThreadGang(int inputSize);
 
     /**
-     * Hook method that returns true when all processing in a cycle is
-     * finished so the gang of Threads will exit.  By default, return
-     * true, which makes this a one-shot ThreadGang unless this method
-     * is overridden.
+     * Hook method that returns true as long as the processing should
+     * continue.  By default, returns false, which means a ThreadGang
+     * will be only "one-shot" this method is overridden.
      */
-    protected boolean runNextCycle() {
+    protected boolean advanceToNextCycle() {
         return false;
     }
 
@@ -75,7 +74,8 @@ public abstract class ThreadGang<E, R> implements Runnable {
     public abstract boolean doWorkInBackground(E inputData);
 
     /**
-     * Hook method that can be used to process results.
+     * Hook method that can be used by doWorkInBackground() to process
+     * results.
      */
     protected abstract void processResults(R results);
 
@@ -125,7 +125,7 @@ public abstract class ThreadGang<E, R> implements Runnable {
                     }
 
                     // Keep running until instructed to stop.
-                } while (runNextCycle());
+                } while (advanceToNextCycle());
             }
         };
     }

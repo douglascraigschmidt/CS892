@@ -15,7 +15,7 @@ import java.util.concurrent.Phaser;
  * @brief This program tests various subclassses of the ThreadGang
  *        framework, which use different Java barrier synchronizers to
  *        implement an "embarraassingly parallel" application that
- *        concurrently searches for words in a List of Strings.
+ *        concurrently searches for words in a Vector of Strings.
  *
  * @@ NS: Need to improve the documentation.
  */
@@ -37,7 +37,7 @@ public class ThreadGangTest {
     // hard-coded strings!
 
     /**
-     * This input List is used by the one-shot tests that search for
+     * This input array is used by the one-shot tests that search for
      * the words concurrently in multiple threads.
      */
     private final static String[] mOneShotInputStrings[] = { 
@@ -45,7 +45,7 @@ public class ThreadGangTest {
     };
 
     /**
-     * This input List is used by the cyclic test that continues to
+     * This input array is used by the cyclic test that continues to
      * search a fixed number of words/Threads concurrently until
      * there's no more input to process.
      */
@@ -55,7 +55,7 @@ public class ThreadGangTest {
     };
 
     /**
-     * This input List is used by the cyclic test that continues to
+     * This input array is used by the cyclic test that continues to
      * search a variable number of words/Threads concurrently until
      * there's no more input to process.
      */
@@ -88,8 +88,8 @@ public class ThreadGangTest {
         protected int mCount;
         
         /**
-         * Factory method that returns the next List of Strings to be
-         * searched concurrently by the one-shot Threads gangs.
+         * Factory method that returns the next Vector of Strings to
+         * be searched concurrently by the one-shot Threads gangs.
          */
         @Override
         protected Vector<String> getNextInput() {
@@ -147,7 +147,7 @@ public class ThreadGangTest {
      * @class SearchOneShotThreadGangJoin
      *
      * @brief Customizes the SearchThreadGangCommon framework to spawn
-     *        a Thread for each element in the List of input Strings
+     *        a Thread for each element in the Vector of input Strings
      *        and uses Thread.join() to wait for all the Threads to
      *        finish.  This implementation doesn't require any Java
      *        synchronization mechanisms other than what's provided by
@@ -177,7 +177,7 @@ public class ThreadGangTest {
             mWorkerThreads = new LinkedList<Thread>();
 
             // Create and start a Thread for each element in the input
-            // List - each Thread performs the processing designated
+            // Vector - each Thread performs the processing designated
             // by the doWorkInBackgroundThread() hook method.
             for (int i = 0; i < size; ++i) {
                 Thread t = new Thread(makeWorker(i));
@@ -203,7 +203,7 @@ public class ThreadGangTest {
      * @class SearchOnThreadGangCountDownLatch
      *
      * @brief Customizes the SearchThreadGangCommon framework to spawn
-     *        a Thread for each element in the List of input Strings
+     *        a Thread for each element in the Vector of input Strings
      *        and uses CountDownLatch to wait for all the Threads to
      *        finish.
      */
@@ -228,11 +228,11 @@ public class ThreadGangTest {
          */
         protected void initiateThreadGang(int size) {
             // Create a CountDownLatch whose count corresponds to each
-            // element in the input List.
+            // element in the input Vector.
             mBarrier = new CountDownLatch(size);
 
             // Create and start a Thread for each element in the input
-            // List - each Thread performs the processing designated
+            // Vector - each Thread performs the processing designated
             // by the doWorkInBackgroundThread() hook method.
             for (int i = 0; i < size; ++i) 
                 new Thread(makeWorker(i)).start();
@@ -294,7 +294,7 @@ public class ThreadGangTest {
             mExecutorService =
                 Executors.newFixedThreadPool(MAX_THREADS);
 
-            // Enqueue each item in the input List for execution in
+            // Enqueue each item in the input Vector for execution in
             // the Executor's Thread pool.
             for (int i = 0; i < size; ++i) 
                 mExecutorService.execute(makeWorker(i));
@@ -322,10 +322,10 @@ public class ThreadGangTest {
     /**
      * @class SearchCyclicThreadGang
      *
-     * @brief Customizes the SearchThreadGangCommon framework to
-     *        continue searching a fixed number of input Strings via a
-     *        fixed number of Threads until there's no more input to
-     *        process.
+     * @brief Customizes the SearchThreadGangCommon framework with a
+     *        CyclicBarrier to continue searching a fixed number of
+     *        input Strings via a fixed number of Threads until
+     *        there's no more input to process.
      */
     static public class SearchCyclicThreadGang 
                   extends SearchThreadGangCommon {
@@ -352,18 +352,20 @@ public class ThreadGangTest {
             mCount = mFixedNumberOfInputStrings.length;
 
             // Initialize the exit latch to 1, which causes
-            // awaitThreadGangDone() to block until the test is finished.
+            // awaitThreadGangDone() to block until the test is
+            // finished.
             mExitLatch = new CountDownLatch(1);
         }
 
         /**
-         * Factory method that returns the next List of Strings to be
-         * searched concurrently by the gang of Threads.
+         * Factory method that returns the next Vector of Strings to
+         * be searched concurrently by the gang of Threads.
          */
         @Override
         protected Vector<String> getNextInput() {
             if (mCount-- > 0) 
-                return new Vector<String>(Arrays.asList(mFixedNumberOfInputStrings[mCount]));
+                return new Vector<String>(Arrays.asList
+                                          (mFixedNumberOfInputStrings[mCount]));
             else 
                 return null;
         }
@@ -386,8 +388,8 @@ public class ThreadGangTest {
          */
         protected void initiateThreadGang(int size) {
             // Create a CyclicBarrier whose (1) "parties" count
-            // corresponds to each element in the input List and (2)
-            // barrier action gets the next list of input data (if
+            // corresponds to each element in the input Vector and (2)
+            // barrier action gets the next Vector of input data (if
             // any).
             mBarrier = new CyclicBarrier
                 (size,
@@ -400,7 +402,7 @@ public class ThreadGangTest {
                  });
 
             // Create and start a Thread for each element in the input
-            // List - each Thread performs the processing designated
+            // Vector - each Thread performs the processing designated
             // by the doWorkInBackgroundThread() hook method.
             for (int i = 0; i < size; ++i)
                 new Thread(makeWorker(i)).start();
@@ -408,10 +410,12 @@ public class ThreadGangTest {
 
         /**
          * When there's no more input data to process release the exit
-         * latch and returns false, else returns true.
+         * latch and return false so the worker Thread will return.
+         * Otherwise, return true so the worker Thread will continue
+         * to run.
          */
         @Override
-        protected boolean runNextCycle() {
+        protected boolean advanceToNextCycle() {
             if (getVector() == null) {
                 mExitLatch.countDown();
                 return false;
@@ -449,8 +453,9 @@ public class ThreadGangTest {
         protected Phaser mPhaser;
 
         /**
-         * Indicate that the size of the mInputList has changed, which
-         * requires a reconfiguration.
+         * Indicate that the size of the input Vector has changed,
+         * which requires a reconfiguration to add or remove Threads
+         * from the gang.
          */
         volatile int mReconfiguration;
         
@@ -474,13 +479,68 @@ public class ThreadGangTest {
             mCount = mVariableNumberOfInputStrings.length;
 
             // Initialize the exit latch to 1, which causes
-            // awaitThreadGangDone() to block until the test is finished.
+            // awaitThreadGangDone() to block until the test is
+            // finished.
             mExitLatch = new CountDownLatch(1);
+
+            // Create a Phaser that controls how the Threads
+            // synchronize on a dynamically reconfigurable barrier.
+            mPhaser = new Phaser() {
+                // Perform the actions upon impending phase advance.
+                protected boolean onAdvance(int phase,
+                                            int registeredParties) {
+                    // Record the old input size to see if we need to
+                    // reconfigure or not.
+                    int oldSize = getVector().size();
+
+                    // Get the new input.
+                    setVector(getNextInput());
+
+                    // Bail out if there's no input or no registered
+                    // parties.
+                    if (getVector() == null || registeredParties == 0)
+                        return true;
+                    else {
+                        int newSize = getVector().size();
+                        printDebugging("@@@@@ Started next cycle with "
+                                       + newSize
+                                       + " compared with "
+                                       + oldSize
+                                       + " @@@@@");
+
+                        // See if we need to reconfigure the Phase due
+                        // to changes in the size of the input Vector.
+                        mReconfiguration = newSize - oldSize;
+
+                        // Create a new CyclicBarrier to manage the
+                        // reconfiguration.
+                        mReconfigurationBarrier = new CyclicBarrier
+                            (oldSize,
+                             // Create the barrier action.
+                             new Runnable() {
+                                 public void run() {
+                                     // If there are more elements in
+                                     // the input Vector than last
+                                     // time create/run new worker
+                                     // Threads to process them.
+                                     if (oldSize < newSize)
+                                         for (int i = oldSize; i < newSize; ++i)
+                                             new Thread(makeWorker(i)).start();
+
+                                     // Indicate there's no more need
+                                     // for reconfiguration.
+                                     mReconfiguration = 0;
+                                 }
+                             });
+                        return false;
+                    }
+                }
+            };
         }
 
         /**
-         * Factory method that returns the next List of Strings to be
-         * searched concurrently by the gang of Threads.
+         * Factory method that returns the next Vector of Strings to
+         * be searched concurrently by the gang of Threads.
          */
         @Override
         protected Vector<String> getNextInput() {
@@ -494,62 +554,8 @@ public class ThreadGangTest {
          * Hook method that initiates the gang of Threads.
          */
         protected void initiateThreadGang(int size) {
-            // Create a Phaser that controls how the Threads
-            // synchronize on a dynamically reconfigurable barrier.
-            mPhaser = new Phaser() {
-                    // Perform the actions upon impending phase advance.
-                    protected boolean onAdvance(int phase,
-                                                int registeredParties) {
-                        // Record the old input size to see if we need
-                        // to reconfigure or not.
-                        int oldSize = getVector().size();
-
-                        // Get the new input.
-                        setVector(getNextInput());
-
-                        // Bail out if there's no input or no
-                        // registered parties.
-                        if (getVector() == null || registeredParties == 0)
-                            return true;
-                        else {
-                            int newSize = getVector().size();
-                            printDebugging("@@@@@ Started next cycle with "
-                                           + newSize
-                                           + " compared with "
-                                           + oldSize
-                                           + " @@@@@");
-
-                            // See if we need to reconfigure the Phase
-                            // due to changes in the size of the
-                            // inputList.
-                            mReconfiguration = newSize - oldSize;
-
-                            // Create a new CyclicBarrier to manage
-                            // the reconfiguration.
-                            mReconfigurationBarrier = new CyclicBarrier
-                                (oldSize,
-                                 // Create the barrier action.
-                                 new Runnable() {
-                                     public void run() {
-                                         // If there are more elements
-                                         // in the inputList than last
-                                         // time create/run new worker
-                                         // Threads to process them.
-                                         if (oldSize < newSize)
-                                             for (int i = oldSize; i < newSize; ++i)
-                                                 new Thread(makeWorker(i)).start();
-
-                                         // Indicate there's no more
-                                         // need for reconfiguration.
-                                         mReconfiguration = 0;
-                                     }
-                                 });
-                            return false;
-                        }
-                    }
-                };
             // Create and start a Thread for each element in the input
-            // List - each Thread performs the processing designated
+            // Vector - each Thread performs the processing designated
             // by the doWorkInBackgroundThread() hook method.
             for (int i = 0; i < size; ++i)
                 new Thread(makeWorker(i)).start();
@@ -575,9 +581,9 @@ public class ThreadGangTest {
                         mReconfigurationBarrier.await();
 
                         // Check to see if this worker is no longer
-                        // needed, i.e., due to the input List
+                        // needed, i.e., due to the input Vector
                         // shrinking relative to the previous input
-                        // List.
+                        // Vector.
                         if (index >= getVector().size()) {
                             // Remove ourselves from the count of
                             // parties that will wait on this Phaser.
@@ -602,13 +608,13 @@ public class ThreadGangTest {
         }
 
         /**
-         * Factory method that creates a Runnable worker that will process
-         * one node of the input List (at location @code index) in a
-         * background Thread.
+         * Factory method that creates a Runnable worker that will
+         * process one node of the input Vector (at location @code
+         * index) in a background Thread.
          */
         protected Runnable makeWorker(final int index) {
             // Register ourselves with the Phaser so we're included in
-            // the list of registered parties.
+            // it's registered parties.
             mPhaser.register();
             
             // Forward the rest of the processing to the superclass's
@@ -617,11 +623,13 @@ public class ThreadGangTest {
         }
 
         /**
-         * When there's no more input data to process releases the
-         * exit latch and returns false, else returns true.
+         * When there's no more input data to process release the exit
+         * latch and return false so the worker Thread will return.
+         * Otherwise, return true so the worker Thread will continue
+         * to run.
          */
         @Override
-        protected boolean runNextCycle() {
+        protected boolean advanceToNextCycle() {
             if (getVector() == null) {
                 mExitLatch.countDown();
                 return false;
