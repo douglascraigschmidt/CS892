@@ -590,7 +590,8 @@ public class ThreadGangTest {
                             mPhaser.arriveAndDeregister();
 
                             // Indicate that we need to throw the
-                            // IndexoutOfBoundsException.
+                            // IndexoutOfBoundsException so this
+                            // Thread will be stopped.
                             throwException = true;
                         }
                     } catch (Exception ex) {
@@ -630,7 +631,7 @@ public class ThreadGangTest {
          */
         @Override
         protected boolean advanceToNextCycle() {
-            if (getVector() == null) {
+            if (getVector() == null) { // mPhaser.isTerminated()
                 mExitLatch.countDown();
                 return false;
             } else
