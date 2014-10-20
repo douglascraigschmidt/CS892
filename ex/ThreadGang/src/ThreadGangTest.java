@@ -502,36 +502,44 @@ public class ThreadGangTest {
                         return true;
                     else {
                         int newSize = getVector().size();
-                        printDebugging("@@@@@ Started next cycle with "
-                                       + newSize
-                                       + " compared with "
-                                       + oldSize
-                                       + " @@@@@");
 
                         // See if we need to reconfigure the Phase due
                         // to changes in the size of the input Vector.
                         mReconfiguration = newSize - oldSize;
 
-                        // Create a new CyclicBarrier to manage the
-                        // reconfiguration.
-                        mReconfigurationBarrier = new CyclicBarrier
-                            (oldSize,
-                             // Create the barrier action.
-                             new Runnable() {
-                                 public void run() {
-                                     // If there are more elements in
-                                     // the input Vector than last
-                                     // time create/run new worker
-                                     // Threads to process them.
-                                     if (oldSize < newSize)
-                                         for (int i = oldSize; i < newSize; ++i)
-                                             new Thread(makeWorker(i)).start();
+                        if (mReconfiguration == 0) 
+                            printDebugging("@@@@@ Started next cycle with same Thread # ("
+                                           + newSize
+                                           + ") @@@@@");
+                        else {
+                            printDebugging("@@@@@ Started next cycle with "
+                                           + newSize
+                                           + " Threads compared with "
+                                           + oldSize
+                                           + " Threads @@@@@");
 
-                                     // Indicate there's no more need
-                                     // for reconfiguration.
-                                     mReconfiguration = 0;
-                                 }
-                             });
+                            // Create a new CyclicBarrier to manage
+                            // the reconfiguration.
+                            mReconfigurationBarrier = new CyclicBarrier
+                                (oldSize,
+                                 // Create the barrier action.
+                                 new Runnable() {
+                                     public void run() {
+                                         // If there are more elements
+                                         // in the input Vector than
+                                         // last time create/run new
+                                         // worker Threads to process
+                                         // them.
+                                         if (oldSize < newSize)
+                                             for (int i = oldSize; i < newSize; ++i)
+                                                 new Thread(makeWorker(i)).start();
+
+                                         // Indicate there's no more need
+                                         // for reconfiguration.
+                                         mReconfiguration = 0;
+                                     }
+                                 });
+                        }
                         return false;
                     }
                 }
