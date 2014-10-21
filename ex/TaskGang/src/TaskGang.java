@@ -19,7 +19,7 @@ public abstract class TaskGang<E> implements Runnable {
     /**
      * Keeps track of which cycle is currently active.
      */
-    protected final AtomicLong mCurrentCycle = 
+    private final AtomicLong mCurrentCycle = 
         new AtomicLong(0);
     
     /**
@@ -28,10 +28,17 @@ public abstract class TaskGang<E> implements Runnable {
     private ExecutorService mExecutorService = null;
         
     /**
-     * Set the List to use as input and also return it.
+     * Increment to the next cycle.
      */
-    protected List<E> setInput(List<E> input) {
-        return mInput = input;
+    protected long incrementCycle() {
+        return mCurrentCycle.incrementAndGet();
+    }
+
+    /**
+     * Return the current cycle.
+     */
+    protected long currentCycle() {
+        return mCurrentCycle.get();
     }
 
     /**
@@ -39,6 +46,13 @@ public abstract class TaskGang<E> implements Runnable {
      */
     protected List<E> getInput() {
         return mInput;
+    }
+
+    /**
+     * Set the List to use as input and also return it.
+     */
+    protected List<E> setInput(List<E> input) {
+        return mInput = input;
     }
 
     /**
@@ -107,7 +121,7 @@ public abstract class TaskGang<E> implements Runnable {
      * true if all goes well, else false (which will stop the
      * background Thread from continuing to run).
      */
-    public abstract boolean processInput(E inputData);
+    protected abstract boolean processInput(E inputData);
 
     /**
      * Template method that creates/runs all the Threads in the gang.  
@@ -142,12 +156,14 @@ public abstract class TaskGang<E> implements Runnable {
                     E element = getInput().get(index);
 
                     // Process input data element.
-                    if (processInput(element) == false)
-                        return;
-                    else
-                        // Indicate the worker Thread is done with
-                        // this cycle.
+                    if (processInput(element))
+                        // Success indicates the worker Thread is done
+                        // with this cycle.
                         taskDone(index);
+                    else
+                        // A problem occurred, so return.
+                        return;
+
                 } catch (IndexOutOfBoundsException e) {
                     return;
                 }

@@ -239,7 +239,7 @@ public class TaskGangTest {
         protected List<String> getNextInput() {
             if (mInputIterator.hasNext()) {
                 // Note that we're starting a new cycle.
-                mCurrentCycle.incrementAndGet();
+                incrementCycle();
 
                 // Return a Vector containing the Strings to search
                 // concurrently.
@@ -258,7 +258,7 @@ public class TaskGangTest {
                                               String inputData) {
             SearchResults results =
                 new SearchResults(Thread.currentThread().getId(),
-                                  mCurrentCycle.get(),
+                                  currentCycle(),
                                   word,
                                   inputData);
 
@@ -318,11 +318,109 @@ public class TaskGangTest {
         /**
          * Constructor initializes the superclass.
          */
-        SearchTaskGangExecutorOneShot(String[] wordsToFind,
+        public SearchTaskGangExecutorOneShot(String[] wordsToFind,
                                       String[][] stringsToSearch) {
             // Pass input to superclass constructor.
             super(wordsToFind,
                   stringsToSearch);
+        }
+
+        /**
+         * Hook method that initiates the gang of Threads by using a
+         * fixed-size Thread pool managed by the ExecutorService.
+         */
+        @Override
+            protected void initiateHook(int inputSize) {
+            printDebugging("@@@ starting cycle "
+                           + currentCycle()
+                           + " with "
+                           + inputSize
+                           + " tasks@@@");
+            // Initialize the exit barrier to inputSize, which causes
+            // awaitTasksDone() to block until the cycle is finished.
+            mExitBarrier = new CountDownLatch(inputSize);
+
+            // Create a fixed-size Thread pool.
+            if (getExecutorService() == null) 
+                setExecutorService (Executors.newFixedThreadPool(MAX_THREADS));
+        }
+
+        /**
+         * Initiate the TaskGang to run each worker in the Thread
+         * pool.
+         */
+        protected void initiateTaskGang(int inputSize) {
+            // Allow subclasses to customize their behavior before the
+            // Threads in the gang are spawned.
+            initiateHook(inputSize);
+
+            // Enqueue each item in the input List for execution in the
+            // Executor's Thread pool.
+            for (int i = 0; i < inputSize; ++i) 
+                getExecutorService().execute(makeTask(i));
+        }
+
+        /**
+         * Runs in a background Thread and searches the inputData for
+         * all occurrences of the words to find.
+         */
+        @Override
+        protected boolean processInput (String inputData) {
+            // Iterate through each word we're searching for
+            // and try to find it in the inputData.
+            for (String word : mWordsToFind) 
+                // Each time a match is found the queueResults() hook
+                // method is called to pass the search results to a
+                // background Thread for concurrent processing.
+                queueResults(searchForWord(word, 
+                                           inputData));
+            return true;
+        }
+
+        /**
+         * Hook method called when a worker Thread is done - it
+         * decrements the CountDownLatch.
+         */
+        @Override
+        protected void taskDone(int index) throws IndexOutOfBoundsException {
+            mExitBarrier.countDown();
+        }
+
+        /**
+         * Hook method that can be used by processInput() to
+         * process results.
+         */
+        protected void queueResults(SearchResults results) {
+          getQueue().add(results);
+        }
+
+        /**
+         * Hook method that shuts down the ExecutorService's Thread
+         * pool and waits for all the Threads to exit before
+         * returning.
+         */
+        @Override
+        protected void awaitTasksDone() {
+            do {
+                // Start processing this cycle of results
+                // concurrently.
+                processQueuedResults(getInput().size() 
+                                     * mWordsToFind.length);
+
+                try {
+                    // Wait until the exit barrier has been tripped.
+                    mExitBarrier.await();
+                } catch (InterruptedException e) {
+                    printDebugging("await() interrupted");
+                }
+
+                // Keep looping as long as there's another cycle's
+                // worth of input.
+            } while (advanceTaskToNextCycle());
+
+            // Call up to the super class to await for ExecutorService
+            // Threads to shutdown.
+            super.awaitTasksDone();
         }
 
         /**
@@ -372,108 +470,6 @@ public class TaskGangTest {
             } catch (InterruptedException e) {
                 printDebugging("processQueuedResults() interrupted");
             }
-        }
-
-        /**
-         * Initiate the TaskGang to run each worker in the Thread
-         * pool.
-         */
-        protected void initiateTaskGang(int inputSize) {
-            // Allow subclasses to customize their behavior before the
-            // Threads in the gang are spawned.
-            initiateHook(inputSize);
-
-            // Enqueue each item in the input List for execution in the
-            // Executor's Thread pool.
-            for (int i = 0; i < inputSize; ++i) 
-                getExecutorService().execute(makeTask(i));
-        }
-
-        /**
-         * Hook method that can be used by processInput() to
-         * process results.
-         */
-        protected void queueResults(SearchResults results) {
-            try {
-                getQueue().put(results);
-            } catch (InterruptedException e) {
-                printDebugging("queueResults() interrupted");
-            }
-        }
-
-        /**
-         * Runs in a background Thread and searches the inputData for
-         * all occurrences of the words to find.
-         */
-        @Override
-        public boolean processInput (String inputData) {
-            // Iterate through each word we're searching for
-            // and try to find it in the inputData.
-            for (String word : mWordsToFind) 
-                // Each time a match is found the queueResults() hook
-                // method is called to pass the search results to a
-                // background Thread for concurrent processing.
-                queueResults(searchForWord(word, 
-                                           inputData));
-            return true;
-        }
-
-        /**
-         * Hook method that initiates the gang of Threads by using a
-         * fixed-size Thread pool managed by the ExecutorService.
-         */
-        @Override
-            protected void initiateHook(int inputSize) {
-            printDebugging("@@@ starting cycle "
-                           + mCurrentCycle.get()
-                           + " with "
-                           + inputSize
-                           + " tasks@@@");
-            // Initialize the exit barrier to inputSize, which causes
-            // awaitTasksDone() to block until the cycle is finished.
-            mExitBarrier = new CountDownLatch(inputSize);
-
-            // Create a fixed-size Thread pool.
-            if (getExecutorService() == null) 
-                setExecutorService (Executors.newFixedThreadPool(MAX_THREADS));
-        }
-
-        /**
-         * Hook method called when a worker Thread is done - it
-         * decrements the CountDownLatch.
-         */
-        @Override
-        protected void taskDone(int index) throws IndexOutOfBoundsException {
-            mExitBarrier.countDown();
-        }
-
-        /**
-         * Hook method that shuts down the ExecutorService's Thread
-         * pool and waits for all the Threads to exit before
-         * returning.
-         */
-        @Override
-        protected void awaitTasksDone() {
-            do {
-                // Start processing this cycle of results
-                // concurrently.
-                processQueuedResults(getInput().size() 
-                                     * mWordsToFind.length);
-
-                try {
-                    // Wait until the exit barrier has been tripped.
-                    mExitBarrier.await();
-                } catch (InterruptedException e) {
-                    printDebugging("await() interrupted");
-                }
-
-                // Keep looping as long as there's another cycle's
-                // worth of input.
-            } while (advanceTaskToNextCycle());
-
-            // Call up to the super class to await for ExecutorService
-            // Threads to shutdown.
-            super.awaitTasksDone();
         }
     }
 
@@ -557,11 +553,6 @@ public class TaskGangTest {
         protected List<Future<SearchResults>> mResultFutures;
 
         /**
-         * Number of Threads in the pool.
-         */ 
-        private final int MAX_THREADS = 4;
-
-        /**
          * Constructor initializes the data members.
          */
         protected SearchTaskGangExecutorFutureOneShot(String[] wordsToFind,
@@ -570,9 +561,9 @@ public class TaskGangTest {
             super(wordsToFind, 
                   stringsToSearch);
 
-            // Initialize the ExecutorService with a fixed-sized pool
-            // of threads.
-            setExecutorService (Executors.newFixedThreadPool(MAX_THREADS));
+            // Initialize the ExecutorService with a cached pool of
+            // Threads.
+            setExecutorService (Executors.newCachedThreadPool());
         }
 
         /**
@@ -597,7 +588,7 @@ public class TaskGangTest {
          * if all goes well, else false (which will stop the background
          * Thread from continuing to run).
          */
-        public boolean processInput(final String inputData) {
+        protected boolean processInput(final String inputData) {
 
             // Iterate through each word and submit a Callable that
             // will search concurrently for this word in the
@@ -647,7 +638,7 @@ public class TaskGangTest {
      * @brief ...
      */
     static public class SearchTaskGangExecutorCompletionOneShot
-        extends SearchTaskGangExecutorFutureOneShot {
+        extends SearchTaskGangCommon {
         /**
          * Processes the results of Futures returned from the
          * ExecutorService.submit() method.
@@ -662,6 +653,10 @@ public class TaskGangTest {
             // Pass input to superclass constructor.
             super(wordsToFind, 
                   stringsToSearch);
+
+            // Initialize the ExecutorService with a cached pool of
+            // Threads.
+            setExecutorService (Executors.newCachedThreadPool());
 
             // Connect the ExecutorService with the CompletionService
             // to process SearchResults concurrently. 
@@ -700,7 +695,7 @@ public class TaskGangTest {
          * if all goes well, else false (which will stop the background
          * Thread from continuing to run).
          */
-        public boolean processInput(final String inputData) {
+        protected boolean processInput(final String inputData) {
 
             // Iterate through each word and submit a Callable that
             // will search concurrently for this word in the
