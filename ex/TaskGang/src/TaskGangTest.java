@@ -15,9 +15,10 @@ import java.util.concurrent.CountDownLatch;
  * @class TaskGangTest
  *
  * @brief This program tests various subclassses of the TaskGang
- *        framework, which use different Java barrier synchronizers to
- *        implement an "embarraassingly parallel" application that
- *        concurrently searches for words in a List of Strings.
+ *        framework, which use different Java concurrency and
+ *        synchronization mechanisms to implement an "embarraassingly
+ *        parallel" application that concurrently searches for words
+ *        in a List of Strings.
  *
  * @@ NS: Need to improve the documentation.
  */
@@ -26,8 +27,8 @@ public class TaskGangTest {
      * Enumerate the tests to run.
      */
     enum TestsToRun {
-        EXECUTOR_CYCLIC,
         EXECUTOR_ONESHOT,
+        EXECUTOR_CYCLIC,
         EXECUTOR_FUTURE_ONESHOT,
         EXECUTOR_COMPLETION_ONESHOT
     }
@@ -72,6 +73,18 @@ public class TaskGangTest {
         {"xdoodoo", "xreo", "xmiomio"}
     };
 
+    /**
+     * Array of words to search for in the input.
+     */
+    private final static String[] mWordList = {"do",
+                                               "re",
+                                               "mi",
+                                               "fa",
+                                               "so",
+                                               "la",
+                                               "ti",
+                                               "do"};
+        
     /**
      * @class SearchResult
      *
@@ -122,7 +135,7 @@ public class TaskGangTest {
         /**
          * The List of SearchResult objects that matched the @code mWord.
          */
-        private List<SearchResult> mList;
+        protected List<SearchResult> mList;
         
         /**
          * Create an empty SearchResults, which is used to shutdown
@@ -768,26 +781,13 @@ public class TaskGangTest {
     public static void main(String[] args) {
         printDebugging("Starting TaskGangTest");
         
-        // List of words to search for.
-        String[] wordList = {"do",
-                             "re",
-                             "mi",
-                             "fa",
-                             "so",
-                             "la",
-                             "ti",
-                             "do"};
-        
-        // @@ NS: Need to improve so that the input comes from file,
-        // not from hard-coded strings!
-
-        // Create/run appropriate type of SearchTaskGang to search
-        // for words concurrently.
+        // Create/run appropriate type of SearchTaskGang to search for
+        // words concurrently.
 
         for (TestsToRun test : TestsToRun.values()) {
             printDebugging("Starting "
                            + test);
-            makeTaskGang(wordList, test).run();
+            makeTaskGang(mWordList, test).run();
             printDebugging("Ending "
                            + test);
         }
