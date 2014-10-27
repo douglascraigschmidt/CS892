@@ -40,10 +40,6 @@ public class AndroidPlatformStrategy extends PlatformStrategy {
      * to let the user see what's going on.
      */
     public void print(final String outputString) {
-        /**
-         * Create a Runnable that's posted to the UI looper thread and
-         * appends the outputString to a TextView.
-         */
         // TODO - You fill in here.
     }
 
