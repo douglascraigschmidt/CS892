@@ -51,19 +51,16 @@ following: <P>
   ReentrantLock</A> and <A
   HREF="https://www.youtube.com/watch?v=n8HIjRXZ6Ms&index=19&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK">Java
   ConditionObject</A> videos. <P>
+  
+<LI> Finish the implementations of PingPongThreadQueue and PingPongThreadBall, which involves understanding
+BlockingQueues as well as implementing the PingPongPaddle class which uses ReentrantLocks and Condition
+objects. <P>
 
 <LI> Implement the hook methods in the ConsolePlatformStrategy.java and
-  AndroidPlatformStrategy.java classes that use a Java CountDownLatch
-  and Activity's runOnUiThread() method to post a Runnable command to
-  the UI Thread, which are covered in the <A
+  AndroidPlatformStrategy.java classes that use a Java CountDownLatch,  
+  which is covered in the <A
   HREF="https://www.youtube.com/watch?v=OeBvP_ygiWE&index=20&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK">Java
   CountDownLatch</A> video. <P>
-
-<LI> You'll need to know a bit about the Android HaMeR concurrency
-  framework to understand how the Activity.runOnUiThread() method
-  works, as described in <A
-  HREF="https://www.youtube.com/watch?v=6cV54pxU6bc&index=28&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK">Posting
-  and Processing Runnables to Android Handler</A>.
 
 </ul>
 
@@ -73,31 +70,29 @@ look similar to this for Eclipse command-line:
 
 <code><pre>
 Ready...Set...Go!
-ping  (1)
-_pong (1)
-ping  (2)
-_pong (2)
-ping  (3)
-_pong (3)
-ping  (4)
-_pong (4)
-ping  (5)
-_pong (5)
-ping  (6)
-_pong (6)
-ping  (7)
-_pong (7)
-ping  (8)
-_pong (8)
-ping  (9)
-_pong (9)
-ping  (10)
-_pong (10)
+ping(1)
+pong(1)
+ping(2)
+pong(2)
+ping(3)
+pong(3)
+ping(4)
+pong(4)
+ping(5)
+pong(5)
+ping(6)
+pong(6)
+ping(7)
+pong(7)
+ping(8)
+pong(8)
+ping(9)
+pong(9)
+ping(10)
+pong(10)
 Done!
 </code></pre>
 
-The Android version is a more interesting GUI.  Moreover, this
-assignment only requires you to create and test the Android version.
 BTW, the test assumes that each line of text is formatted: <text
 content> + '\n' <P>
 
@@ -106,6 +101,19 @@ project and select [Run As] -> [Android Application] <P>
 
 To Run the Android Unit Test, right click on the 'A3-Android-Test'
 project and select [Run As] -> [Android Unit Test] <P>
+
+To Run the Java Console application, right click on the 'A3-Android'
+project and select [Run As] -> [Java Application] <P>
+
+Note: Some versions of the ADT Plugin may not be able to run on the console by default.
+The current workaround is as follows: <P>
+
+1. Right Click on the project -> "Run As" -> "Run Configurations" <BR>
+2. Select "Java Application" and then "Main" <BR>
+3. Open the tab "Classpath" and remove the "Android Libraries" under "Bootstrap Entities" <BR>
+4. Click "Run" and your project should run properly (assuming you've implemented everything correctly).<P>
+
+Finally, while you have implemented different synchronization strategies for the PingPongClass, only one strategy is used in the application at any given time. To use/test different strategies, you must edit Options.java, which contains a member called "mSyncMechanism". Changing this will make the application use different strategies. For example setting it to "QUEUE" will use your BlockingQueue strategy, while setting it to "PADDLE" will use your paddle/ball strategy. <BR>
 
 <HR width=50% align=left><P>
 <H4>Concluding Remarks</H4>
