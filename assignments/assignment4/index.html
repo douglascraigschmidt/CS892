@@ -1,0 +1,170 @@
+<html>
+
+<title>BouncyBalloons Program (Assignment 4)</title>
+
+<BODY text = "#000000"
+link="#000fff"
+vlink="#ff0f0f"
+bgcolor="#ffffff">
+
+<HR>
+<h3>BouncyBalloons Program (Assignment 4)</h3>
+
+<HR width=50% align=left><P>
+<H4>Overview of the Assignment</H4>
+
+In this assignment, you will implement parts of an Android program
+that allows a user to create balloons that bounce around the screen.
+The user will also be able to place barriers on the screen that
+restrict the movement of balloons.  Each balloon has a certain number
+of times that it can bounce.  Once it bounces the designated number of
+time, the balloon "pops" or "explodes", removing the barrier that it
+was last in contact with. <P>
+
+You will implement three parts of the assignment: 
+<UL>
+<LI> A BarrierManager that manages concurrent access to barriers on the screen,
+
+<LI> A subclass of Android AsyncTask that counts how many bounces are
+left until all balloons explode, and
+
+<LI> Parts of an Android Activity that uses the Java ExecutorService
+to handle moving the balloons around the screen.
+
+</UL>
+
+<P><HR width=50% align=left><P>
+<H4>Program Description</H4>
+
+In this directory you'll find two projects. One project contains the
+Android source code and a majority of the files for the assignment.
+The other project contains (1) a driver program that tests how long it
+takes for a simulation to run using each of the BarrierManager
+implementations and (2) an implementation of BarrierManager that uses
+StampedLocks. These projects are separated because StampedLocks are a
+part of Java 8, which is not yet supported by Android.  You will
+therefore need to install Java 8 if you have not already, as discussed
+below. <P>
+
+Implement this assignment by completing the "TODO - You fill in here"
+comments to provide a working solution.  DO NOT CHANGE THE OVERALL
+STRUCTURE OF THE SKELETON - just fill in the "TODO - You fill in here"
+portions!!! <P>
+
+Although there are a lot of files, the actual amount of code you need
+to write is relatively localized - the main goal is to understand the
+framework and how to apply various Java synchronization mechanisms and
+concurrency frameworks. In particular, you'll need to do the
+following: <P>
+
+<UL>
+
+<LI> Read and understand the Point, BouncyBall, and BouncyBarrier
+ classes, which serve as the data model for this assignment.<P>
+
+<LI> Read and understand the BarrierManager and BarrierManagerStrategy
+ classes. These classes use the Strategy Pattern to allow the
+ application to easily switch between synchronization mechanisms. The
+ SynchronizedBarrierManager and CopyOnWriteBarrierManager
+ implementations are provided as examples to help guide your
+ solutions. <P>
+ 
+<LI> Implement the ReentrantBarrierManager and RWBarrierManager
+ classes nested inside BarrierManagerStrategy, which use
+ ReentrantLocks and ReentrantReadWriteLocks, respectively, to
+ synchronize access to the list of barriers currently being
+ managed. Information on these mechanisms can be found in the <A
+ HREF="https://www.youtube.com/watch?v=hDTCuE5W-mA&index=16&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK">Java
+ ReentrantLock</A> and <A
+ HREF="https://vanderbilt.coursera.org/cs282-001/lecture/281">Java
+ ReentrantReadWriteLock</A> videos. <P>
+  
+<LI> You must also implement the StampedBarrierManager in the Java
+ project, which uses StampedLocks and optimistic reading to
+ synchronize access to the list of barriers. Information on
+ StampedLocks can be found at the end of the <A
+ HREF="https://vanderbilt.coursera.org/cs282-001/lecture/281">Java
+ StampedLock</A> video. <P>
+
+<LI> Read and understand the BouncyBalloonRunnable class, which
+     manages a balloon as it moves around the screen. <P>
+
+<LI> Read and understand the MainActivity class, then fill in the
+ parts that use the Java ExecutorService to move the balloons around
+ the screen via multiple Threads.  You'll need to instantiate the
+ ExecutorService, add BouncyBalloonRunnables to it when appropriate,
+ and shut the service down when the application closes or the user
+ hits the "Clear" button. These spots are clearly marked with "//
+ TODO" comments. More information on the Java Executor framework can
+ be found in the <A
+ HREF="https://vanderbilt.coursera.org/cs282-001/lecture/297"> Java
+ Executor Framework</A> videos. <P>
+  
+<LI> Implement the BouncesLeftTask, which extends the Android
+ AsyncTask and is nested inside MainActivity. This task should
+ calculate how many bounces will happen before all balloons explode in
+ the background, and then create a toast that displays the
+ result. More information on AsyncTasks and Toasts can be found in the
+ <A HREF="https://www.youtube.com/watch?v=2-o92SLinqk"> Android
+ AsyncTask Framework </A> video and <A
+ href="http://developer.android.com/guide/topics/ui/notifiers/toasts.html">
+ Toasts </A> documentation.
+
+</ul>
+
+We do not provide any unit tests for this assignment. There is a
+TimedTest in the Java project, but this is used mainly to demonstrate
+the efficiency differences between the different BarrierManager
+implementations. Correct functionality will have to be confirmed
+visually using the emulator. <P>
+
+To Run the Android Application, right click on the 'A4-Android'
+project and select [Run As] -> [Android Application] <P>
+
+To Run the Java Timed Test on the console, right click on the
+'A4-Java' project and select [Run As] -> [Java Application] <P>
+
+To get the StampedLock implementation to compile, you will have to
+install Java 8 if you have not already and set it as the project's
+compiler. At the time of this writing, the steps to install Java 8
+with Eclipse are generally as follows: <P>
+
+<UL>
+
+<LI>Download the correct software package for your system from Oracle
+at:<br> <a
+href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">
+http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+</a>
+
+<LI>Execute the installer and specify an install directory somewhere on your machine.
+
+<LI>In Eclipse, select [Window] -> [Preferences] -> [Java] -> [Installed JRE's] -> [Add]
+
+<LI>Select [Standard VM] and hit [Next].
+
+<LI>Select [Directory] and find the directory you installed Java 8 to. Then select [Finish].
+
+<LI>Check the box next to the JDK you just installed and hit [Ok].
+
+</UL>
+
+Finally, while you have implemented different synchronization
+strategies for the BarrierManagerStrategy, only one strategy is used
+in the Android application at any given time. To use/test different
+strategies, you must edit Options.java, which contains a member called
+"MANAGER_STRATEGY". Changing this will make the application use
+different strategies. For example, setting it to
+"Strategy.Synchronized" will force it to use the synchronized keyword
+strategy. <BR>
+
+<HR width=50% align=left><P>
+<H4>Concluding Remarks</H4>
+
+This assignment is designed to demonstrate the performance difference
+between different types of locking mechanisms and to get you familiar
+with using the Java Executor framework and the Android AsyncTask
+concurrency framework.
+
+</body>
+</html>

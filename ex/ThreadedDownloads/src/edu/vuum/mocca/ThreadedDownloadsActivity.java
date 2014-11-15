@@ -80,7 +80,9 @@ public class ThreadedDownloadsActivity extends Activity {
      */
     private DownloadContext makeDownloadContext() {
         // This command is called back after the image is displayed to
-        // indicate there's no active ButtonStrategy.
+        // indicate there's no active ButtonStrategy, which of course
+        // will be updated next time the user clicks a button on the
+        // UI.
         Runnable completionCommand = 
             new Runnable() {
                 public void run() {
@@ -122,12 +124,13 @@ public class ThreadedDownloadsActivity extends Activity {
         }
 
         // Get the ButtonStrategy associated with the button's
-        // resource id.
+        // resource id, which keeps track of which button was pushed
+        // by the user on the UI.
         mActiveButtonStrategy = 
             mButtonStrategyMapper.getButtonStrategy(view.getId());
 
-        // Invoke the ButtonStrategy to download and display the
-        // image concurrently.
+        // Invoke the ButtonStrategy to download and display the image
+        // concurrently.
         mActiveButtonStrategy.downloadAndDisplayImage(downloadContext);
     }
 

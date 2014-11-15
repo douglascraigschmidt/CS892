@@ -18,9 +18,9 @@ import android.widget.Toast;
 /**
  * @class DownloadContext
  *
- * @brief Class that defines methods shared by all the
- *        ConcurrencyStrategy implementations.  It plays the role of
- *        the "Context" in the Strategy pattern.
+ * @brief Class that defines methods shared by all the ButtonStrategy
+ *        implementations.  It plays the role of the "Context" in the
+ *        Strategy pattern.
  */
 class DownloadContext {
     /**
