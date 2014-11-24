@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @class MainConsole
@@ -72,8 +73,27 @@ public class MainConsole {
         PlatformStrategy.instance().errorLog("MainConsole", 
                                              "Starting ImageTaskGangTest");
 
-        new ImageTaskGang(FILTERS,
-                          getURLIterator()).run();
+        // Create an exit barrier with a count of one to synchronize
+        // with the completion of the image downloading and processing
+        // in the TaskGang.
+        final CountDownLatch mExitBarrier = 
+            new CountDownLatch(1);
+
+        new Thread(new ImageTaskGang(FILTERS,
+                                     getURLIterator(),
+                                     new Runnable() {
+                                         @Override
+                                         public void run() {
+                                             mExitBarrier.countDown();
+                                         }
+                                     })).start();
+
+        try {
+            mExitBarrier.await();
+        } catch (InterruptedException e) {
+            PlatformStrategy.instance().errorLog("MainConsole", 
+                                                 "await interrupted");
+        }
 
         PlatformStrategy.instance().errorLog("MainConsole", 
                                              "Ending ImageTaskGangTest");

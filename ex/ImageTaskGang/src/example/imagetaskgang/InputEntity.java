@@ -36,6 +36,7 @@ public abstract class InputEntity {
     public InputEntity() {
         mSourceUrl = null;
         mFilterName = null;
+        mSucceeded = true;
     }
 
     /**
@@ -44,6 +45,7 @@ public abstract class InputEntity {
     public InputEntity(URL sourceURL) {
         mSourceUrl = sourceURL;
         mFilterName = null;
+        mSucceeded = true;
     }
 
     /**

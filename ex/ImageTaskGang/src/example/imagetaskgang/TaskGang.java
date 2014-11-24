@@ -126,16 +126,16 @@ public abstract class TaskGang<E> implements Runnable {
      * Template method that creates/runs all the tasks in the gang.
      */
     @Override
-	public void run() {
+    public void run() {
         // Invoke hook method to get initial List of input data to
         // process.
-        setInput(getNextInput());
+        if (setInput(getNextInput()) != null) {
+            // Invoke hook method to initialize the gang of tasks.
+            initiateTaskGang(getInput().size());
 
-        // Invoke method to initialize the gang of tasks.
-        initiateTaskGang(getInput().size());
-
-        // Invoke hook method to wait for all the tasks to exit.
-        awaitTasksDone();
+            // Invoke hook method to wait for all the tasks to exit.
+            awaitTasksDone();
+        }            
     }
 
     /**

@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,10 +49,25 @@ public class ImageTaskGang extends TaskGang<URL> {
     private ExecutorCompletionService<InputEntity> mCompletionService;
 
     /**
+     * Set the completion hook that's called when all the images are
+     * downloaded and processed.
+     */
+    private Runnable mCompletionHook;
+
+    /**
+     * The barrier that's used to coordinate each cycle, i.e., each
+     * Thread must await on mIterationBarrier for all the other
+     * Threads to complete their processing before they all attempt to
+     * move to the next cycle en masse.
+     */
+    protected CountDownLatch mIterationBarrier = null;
+
+    /**
      * Constructor initializes the superclass and data members.
      */
     public ImageTaskGang(Filter[] filters,
-                         Iterator<List<URL>> urlIterator) {
+                         Iterator<List<URL>> urlIterator,
+                         Runnable completionHook) {
         // Create an Iterator for the array of URLs to download.
         mUrlIterator = urlIterator;
 
@@ -67,30 +82,24 @@ public class ImageTaskGang extends TaskGang<URL> {
         // SearchResults concurrently.
         mCompletionService =
             new ExecutorCompletionService<InputEntity>(getExecutor());
+
+        // Set the completion hook that's called when all the images
+        // are downloaded and processed.
+        mCompletionHook = completionHook;
     }
 
     /**
-     * Constructor initializes the superclass and data members, as
-     * well as allows the caller to select which Java Executor
-     * implementation to use.
+     * Each task in the gang uses the CountDownLatch countDown()
+     * method indicate that they are done with their processing.
      */
-    public ImageTaskGang(Filter[] filters,
-                         Iterator<List<URL>> urlIterator,
-                         Executor executor) {
-        // Create an Iterator for the array of URLs to download.
-        mUrlIterator = urlIterator;
-
-        // Store the Filters to apply.
-        mFilters = Arrays.asList(filters);
-
-        // Initialize the Executor with a cached pool of Threads,
-        // which grow dynamically.
-        setExecutor(executor);
-
-        // Connect the Executor with the CompletionService
-        // to process SearchResults concurrently. 
-        mCompletionService =
-            new ExecutorCompletionService<InputEntity>(getExecutor());
+    @Override
+    protected void taskDone(int index) throws IndexOutOfBoundsException {
+        try {
+            // Indicate that this task is done with its computations.
+            mIterationBarrier.countDown();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } 
     }
 
     /**
@@ -117,6 +126,9 @@ public class ImageTaskGang extends TaskGang<URL> {
      */
     @Override
     protected void initiateTaskGang(int inputSize) {
+        // Create a new iteration barrier with the appropriate size.
+        mIterationBarrier = new CountDownLatch(inputSize);
+
         // Enqueue each item in the input List for execution in the
         // Executor's Thread pool.
         for (int i = 0; i < inputSize; ++i)
@@ -128,33 +140,93 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
+     * Block on the ExecutorCompletionService's completion queue,
+     * until all the processed downloads have been received.  Store
+     * the processed downloads in an organized manner
+     */
+    protected void concurrentlyProcessFilteredResults() {
+        // Need to account for all the downloaded images and all the
+        // filtering of these images.
+        final int count = getInput().size() * mFilters.size();
+
+        // Loop for the designated number of results.
+        for (int i = 0; i < count; ++i) 
+            try {
+                // Take the next ready Future off the
+                // CompletionService's queue.
+                final Future<InputEntity> resultFuture =
+                    mCompletionService.take();
+
+                // The get() call will not block since the results
+                // should be ready before they are added to the
+                // completion queue.
+                InputEntity inputEntity = resultFuture.get();
+    
+                PlatformStrategy.instance().errorLog
+                    ("ImageTaskGang",
+                     "Operation on file " 
+                     + inputEntity.getSourceURL()
+                     + " in iteration "
+                     + currentCycle()
+                     + (inputEntity.succeeded() == true 
+                        ? " succeeded" 
+                        : " failed"));
+                     
+            } catch (ExecutionException e) {
+                PlatformStrategy.instance().errorLog("ImageTaskGang",
+                                                     "get() ExecutionException");
+            } catch (InterruptedException e) {
+                PlatformStrategy.instance().errorLog("ImageTaskGang",
+                                                     "get() InterruptedException");
+            }
+    }
+
+    /**
      * Hook method that used as an exit barrier to wait for the gang
      * of tasks to exit.
      */
     @Override
     protected void awaitTasksDone() {
-        // Check to see if there's another iteration cycle to process.
-        if (advanceTaskToNextCycle()) 
-            this.run();
-        else if (getExecutor() instanceof ExecutorService) {
-            // Only call the shutdown() and awaitTermination() methods if
-            // we've actually got an ExecutorService (as opposed to just
-            // an Executor).
-            ExecutorService executorService = 
-                (ExecutorService) getExecutor();
+        try {
+            for (;;) {
+                // Wait until all the iteration cycles are done.
+                mIterationBarrier.await();
 
-            // Tell the ExecutorService to initiate a graceful
-            // shutdown.
-            executorService.shutdown();
-            try {
+                // Check to see if there's any input remaining to
+                // process.
+                if (setInput(getNextInput()) == null)
+                    break;
+                
+                // Invoke hook method to initialize the gang of tasks.
+                initiateTaskGang(getInput().size());
+            } 
+
+            // Only call the shutdown() and awaitTermination() methods
+            // if we've actually got an ExecutorService (as opposed to
+            // just an Executor).
+            if (getExecutor() instanceof ExecutorService) {
+                ExecutorService executorService = 
+                    (ExecutorService) getExecutor();
+
+                // Tell the ExecutorService to initiate a graceful
+                // shutdown.
+                executorService.shutdown();
+
                 // Wait for all the tasks/threads in the pool to
                 // complete.
                 executorService.awaitTermination(Long.MAX_VALUE,
                                                  TimeUnit.NANOSECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        PlatformStrategy.instance().errorLog("ImageTaskGang",
+                                             "calling completion hook");
+
+        // Run the completion hook now that all the image processing
+        // is done.
+        mCompletionHook.run();
     }
 
     /**
@@ -205,44 +277,6 @@ public class ImageTaskGang extends TaskGang<URL> {
         }
 
         return true;
-    }
-
-    /**
-     * Block on the ExecutorCompletionService's completion queue,
-     * until all the processed downloads have been received.  Store
-     * the processed downloads in an organized manner
-     */
-    protected void concurrentlyProcessFilteredResults() {
-        // Need to account for all the downloaded images and all the
-        // filtering of these images.
-        final int count = getInput().size() * mFilters.size();
-
-        // Loop for the designated number of results.
-        for (int i = 0; i < count; ++i) 
-            try {
-                // Take the next ready Future off the
-                // CompletionService's queue.
-                final Future<InputEntity> resultFuture =
-                    mCompletionService.take();
-
-                // The get() call will not block since the results
-                // should be ready before they are added to the
-                // completion queue.
-                InputEntity inputEntity = resultFuture.get();
-                /*
-                PlatformStrategy.instance().errorLog
-                    ("ImageTaskGang",
-                     "Operation on file " 
-                     + inputEntity.getSourceURL()
-                     + inputEntity.succeeded() != null 
-                     	? " succeeded" 
-                        : " failed");
-                */
-            } catch (ExecutionException e) {
-                System.out.println("get() ExecutionException");
-            } catch (InterruptedException e) {
-                System.out.println("get() InterruptedException");
-            }
     }
 
     /**

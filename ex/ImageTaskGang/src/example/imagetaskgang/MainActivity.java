@@ -70,6 +70,23 @@ public class MainActivity extends Activity {
     static final String FILTER_EXTRA = "filter_extra";
 
     /**
+     * Define a completion hook that's called back when the
+     * ImageTaskGang is finished to display the results.
+     */
+    final Runnable displayResultsRunnable = 
+        new Runnable() {
+            @Override
+            public void run() {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            displayResults();
+                        }
+                    });
+            }
+        };
+
+    /**
      * Hook method called when the Activity is first launched to
      * initialize the content view and various data members.
      */
@@ -107,8 +124,8 @@ public class MainActivity extends Activity {
      */
     public void useDefault(View view) {
         new Thread(new ImageTaskGang(FILTERS,
-                                     getURLIterator())).start();
-        goToViewResults();
+                                     getURLIterator(),
+                                     displayResultsRunnable)).start();
     }
 	
     /**
@@ -116,8 +133,13 @@ public class MainActivity extends Activity {
      */
     public void runGang(View view) {
         new Thread(new ImageTaskGang(FILTERS,
-                                     mURLListAdapter.getURLIterator())).start();
-        goToViewResults();
+                                     mURLListAdapter.getURLIterator(),
+                                     new Runnable() { 
+                                         @Override
+                                         public void run() {
+                                             displayResults();
+                                         }
+                                     })).start();
     }
 	
     /**
@@ -151,14 +173,18 @@ public class MainActivity extends Activity {
     /**
      * @@ Nolan, please fill in here.
      */
-    private void goToViewResults() {
+    private void displayResults() {
+        // @@ Nolan, please explain what you're doing here, e.g., why
+        // are you passing all the filter names?
         String[] filterNames = new String[FILTERS.length];
         for (int i = 0; i < filterNames.length; ++i) {
             filterNames[i] = FILTERS[i].getName();
         }
-        Intent resultIntent = new Intent(this, ResultActivity.class);
-        resultIntent.putExtra(FILTER_EXTRA, filterNames);
-        startActivity(resultIntent);
+        Intent resultsIntent = new Intent(this,
+                                          ResultsActivity.class);
+        resultsIntent.putExtra(FILTER_EXTRA, 
+                               filterNames);
+        startActivity(resultsIntent);
     }
 	
     /**
