@@ -58,7 +58,7 @@ public class DownloadWithAsyncTask implements ButtonStrategy {
          @ @return The Bitmap representation of the downloaded image.
         */
         protected Bitmap doInBackground(String... urls) {
-            // Downlaod the image, which can block since we're in a
+            // Download the image, which can block since we're in a
             // background thread.
             return mDownloadContext.downloadImage(urls[0]);
         }
@@ -82,7 +82,7 @@ public class DownloadWithAsyncTask implements ButtonStrategy {
      * Thread in the pool of Threads.
      */
     @Override
-        public void downloadAndDisplayImage(final DownloadContext downloadContext) {
+    public void downloadAndDisplayImage(final DownloadContext downloadContext) {
         mDownloader = new DownloadAsyncTask(downloadContext);
 
         mDownloader.execute(downloadContext.getUrlString());
@@ -92,7 +92,7 @@ public class DownloadWithAsyncTask implements ButtonStrategy {
      * Cancel a download.
      */
     @Override
-        public void cancelDownload(DownloadContext downloadContext) {
+    public void cancelDownload(DownloadContext downloadContext) {
         // Let the user know this download is being canceled.
         downloadContext.showToast("Canceling DownloadWithAsyncTask in progress");
 
