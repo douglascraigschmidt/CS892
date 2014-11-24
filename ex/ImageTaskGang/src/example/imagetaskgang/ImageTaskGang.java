@@ -133,10 +133,6 @@ public class ImageTaskGang extends TaskGang<URL> {
         // Executor's Thread pool.
         for (int i = 0; i < inputSize; ++i)
             getExecutor().execute(makeTask(i));
-
-        // Process all the Futures concurrently via the
-        // ExecutorCompletionService's completion queue.
-        concurrentlyProcessFilteredResults();
     }
 
     /**
@@ -144,13 +140,9 @@ public class ImageTaskGang extends TaskGang<URL> {
      * until all the processed downloads have been received.  Store
      * the processed downloads in an organized manner
      */
-    protected void concurrentlyProcessFilteredResults() {
-        // Need to account for all the downloaded images and all the
-        // filtering of these images.
-        final int count = getInput().size() * mFilters.size();
-
+    protected void concurrentlyProcessFilteredResults(int resultsCount) {
         // Loop for the designated number of results.
-        for (int i = 0; i < count; ++i) 
+        for (int i = 0; i < resultsCount; ++i) 
             try {
                 // Take the next ready Future off the
                 // CompletionService's queue.
@@ -164,10 +156,8 @@ public class ImageTaskGang extends TaskGang<URL> {
     
                 PlatformStrategy.instance().errorLog
                     ("ImageTaskGang",
-                     "Operation on file " 
+                     "Operations on file " 
                      + inputEntity.getSourceURL()
-                     + " in iteration "
-                     + currentCycle()
                      + (inputEntity.succeeded() == true 
                         ? " succeeded" 
                         : " failed"));
@@ -188,18 +178,35 @@ public class ImageTaskGang extends TaskGang<URL> {
     @Override
     protected void awaitTasksDone() {
         try {
+            // Keeps track of the number of result Futures to process.
+            int resultsCount = 0;
+
             for (;;) {
-                // Wait until all the iteration cycles are done.
+                // Increment the number of URLs to download.
+                resultsCount += getInput().size();
+
+                // Barrier synchronizer that wait until all tasks in
+                // this iteration cycle are done.
                 mIterationBarrier.await();
 
                 // Check to see if there's any input remaining to
                 // process.
                 if (setInput(getNextInput()) == null)
                     break;
-                
-                // Invoke hook method to initialize the gang of tasks.
-                initiateTaskGang(getInput().size());
+                else
+                    // Invoke hook method to initialize the gang of
+                    // tasks for the next iteration cycle.
+                    initiateTaskGang(getInput().size());
             } 
+
+
+            // Account for all the downloaded images and all the
+            // filtering of these images.
+            resultsCount *= mFilters.size();
+
+            // Process all the Futures concurrently via the
+            // ExecutorCompletionService's completion queue.
+            concurrentlyProcessFilteredResults(resultsCount);
 
             // Only call the shutdown() and awaitTermination() methods
             // if we've actually got an ExecutorService (as opposed to
@@ -221,21 +228,9 @@ public class ImageTaskGang extends TaskGang<URL> {
             e.printStackTrace();
         }
 
-        PlatformStrategy.instance().errorLog("ImageTaskGang",
-                                             "calling completion hook");
-
         // Run the completion hook now that all the image processing
         // is done.
         mCompletionHook.run();
-    }
-
-    /**
-     * Hook method that returns true as long there's URLs for the
-     * TaskGang to process.
-     */
-    @Override
-    protected boolean advanceTaskToNextCycle() {
-        return mUrlIterator.hasNext();
     }
 
     /**
@@ -256,9 +251,9 @@ public class ImageTaskGang extends TaskGang<URL> {
         // completion queue.
         for (final Filter filter : mFilters) {
         	
-            // The ExecutorCompletionService will receive a callable
-            // and invoke its call() method, which returns the
-            // filtered InputEntity, which is an ImageEntity.
+            // The ExecutorCompletionService receives a callable and
+            // invokes its call() method, which returns the filtered
+            // InputEntity, which is an ImageEntity.
             mCompletionService.submit(new Callable<InputEntity>() {
                     @Override
                     public InputEntity call() {
