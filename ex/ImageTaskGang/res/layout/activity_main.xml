@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}" >
+    
+    <LinearLayout
+		android:id="@+id/buttonLayout"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal" >
+    
+	    <Button android:id="@+id/useDefault"
+	        android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:text="@string/use_default"
+	        android:onClick="useDefault"
+	        style="?android:attr/borderlessButtonStyle" />
+	    
+	    <Button android:id="@+id/addList"
+	        android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:text="@string/add_list"
+	        android:onClick="addList"
+	        style="?android:attr/borderlessButtonStyle" />
+	    
+	    <Button android:id="@+id/runGang"
+	        android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:text="@string/run_gang"
+	        android:onClick="runGang"
+	        style="?android:attr/borderlessButtonStyle" />
+	    
+	    <Button android:id="@+id/clear"
+	        android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:text="@string/clear_dirs"
+	        android:onClick="clearFilterDirectories"
+	        style="?android:attr/borderlessButtonStyle" />
+	    
+	</LinearLayout>
+    
+    <ListView
+        android:id="@+id/listOfURLLists"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_below="@id/buttonLayout"
+        android:descendantFocusability="afterDescendants" />
+
+</RelativeLayout>
