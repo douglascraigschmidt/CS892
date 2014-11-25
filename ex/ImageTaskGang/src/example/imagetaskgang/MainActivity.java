@@ -77,6 +77,12 @@ public class MainActivity extends Activity {
         new Runnable() {
             @Override
             public void run() {
+                // @@ Nolan, I don't think we need to run the
+                // displayResults() method on the UI Thread since
+                // startActivity() can be called from a background
+                // Thread.  Can you please experiment with this a bit
+                // to see if we can zap the call to runOnUiThread()
+                // here?
                 MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
