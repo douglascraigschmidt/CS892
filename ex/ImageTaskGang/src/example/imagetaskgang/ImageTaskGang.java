@@ -283,9 +283,13 @@ public class ImageTaskGang extends TaskGang<URL> {
         // The size of the image downloading buffer
         final int BUFFER_SIZE = 4096;
 
-        // @@ Nolan, please document this code.
+        // Opens a new ByteArrayOutputStream to write the 
+        // downloaded contents to a byte array, which is
+        // a generic form of the image.
         ByteArrayOutputStream ostream = 
             new ByteArrayOutputStream();
+        
+        // This is the buffer in which the input data will be stored
         byte[] readBuffer = new byte[BUFFER_SIZE];
         int bytes;
 
@@ -294,11 +298,22 @@ public class ImageTaskGang extends TaskGang<URL> {
             // implementing via "try-with-resources", so I moved it
             // here.  I probably need to update Eclipse to use Java
             // 1.7.
+        	// @@ Doug, I added "istream.close()" below to account for this,
+        	// but if we switch it back that call is redundant!
+        	
+        	// Open an InputStream from the inputUrl from which to read
+        	// the image data.
             InputStream istream = (InputStream) url.openStream();
 
+            // While the is unread data from the inputStream, continue
+            // writing data to the byte array.
             while ((bytes = istream.read(readBuffer)) > 0) {
                 ostream.write(readBuffer, 0, bytes);
             }
+            
+            // Close the inputStream and return the byte array
+            // of image data
+            istream.close();
             return ostream.toByteArray();
         } catch (IOException e) {
             // "Try-with-resources" will handle cleaning up the istream

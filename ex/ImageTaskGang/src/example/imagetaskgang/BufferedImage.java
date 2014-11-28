@@ -11,7 +11,7 @@ class BufferedImage implements Image {
      * A Java BufferedImage object.
      */
     // @@ Need to fix 
-	// public java.awt.image.BufferedImage mBufferedImage;
+	//public java.awt.image.BufferedImage mBufferedImage;
 
     /**
      * Constructor that converts @a imageData into a Java @a BufferedImage.

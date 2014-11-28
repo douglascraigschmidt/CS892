@@ -39,6 +39,7 @@ public class OutputFilterDecorator extends FilterDecorator {
         // Call the applyFilter() hook method.
         InputEntity result = super.filter(inputEntity);
 
+        // @@ Nolan use a try with resources
         try {
             // Make a directory for the filter if it does not already
             // exist.

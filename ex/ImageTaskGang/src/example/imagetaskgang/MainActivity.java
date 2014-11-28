@@ -15,6 +15,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -32,17 +34,21 @@ import android.widget.ListView;
  */
 public class MainActivity extends Activity {
     /**
-     * @@ Nolan, please fill in here.
+     * A ListView where each element holds a
+     * comma-separated list of URLs to download
      */
     private ListView mListUrlGroups;
 
     /**
-     * @@ Nolan, please fill in here.
+     * The Adapter that updates the list of
+     * comma-separated lists of URLs
      */
     private URLListAdapter mURLListAdapter;
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Suggestions of default URLs that are supposed to be
+     * presented to the user via AutoCompleteTextView. Currently
+     * broken
      */
     private final String[] SUGGESTIONS = new String[] {        
         "http://www.mariowiki.com/images/thumb/1/19/GoldMushroomNSMB2.png/200px-GoldMushroomNSMB2.png",
@@ -65,7 +71,10 @@ public class MainActivity extends Activity {
     };
 	
     /**
-     * @@ Nolan, please fill in here.
+     * The name of the extra attached to the intent that
+     * starts ResultActivity. This allows the ResultActivity
+     * to divide the output into groups for viewing the results 
+     * more clearly.
      */
     static final String FILTER_EXTRA = "filter_extra";
 
@@ -118,7 +127,9 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Adds a list to the ListView to allow for variable
+     * number of lists to process (i.e. variable number
+     * of cycles in the TaskGang).
      */
     public void addList(View view) {
         mURLListAdapter.addList();
@@ -126,7 +137,9 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Run the gang using a default set of URL lists 
+     * hardcoded into the application rather than 
+     * reading the input lists
      */
     public void useDefault(View view) {
         new Thread(new ImageTaskGang(FILTERS,
@@ -135,7 +148,7 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Run the gang by reading the input lists of URLs
      */
     public void runGang(View view) {
         new Thread(new ImageTaskGang(FILTERS,
@@ -149,7 +162,7 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Delete the previously downloaded pictures and directories
      */
     public void clearFilterDirectories(View view) {
         for (Filter filter : FILTERS) {
@@ -159,7 +172,9 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * @@ Nolan, please fill in here.
+     * A helper method that recursively deletes files in a 
+     * specified directory. Android does not allow you to
+     * delete a directory with child files.
      */
     private void deleteSubFolders(String path) {
         File currentFolder = new File(path);        
@@ -177,19 +192,24 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Starts the intent to view the results via ResultsActivity
      */
     private void displayResults() {
-        // @@ Nolan, please explain what you're doing here, e.g., why
-        // are you passing all the filter names?
+        // Pass a list of filterNames to the ResultsActivity
+    	// so it knows what buttons to generate to allow
+    	// the user to view all the downloaded results.
         String[] filterNames = new String[FILTERS.length];
         for (int i = 0; i < filterNames.length; ++i) {
             filterNames[i] = FILTERS[i].getName();
         }
+        
+        // Create the intent and add the list of filterNames as an extra
         Intent resultsIntent = new Intent(this,
                                           ResultsActivity.class);
         resultsIntent.putExtra(FILTER_EXTRA, 
                                filterNames);
+        
+        // Start the ResultsActivity
         startActivity(resultsIntent);
     }
 	
@@ -239,7 +259,7 @@ public class MainActivity extends Activity {
          */
         private ArrayAdapter<String> mSuggestions = 
             new ArrayAdapter<String>(getApplicationContext(),
-                                     android.R.layout.simple_list_item_1, SUGGESTIONS);
+                                     R.layout.suggestion_item, SUGGESTIONS);
 		
         /**
          * @@ Nolan, please fill in here.
@@ -250,6 +270,8 @@ public class MainActivity extends Activity {
             AutoCompleteTextView initView = 
                 new AutoCompleteTextView(getApplicationContext());
             initView.setAdapter(mSuggestions);
+            initView.setDropDownHeight(initView.getHeight());
+            initView.setDropDownWidth(initView.getWidth());
             mList = new ArrayList<AutoCompleteTextView>(Arrays.asList(initView));
             notifyDataSetChanged();
         }
@@ -316,26 +338,22 @@ public class MainActivity extends Activity {
          */
         @SuppressLint("InflateParams")
             @Override
-            public View getView(int position, View activeView, 
+            public View getView(final int position, View activeView, 
 				ViewGroup parent) {
             AutoCompleteTextView newView;
             if (activeView == null) {
-                newView = 
-                    new AutoCompleteTextView(getApplicationContext());
-                newView.setAdapter(mSuggestions);
-                newView.setThreshold(1);
                 activeView = mInflater.inflate(R.layout.list_item, null);
-                newView = (AutoCompleteTextView) activeView
-                    .findViewById(R.id.ListOfURLs);
+                newView = (AutoCompleteTextView) activeView.findViewById(R.id.ListOfURLs);
+                newView.setAdapter(mSuggestions);
                 activeView.setTag(newView);
             } else {
                 newView = (AutoCompleteTextView) activeView.getTag();
             }
-            
-            newView.append(mList.get(position).getText().toString());
+
+            if (!newView.getText().toString().isEmpty())
+            	newView.setText((mList.get(position).getText().toString()));
             newView.setId(position);
- 
-            // @@ possibly use newView.addTextChangedListener(watcher)
+            
             newView.setOnFocusChangeListener(new OnFocusChangeListener() {
                     public void onFocusChange(View view, boolean hasFocus) {
                         if (!hasFocus){
@@ -344,9 +362,10 @@ public class MainActivity extends Activity {
                             mList.set(position, urls);
                         }
                     }
-                });
- 
-            return activeView;
+                }
+            );
+            
+            return newView;
         }
     }
 }

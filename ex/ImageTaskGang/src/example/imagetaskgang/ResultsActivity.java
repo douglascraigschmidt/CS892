@@ -21,58 +21,84 @@ import android.widget.LinearLayout;
 /**
  * @class ResultsActivity
  *
- * @brief @@ Nolan, please fill in here.
+ * @brief Shows the results of the ImageDownloadTask in
+ * an easily understood and clear format
  */
 public class ResultsActivity extends ListActivity {
     /**
-     * @@ Nolan, please fill in here.
+     * The names of the filters used in the
+     * ImageDownloadTask. This is used to organize the
+     * results into groups
      */
     private String[] mFilterNames;
 
     /**
-     * @@ Nolan, please fill in here.
+     * The layout that contains the buttons that 
+     * are responsible for loading the images into the 
+     * ListView
      */
     private LinearLayout mLayout;
 
     /**
-     * @@ Nolan, please fill in here.
+     * The adapter responsible for loading the results into
+     * the ListView
      */
     private ImageAdapter bitmapAdapter;
 	
     /**
-     * @@ Nolan, please fill in here.
+     * Creates the activity and generates a button for 
+     * each filter applied to the images. These buttons
+     * load change the bitmapAdapter's source to a new directory,
+     * from which it will load images into the ListView.
      */
     @SuppressLint("InflateParams")
     @Override protected void onCreate(Bundle savedInstanceState) {
-        // @@ Nolan, please document the logic in this method.
         super.onCreate(savedInstanceState);
 		
+        // Sets the adapter to an ImageAdapter (defined below)
         bitmapAdapter = new ImageAdapter(this);
         setListAdapter(bitmapAdapter);
 		
         setContentView(R.layout.activity_result);
 		
         mLayout = (LinearLayout) findViewById(R.id.buttonList);
+        
+        // Retrieves the names of the filters applied to this
+        // set of downloads.
         mFilterNames =
             getIntent().getStringArrayExtra(MainActivity.FILTER_EXTRA);
 
+        // Iterate over the filter names and generate a button for 
+        // each filter
         for (String filterName : mFilterNames) {
+        	
+        	// Create a new button with the layout of "result_button"
             Button resultButton = 
                 (Button) LayoutInflater.from(this).inflate (R.layout.result_button,
                                                             null);
+            
+            // Set the new button's text and tag to the filter name
             resultButton.setText(filterName);
             resultButton.setTag(filterName);
+            
+            // When the button is clicked, change the bitmapAdapter
+            // source to the appropriate filter directory
             resultButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Button button =
                             (Button) view;
+                        
+                        // Find the filter directory and load the directory
+                        // as the source of the bitmapAdapter
                         bitmapAdapter.setBitmaps
                             (new File(PlatformStrategy.instance().getDirectoryPath(),
                                       button.getText().toString()).getAbsolutePath());
 					
                     }
                 });
+            
+            // Add the button to the layout
             mLayout.addView(resultButton);
         }
     }
@@ -80,21 +106,22 @@ public class ResultsActivity extends ListActivity {
     /**
      * @class ImageAdapter
      *
-     * @brief @@ Nolan, please fill in here.
+     * @brief The Adapter that loads the images into the
+     * Layout's ListView
      */
     public class ImageAdapter extends BaseAdapter {
         /**
-         * @@ Nolan, please fill in here.
+         * The Context of the application
          */
         private Context mContext;
 
         /**
-         * @@ Nolan, please fill in here.
+         * the ArrayList of bitmaps that hold the thumbnail images
          */
         private ArrayList<Bitmap> mBitmaps;
 
         /**
-         * @@ Nolan, please fill in here.
+         * Creates the ImageAdapter in the given context
          */
         public ImageAdapter(Context c) {
             mContext = c;
@@ -102,7 +129,7 @@ public class ResultsActivity extends ListActivity {
         }
 
         /**
-         * @@ Nolan, please fill in here.
+         * Returns the count of bitmaps in the list
          */
         @Override
             public int getCount() {
@@ -110,7 +137,7 @@ public class ResultsActivity extends ListActivity {
         }
 
         /**
-         * @@ Nolan, please fill in here.
+         * Returns the bitmap at the given position
          */
         @Override
             public Object getItem(int position) {
@@ -118,7 +145,9 @@ public class ResultsActivity extends ListActivity {
         }
 
         /**
-         * @@ Nolan, please fill in here.
+         * Returns the given position as the Id of the bitmap.
+         * This works because the bitmaps are stored in a
+         * sequential manner.
          */
         @Override
             public long getItemId(int position) {
@@ -126,7 +155,8 @@ public class ResultsActivity extends ListActivity {
         }
 
         /**
-         * @@ Nolan, please fill in here.
+         * Returns the view. This method is necessary for
+         * filling the ListView appropriately
          */
         @Override
         public View getView(int position,
@@ -145,7 +175,8 @@ public class ResultsActivity extends ListActivity {
         }
 
         /**
-         * @@ Nolan, please fill in here.
+         * Resets the bitmaps of the ListView to the one's
+         * found at the given filterPath
          */
         private void setBitmaps(String filterPath) {
             File[] bitmaps = new File(filterPath).listFiles();
@@ -155,6 +186,8 @@ public class ResultsActivity extends ListActivity {
                 if (bitmap != null) {
                     File bitmapFile =
                         new File(bitmap.toString());
+                    // @@ Nolan pre-decode and only load a 100x100 or smaller
+                    // thumbnail preview of the image! (use gridview?)
                     mBitmaps.add
                         (BitmapFactory.decodeFile
                          (bitmapFile.getAbsolutePath()));
