@@ -12,13 +12,18 @@ class BufferedImage implements Image {
      */
     // @@ Need to fix 
 	//public java.awt.image.BufferedImage mBufferedImage;
+	//import javax.imageio.ImageIO;
 
     /**
      * Constructor that converts @a imageData into a Java @a BufferedImage.
      * @@ Nolan, we may need to change the type of the @imageData parameter..
      */
     public BufferedImage(byte[] imageData) {
-        // mBufferedImage = null; // @@ Nolan, please fill in here.
+//    	try {
+//	      	mBufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
+//	    } catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
     }
 
     /**

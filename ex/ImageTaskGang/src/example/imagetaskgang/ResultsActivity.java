@@ -166,7 +166,7 @@ public class ResultsActivity extends ListActivity {
             if (convertView == null) {
                 imageView = new ImageView(mContext);
                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                imageView.setPadding(0, 0, 0, 0);
+                imageView.setPadding(5, 5, 5, 5);
             } else {
                 imageView = (ImageView) convertView;
             }
@@ -184,13 +184,9 @@ public class ResultsActivity extends ListActivity {
 
             for (File bitmap : bitmaps){
                 if (bitmap != null) {
-                    File bitmapFile =
-                        new File(bitmap.toString());
-                    // @@ Nolan pre-decode and only load a 100x100 or smaller
-                    // thumbnail preview of the image! (use gridview?)
+                	// @@ Nolan Gridview?
                     mBitmaps.add
-                        (BitmapFactory.decodeFile
-                         (bitmapFile.getAbsolutePath()));
+                        (BitmapFactory.decodeFile(bitmap.getAbsolutePath()));
                 }
             }
             notifyDataSetChanged();

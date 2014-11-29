@@ -88,4 +88,5 @@ public class ImageEntity extends InputEntity {
         format = format.equalsIgnoreCase("jpeg") ? "jpg" : format;
         return format;
     }
+    
 }

@@ -2,11 +2,18 @@ package example.imagetaskgang;
 
 import java.io.FileOutputStream;
 import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.AutoCompleteTextView;
 
 /**
  * @class PlatformStrategyAndroid
@@ -84,8 +91,8 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
                            + Color.green(pixel) * .587
                            + Color.blue(pixel) * .114);
                 grayScaleImage.setPixel(j, i, 
-                                      Color.rgb(grayScale, grayScale, grayScale)
-                                      );
+                                     Color.rgb(grayScale, grayScale, grayScale)
+                                     );
             }
         }
 
@@ -116,5 +123,52 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
     public void errorLog(String javaFile,
                          String errorMessage) {
         Log.e(javaFile, errorMessage);
+    }
+    
+    /**
+     * Gets an iterator over a list of lists of URLs from which
+     * we want to download images
+     */
+    public Iterator<List<URL>> getUrlIterator(InputSource source) {
+    	List<List<URL>> variableNumberOfInputURLs = 
+                new ArrayList<List<URL>>();
+    	
+    	try {
+    		switch (source) {
+    		case DEFAULT:
+	            variableNumberOfInputURLs = super.getDefaultList();
+	            break;
+	            
+    		case USER:
+    			if (mOuterClass.get() != null) {
+	    			int numChildViews = 
+	    					mOuterClass.get().mListUrlGroups.getChildCount();
+			    	for (int i = 0; i < numChildViews; ++i) {
+			    		AutoCompleteTextView child = 
+			    				(AutoCompleteTextView) 
+			    				mOuterClass.get().mListUrlGroups.getChildAt(i);
+			    		List<URL> urls = new ArrayList<URL>();
+			            StringTokenizer tokenizer = 
+			                new StringTokenizer(child.getText().toString(), ", ");
+			            while (tokenizer.hasMoreTokens()) {
+		                    urls.add(new URL(tokenizer.nextToken().trim()));
+			            }
+			            variableNumberOfInputURLs.add(urls);
+			    	}
+    			}
+    			break;
+    			
+		    default:
+		    	if (mOuterClass.get() != null) 
+		    		mOuterClass.get().showToast("Invalid Source");
+		    	return null;
+	    	}
+    	} catch (MalformedURLException e) {
+    		if (mOuterClass.get() != null) 
+	    		mOuterClass.get().showToast("Invalid URL");
+    		return null;
+    	}
+    	
+		return variableNumberOfInputURLs.iterator();
     }
 }

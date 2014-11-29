@@ -12,22 +12,12 @@ import java.io.FileOutputStream;
  *        pattern.
  */
 public class OutputFilterDecorator extends FilterDecorator {
-    /**
-     * The ImageEntity that is being filtered and output.
+	
+	/**
+     * Constructs the filter decorator with the @a filter to apply
      */
-    private ImageEntity mImageEntity;
-
-    /**
-     * Constructs the filter with the @a filter to apply and the @a
-     * imageEntity the filter is being applied to.
-     */
-    public OutputFilterDecorator(Filter filter,
-                                 ImageEntity imageEntity) {
-        // Initialize the superclass.
-        super(filter);
-        
-        // Store the imageEntity in the data member.
-        mImageEntity = imageEntity;
+    public OutputFilterDecorator(Filter filter) {
+    	super(filter);
     }
 
     /**
@@ -35,10 +25,12 @@ public class OutputFilterDecorator extends FilterDecorator {
      * result by first forwarding to the super class for filtering and
      * then writing the results to an output file.
      */
-    public InputEntity applyFilter(InputEntity inputEntity) {
-        // Call the applyFilter() hook method.
-        InputEntity result = super.filter(inputEntity);
-
+	@Override
+	protected InputEntity decorate(InputEntity inputEntity) {
+		// Call the applyFilter() hook method.
+        //ImageEntity result = (ImageEntity) super.filter(inputEntity);
+		ImageEntity result = (ImageEntity) inputEntity;
+		
         // @@ Nolan use a try with resources
         try {
             // Make a directory for the filter if it does not already
@@ -53,13 +45,13 @@ public class OutputFilterDecorator extends FilterDecorator {
             // organize the filtered results.
             File newImage = 
                 new File(externalFile, 
-                         mImageEntity.getFileName());
-	
+                         result.getFileName());
+            
             // Write the compressed image to the appropriate
             // directory.
             FileOutputStream outputFile = 
                 new FileOutputStream(newImage);
-            PlatformStrategy.instance().storeImage(mImageEntity.getImage(), 
+            PlatformStrategy.instance().storeImage(result.getImage(), 
                                                    outputFile);
 
             // @@ Nolan, we need to fix this once I've upgraded my
@@ -71,5 +63,6 @@ public class OutputFilterDecorator extends FilterDecorator {
         }
 
         return result;
-    }
+	}
+
 }

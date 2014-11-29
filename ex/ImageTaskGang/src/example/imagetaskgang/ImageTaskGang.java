@@ -261,8 +261,7 @@ public class ImageTaskGang extends TaskGang<URL> {
                         // contains the original filter and the
                         // original Image.
                         Filter decoratedFilter =
-                            new OutputFilterDecorator(filter, 
-                                                      originalImage);
+                            new OutputFilterDecorator(filter);
 
                         // Filter the original image and store it in a
                         // file.

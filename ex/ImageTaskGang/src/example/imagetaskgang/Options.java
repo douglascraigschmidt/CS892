@@ -20,6 +20,12 @@ public class Options {
      * URL file. Defaults to an empty line
      */
     private String mSeparator = "";
+    
+    /**
+     * Input Source selection. Determines where the list
+     * of URL lists will come from
+     */
+    private String mInputSource = "DEFAULT";
 
     /**
      * Controls whether debugging output will be generated (defaults
@@ -51,6 +57,13 @@ public class Options {
     public String getSeparator() {
 		return mSeparator;
 	}
+    
+    /**
+     * Return the Input Source selection
+     */
+    public String getInputSource() {
+		return mInputSource;
+	}
 
     /**
      * Returns whether debugging output is generated.
@@ -71,6 +84,8 @@ public class Options {
                     mDiagnosticsEnabled = argv[argc + 1].equals("true");
                 else if (argv[argc].equals("-s"))
                 	mSeparator = argv[argc + 1];
+                else if (argv[argc].equals("-i"))
+                	mInputSource = argv[argc + 1];
                 else {
                     printUsage();
                     return false;
@@ -92,6 +107,7 @@ public class Options {
         System.out.println("-d [true|false]");
         System.out.println("-f URL-file-pathame");
         System.out.println("-h: invoke help");
+        System.out.println("-i: URL-list-input-source [ DEFAULT | USER | FILE ]");
         System.out.println("-s URL-list-separator");
     }
 

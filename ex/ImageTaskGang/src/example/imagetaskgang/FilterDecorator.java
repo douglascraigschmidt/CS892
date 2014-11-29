@@ -27,7 +27,10 @@ public abstract class FilterDecorator extends Filter {
      * This template method forwards to the decorated filter to filter the 
      * @a inputEntity parameter.
      */
-    public InputEntity filter(InputEntity inputEntity) {
-        return mFilter.filter(inputEntity);
+    @Override
+    protected InputEntity applyFilter(InputEntity inputEntity) {
+        return decorate(mFilter.filter(inputEntity));
     }
+    
+    protected abstract InputEntity decorate(InputEntity inputEntity);
 }
