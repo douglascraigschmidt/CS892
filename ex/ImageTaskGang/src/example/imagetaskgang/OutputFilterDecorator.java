@@ -20,12 +20,13 @@ public class OutputFilterDecorator extends FilterDecorator {
     }
 
     /**
+     * @@ Nolan, this comment is no longer correct.  Can you please update it?
      * The hook method that defines the logic for processing the
      * result by first forwarding to the super class for filtering and
      * then writing the results to an output file.
      */
     @Override
-	protected InputEntity decorate(InputEntity inputEntity) {
+    protected InputEntity decorate(InputEntity inputEntity) {
         // Call the applyFilter() hook method.
         ImageEntity result = (ImageEntity) inputEntity;
 		

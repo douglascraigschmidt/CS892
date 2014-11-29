@@ -33,8 +33,8 @@ public abstract class FilterDecorator extends Filter {
     }
     
     /**
-     * The logic that "decorates" the member filter. This logic
-     * is applied to the inputEntity after it has been filtered.
+     * The logic that "decorates" the member filter, which is applied
+     * to the inputEntity after it has been filtered.
      */
     protected abstract InputEntity decorate(InputEntity inputEntity);
 }
