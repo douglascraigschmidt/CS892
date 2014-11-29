@@ -133,27 +133,40 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
     	List<List<URL>> variableNumberOfInputURLs = 
             new ArrayList<List<URL>>();
     	
-        // @@ Nolan, please document this code!
     	try {
             switch (source) {
+            // If the user selects the defaults source, return
+            // the default list of URL lists. Works on both console
+            // and Android platforms
             case DEFAULT:
                 variableNumberOfInputURLs = super.getDefaultList();
                 break;
 	            
+            // Take input from the Android UI
             case USER:
+            	
+            	// Check if the Activity still exists
                 if (mOuterClass.get() != null) {
+                	
+                	// Iterate over the children of the LinearLayout
+                	// that holds the list of URL lists
                     int numChildViews = 
                         mOuterClass.get().mListUrlGroups.getChildCount();
                     for (int i = 0; i < numChildViews; ++i) {
                         AutoCompleteTextView child = 
                             (AutoCompleteTextView) 
                             mOuterClass.get().mListUrlGroups.getChildAt(i);
+                        
+                        // Create a new URL list and add each URL
+                        // separated by commas to the list
                         List<URL> urls = new ArrayList<URL>();
                         StringTokenizer tokenizer = 
                             new StringTokenizer(child.getText().toString(), ", ");
                         while (tokenizer.hasMoreTokens()) {
                             urls.add(new URL(tokenizer.nextToken().trim()));
                         }
+                        
+                        // Add the list of URLs to the main list
                         variableNumberOfInputURLs.add(urls);
                     }
                 }
@@ -170,6 +183,7 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
             return null;
     	}
     	
+    	// Return an iterator over the list of URL lists
         return variableNumberOfInputURLs.iterator();
     }
 }

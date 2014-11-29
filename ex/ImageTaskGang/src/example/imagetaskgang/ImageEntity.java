@@ -7,10 +7,9 @@ import java.net.URL;
  *
  * @brief Extends InputEntity and defines the logic for decoding raw
  *        byte arrays into an Image that can be used in the rest of
- *        the application.
- *
- *        @@ Nolan, please double check that this is the right
- *        description for this class!
+ *        the application. Also handles common file-related tasks
+ *        such as simple retrieval of the native format and original
+ *        file name of the image.
  */
 public class ImageEntity extends InputEntity {
     /**

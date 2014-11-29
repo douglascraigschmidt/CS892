@@ -1,7 +1,10 @@
 package example.imagetaskgang;
 
+import android.annotation.SuppressLint;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * @class OutputFilterDecorator
@@ -20,46 +23,45 @@ public class OutputFilterDecorator extends FilterDecorator {
     }
 
     /**
-     * @@ Nolan, this comment is no longer correct.  Can you please update it?
-     * The hook method that defines the logic for processing the
-     * result by first forwarding to the super class for filtering and
-     * then writing the results to an output file.
+     * The hook method that is called on the InputEntity once it has
+     * been filtered with mFilter. This method stores the filtered
+     * InputEntity in a file by delegating the storing to the platform-
+     * specific implementation of storeImage(...).
      */
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     protected InputEntity decorate(InputEntity inputEntity) {
         // Call the applyFilter() hook method.
         ImageEntity result = (ImageEntity) inputEntity;
 		
-        // @@ Nolan use a try with resources once we upgrade to 1.7
-        try {
-            // Make a directory for the filter if it does not already
-            // exist.
-            File externalFile = 
-                new File(PlatformStrategy.instance().getDirectoryPath(),
-                         this.getName());
-            externalFile.mkdirs();
-	        
-            // We will store the filtered image as its original
-            // filename, within the appropriate filter directory to
-            // organize the filtered results.
-            File newImage = 
-                new File(externalFile, 
-                         result.getFileName());
-            
-            // Write the compressed image to the appropriate
-            // directory.
-            FileOutputStream outputFile = 
-                new FileOutputStream(newImage);
-            PlatformStrategy.instance().storeImage(result.getImage(), 
-                                                   outputFile);
-
-            // @@ Nolan, we need to fix this once I've upgraded my
-            // Android IDE to the right version of Eclipse and Java
-            // 1.7.
-            outputFile.close();
-        } catch (Exception e) {
-            System.out.println("get() exception");
-        }
+        // Make a directory for the filter if it does not already
+        // exist.
+        File externalFile = 
+            new File(PlatformStrategy.instance().getDirectoryPath(),
+                     this.getName());
+        externalFile.mkdirs();
+        
+        // We will store the filtered image as its original
+        // filename, within the appropriate filter directory to
+        // organize the filtered results.
+        File newImage = 
+            new File(externalFile, 
+                     result.getFileName());
+        
+        // Write the compressed image to the appropriate
+        // directory.
+		try (FileOutputStream outputFile = new FileOutputStream(newImage)) {
+			PlatformStrategy.instance().storeImage(result.getImage(), 
+                    outputFile);
+		} catch (FileNotFoundException e) {
+			// try-with-resources will clean up resources
+			e.printStackTrace();
+			return null;
+		} catch (IOException e1) {
+			// try-with-resources will clean up resources
+			e1.printStackTrace();
+			return null;
+		}
 
         return result;
     }

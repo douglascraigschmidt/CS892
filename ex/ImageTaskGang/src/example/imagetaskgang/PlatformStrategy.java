@@ -71,10 +71,14 @@ public abstract class PlatformStrategy {
      * An enumeration of each different input source
      */
     public static enum InputSource {
-    	DEFAULT, // @@ Nolan, please document this enumeral.
-        USER,    // @@ Nolan, please document this enumeral.
-        FILE,    // @@ Nolan, please document this enumeral.
-        ERROR    // @@ Nolan, please document this enumeral.
+    	// The default input source that is shared between platforms
+    	DEFAULT,
+    	// Input from a user-source such as the android UI or console
+        USER,
+        // Input from a delimited file
+        FILE, 
+        // Returned when trying to retrieve an unrecognized source
+        ERROR
     }
     
     /**

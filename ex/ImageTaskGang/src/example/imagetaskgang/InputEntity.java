@@ -8,9 +8,9 @@ import java.net.URL;
  * @brief An abstract super class that defines the base API for
  *        decoding raw bytes of data obtained from some input source
  *        into some result that can be processed by the rest of the
- *        application.
- *
- * @@ Nolan, please make sure this explanation is correct!
+ *        application. Once the input source data has been processed,
+ *        this class also stores meta-data such as what processing has
+ *        been applied and whether it succeeded or not.
  */
 public abstract class InputEntity {
     /**
@@ -25,8 +25,6 @@ public abstract class InputEntity {
     
     /**
      * Keeps track of whether operations on this InputEntity succeed.
-     * @@ Nolan, we need to improve this and use it consistently to
-     * keep track of whether downloads and processing succeed.
      */
     protected boolean mSucceeded;
 

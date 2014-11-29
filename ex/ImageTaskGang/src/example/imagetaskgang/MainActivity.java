@@ -185,7 +185,10 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * @@ Nolan, please document this method!
+     * Sets the list of buttons to disabled. This shows
+     * that the application is processing visually, and is 
+     * a (slightly forceful) way to keep multiple task gangs
+     * from being started accidentally.
      */
     private void setButtonsEnabled(boolean enabled) {
     	LinearLayout buttonLayout = 

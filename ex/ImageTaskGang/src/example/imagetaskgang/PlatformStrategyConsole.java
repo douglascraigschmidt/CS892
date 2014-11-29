@@ -1,5 +1,6 @@
 package example.imagetaskgang;
 
+import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -110,50 +111,54 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      * Overrides the getURLIterator method to return the
      * Console-specific input sources.
      */
-    public Iterator<List<URL>> getUrlIterator(InputSource source) {
+    @SuppressLint("NewApi")
+	public Iterator<List<URL>> getUrlIterator(InputSource source) {
         List<List<URL>> variableNumberOfInputURLs = 
             new ArrayList<List<URL>>();
     	
-        // @@ Nolan, please document this code!
     	try {
             switch (source) {
+            
+            // If the user selects the defaults source, return
+            // the default list of URL lists. Works on both console
+            // and Android platforms
             case DEFAULT:
                 variableNumberOfInputURLs = super.getDefaultList();
                 break;
 	           
+            // Read a list of URL lists from a delimited file
             case FILE:
-                // @@ Nolan change to try with resources after upgrade to 1.7
-                BufferedReader urlReader = null;
-                try {
-                    urlReader =
-                        new BufferedReader(new FileReader
-                                           (Options.instance().getURLFilePathname()));
+                try (BufferedReader urlReader = new BufferedReader(
+                		new FileReader(Options.instance().getURLFilePathname()))) {
+
                     List<URL> currentUrls = new ArrayList<URL>();
+                    
+                    // Iterator over each line in the file
                     for (String url; 
                          (url = urlReader.readLine()) != null;
                          ) {
+                    	
+                    	// If the line is the dedicated delimiter, add the current
+                    	// list to the main list, and start a new list.
                         if (url.equalsIgnoreCase(Options.instance().getSeparator())) {
                             variableNumberOfInputURLs.add(currentUrls);
                             currentUrls = new ArrayList<URL>();
                         }
+                        // Otherwise, add the url to the current list
                         else
                             currentUrls.add(new URL(url));
                     }
+                    
+                    // Add the final list to the main list
                     variableNumberOfInputURLs.add(currentUrls);
 			    	
                 } catch (FileNotFoundException e) {
                     mOutput.println("URL file not found");
+                    return null;
                 } catch (IOException e) {
                     mOutput.println("Error reading file");
-                } finally {
-                    if (urlReader != null) {
-                        try {
-                            urlReader.close();
-                        } catch (IOException e) {
-                            mOutput.println("Error closing reader");
-                        }
-                    }
-                }
+                    return null;
+                } 
                 break;
     			
             default:
@@ -165,6 +170,7 @@ public class PlatformStrategyConsole extends PlatformStrategy {
             return null;
     	}
     	
+    	// Return an iterator over the list of URL lists
         return variableNumberOfInputURLs.iterator();
     }
 	

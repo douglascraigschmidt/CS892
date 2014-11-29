@@ -16,7 +16,6 @@ class BufferedImage implements Image {
 
     /**
      * Constructor that converts @a imageData into a Java @a BufferedImage.
-     * @@ Nolan, we may need to change the type of the @imageData parameter..
      */
     public BufferedImage(byte[] imageData) {
 //    	try {
