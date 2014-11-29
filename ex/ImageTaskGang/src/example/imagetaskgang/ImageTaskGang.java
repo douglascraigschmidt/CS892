@@ -136,9 +136,10 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
-     * Block on the ExecutorCompletionService's completion queue,
-     * until all the processed downloads have been received.  Store
-     * the processed downloads in an organized manner
+     * Block on the ExecutorCompletionService's completion queue until
+     * all the processed downloads have been received and then print
+     * diagnostics indicating if the downloading and processing worked
+     * properly.
      */
     protected void concurrentlyProcessFilteredResults(int resultsCount) {
         // Loop for the designated number of results.
@@ -154,6 +155,7 @@ public class ImageTaskGang extends TaskGang<URL> {
                 // completion queue.
                 InputEntity inputEntity = resultFuture.get();
     
+                // Indicate success or failure for this URL.
                 PlatformStrategy.instance().errorLog
                     ("ImageTaskGang",
                      "Operations on file " 
@@ -234,8 +236,8 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
-     * Runs in a background Thread, downloads an image, and initiates
-     * processing on the image via the ExecutorCompletionService.
+     * Run in a background Thread, download an image, and perform
+     * processing/storing on the image via ExecutorCompletionService.
      */
     @Override
     protected boolean processInput(URL urlToDownload) {

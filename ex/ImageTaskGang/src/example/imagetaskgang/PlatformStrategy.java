@@ -71,11 +71,14 @@ public abstract class PlatformStrategy {
      * An enumeration of each different input source
      */
     public static enum InputSource {
-    	DEFAULT, USER, FILE, ERROR
+    	DEFAULT, // @@ Nolan, please document this enumeral.
+        USER,    // @@ Nolan, please document this enumeral.
+        FILE,    // @@ Nolan, please document this enumeral.
+        ERROR    // @@ Nolan, please document this enumeral.
     }
     
     /**
-     * Return an Iterator over a list of input URL lists
+     * Return an Iterator over a list of input URL lists.
      */
     public abstract Iterator<List<URL>> getUrlIterator(InputSource source);
     
@@ -103,23 +106,18 @@ public abstract class PlatformStrategy {
     }
     
     /**
-     * Takes a string input and returns the corresponding
-     * InputSource
+     * Takes a string input and returns the corresponding InputSource.
      */
     public InputSource getInputSource(String inputSource) {
-		if (inputSource.equalsIgnoreCase("DEFAULT")) {
-			return InputSource.DEFAULT;
-		}
-		else if (inputSource.equalsIgnoreCase("USER")) {
-			return InputSource.USER;
-		}
-		else if (inputSource.equalsIgnoreCase("FILE")) {
-			return InputSource.FILE;
-		}
-		else {
-			return InputSource.ERROR;
-		}
-	}
+        if (inputSource.equalsIgnoreCase("DEFAULT")) 
+            return InputSource.DEFAULT;
+        else if (inputSource.equalsIgnoreCase("USER")) 
+            return InputSource.USER;
+        else if (inputSource.equalsIgnoreCase("FILE")) 
+            return InputSource.FILE;
+        else 
+            return InputSource.ERROR;
+    }
 
     /**
      * Make the constructor protected to ensure singleton access.

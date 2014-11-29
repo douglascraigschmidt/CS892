@@ -127,48 +127,49 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
     
     /**
      * Gets an iterator over a list of lists of URLs from which
-     * we want to download images
+     * we want to download images.
      */
     public Iterator<List<URL>> getUrlIterator(InputSource source) {
     	List<List<URL>> variableNumberOfInputURLs = 
-                new ArrayList<List<URL>>();
+            new ArrayList<List<URL>>();
     	
+        // @@ Nolan, please document this code!
     	try {
-    		switch (source) {
-    		case DEFAULT:
-	            variableNumberOfInputURLs = super.getDefaultList();
-	            break;
+            switch (source) {
+            case DEFAULT:
+                variableNumberOfInputURLs = super.getDefaultList();
+                break;
 	            
-    		case USER:
-    			if (mOuterClass.get() != null) {
-	    			int numChildViews = 
-	    					mOuterClass.get().mListUrlGroups.getChildCount();
-			    	for (int i = 0; i < numChildViews; ++i) {
-			    		AutoCompleteTextView child = 
-			    				(AutoCompleteTextView) 
-			    				mOuterClass.get().mListUrlGroups.getChildAt(i);
-			    		List<URL> urls = new ArrayList<URL>();
-			            StringTokenizer tokenizer = 
-			                new StringTokenizer(child.getText().toString(), ", ");
-			            while (tokenizer.hasMoreTokens()) {
-		                    urls.add(new URL(tokenizer.nextToken().trim()));
-			            }
-			            variableNumberOfInputURLs.add(urls);
-			    	}
-    			}
-    			break;
+            case USER:
+                if (mOuterClass.get() != null) {
+                    int numChildViews = 
+                        mOuterClass.get().mListUrlGroups.getChildCount();
+                    for (int i = 0; i < numChildViews; ++i) {
+                        AutoCompleteTextView child = 
+                            (AutoCompleteTextView) 
+                            mOuterClass.get().mListUrlGroups.getChildAt(i);
+                        List<URL> urls = new ArrayList<URL>();
+                        StringTokenizer tokenizer = 
+                            new StringTokenizer(child.getText().toString(), ", ");
+                        while (tokenizer.hasMoreTokens()) {
+                            urls.add(new URL(tokenizer.nextToken().trim()));
+                        }
+                        variableNumberOfInputURLs.add(urls);
+                    }
+                }
+                break;
     			
-		    default:
-		    	if (mOuterClass.get() != null) 
-		    		mOuterClass.get().showToast("Invalid Source");
-		    	return null;
-	    	}
+            default:
+                if (mOuterClass.get() != null) 
+                    mOuterClass.get().showToast("Invalid Source");
+                return null;
+            }
     	} catch (MalformedURLException e) {
-    		if (mOuterClass.get() != null) 
-	    		mOuterClass.get().showToast("Invalid URL");
-    		return null;
+            if (mOuterClass.get() != null) 
+                mOuterClass.get().showToast("Invalid URL");
+            return null;
     	}
     	
-		return variableNumberOfInputURLs.iterator();
+        return variableNumberOfInputURLs.iterator();
     }
 }

@@ -24,50 +24,48 @@ import android.widget.LinearLayout;
 /**
  * @class ResultsActivity
  *
- * @brief Shows the results of the ImageDownloadTask in
- * an easily understood and clear format
+ * @brief Shows the results of the ImageDownloadTask in an easily
+ *        understood and clear format on the Android platform.
  */
 public class ResultsActivity extends Activity {
     /**
-     * The names of the filters used in the
-     * ImageDownloadTask. This is used to organize the
-     * results into groups
+     * The names of the filters used in the ImageDownloadTask. This is
+     * used to organize the results into groups.
      */
     private String[] mFilterNames;
 
     /**
-     * The layout that contains the buttons that 
-     * are responsible for loading the images into the 
-     * GridView
+     * The layout that contains the buttons that are responsible for
+     * loading the images into the GridView.
      */
     private LinearLayout mLayout;
     
     /**
-     * The column width to use for the GridView
+     * The column width to use for the GridView.
      */
     private int mColWidth;
     
     /**
-     * The number of columns to use in the GridView
+     * The number of columns to use in the GridView.
      */
     private int mNumCols;
     
     /**
-     * A reasonable column width
+     * A reasonable column width.
      */
     private final int COL_WIDTH = 300;
 
     /**
      * The adapter responsible for loading the results into
-     * the GridView
+     * the GridView.
      */
     private ImageAdapter bitmapAdapter;
 	
     /**
-     * Creates the activity and generates a button for 
-     * each filter applied to the images. These buttons
-     * load change the bitmapAdapter's source to a new directory,
-     * from which it will load images into the GridView.
+     * Creates the activity and generates a button for each filter
+     * applied to the images. These buttons load change the
+     * bitmapAdapter's source to a new directory, from which it will
+     * load images into the GridView.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,37 +88,37 @@ public class ResultsActivity extends Activity {
 
         // Iterate over the filter names and generate a button for 
         // each filter
-        for (String filterName : mFilterNames) {
-        	addResultButton(filterName);
-        }
+        for (String filterName : mFilterNames) 
+            addResultButton(filterName);
     }
     
     /**
-     * Add a button with the given filterName as its text.
-     * This button will load the results of the given filter
-     * into the GridView
+     * Add a button with the given filterName as its text.  This
+     * button will load the results of the given filter into the
+     * GridView
      */
     @SuppressLint("InflateParams")
 	private void addResultButton(String filterName) {
-    	// Create a new button with the layout of "result_button"
+    	// Create a new button with the layout of "result_button".
         Button resultButton = 
-            (Button) LayoutInflater.from(this).inflate (R.layout.result_button,
-                                                        null);
+            (Button) LayoutInflater.from(this).inflate 
+            (R.layout.result_button,
+             null);
         
-        // Set the new button's text and tag to the filter name
+        // Set the new button's text and tag to the filter name.
         resultButton.setText(filterName);
         resultButton.setTag(filterName);
         
-        // When the button is clicked, change the bitmapAdapter
-        // source to the appropriate filter directory
+        // When the button is clicked, change the bitmapAdapter source
+        // to the appropriate filter directory.
         resultButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Button button =
                         (Button) view;
                     
-                    // Find the filter directory and load the directory
-                    // as the source of the bitmapAdapter
+                    // Find the filter directory and load the
+                    // directory as the source of the bitmapAdapter.
                     bitmapAdapter.setBitmaps
                         (new File(PlatformStrategy.instance().getDirectoryPath(),
                                   button.getText().toString()).getAbsolutePath());
@@ -133,8 +131,8 @@ public class ResultsActivity extends Activity {
     }
     
     /**
-     * Configures the GridView with an appropriate column number
-     * and width based on the screen size
+     * Configures the GridView with an appropriate column number and
+     * width based on the screen size
      */
     private void configureGridView(GridView imageGrid) {
     	// Retrieve the Screen dimensions

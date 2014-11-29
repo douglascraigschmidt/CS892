@@ -12,8 +12,7 @@ import java.io.FileOutputStream;
  *        pattern.
  */
 public class OutputFilterDecorator extends FilterDecorator {
-	
-	/**
+    /**
      * Constructs the filter decorator with the @a filter to apply
      */
     public OutputFilterDecorator(Filter filter) {
@@ -25,10 +24,10 @@ public class OutputFilterDecorator extends FilterDecorator {
      * result by first forwarding to the super class for filtering and
      * then writing the results to an output file.
      */
-	@Override
+    @Override
 	protected InputEntity decorate(InputEntity inputEntity) {
-		// Call the applyFilter() hook method.
-		ImageEntity result = (ImageEntity) inputEntity;
+        // Call the applyFilter() hook method.
+        ImageEntity result = (ImageEntity) inputEntity;
 		
         // @@ Nolan use a try with resources once we upgrade to 1.7
         try {
@@ -62,6 +61,6 @@ public class OutputFilterDecorator extends FilterDecorator {
         }
 
         return result;
-	}
+    }
 
 }

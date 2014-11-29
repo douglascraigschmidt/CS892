@@ -24,16 +24,14 @@ import android.widget.Toast;
  */
 public class MainActivity extends Activity {
     /**
-     * A LinearLayout where each element is an 
-     * AutoCompleteTextview that holds a
-     * comma-separated list of URLs to download
+     * A LinearLayout where each element is an AutoCompleteTextview
+     * that holds a comma-separated list of URLs to download
      */
     protected LinearLayout mListUrlGroups;
 	
     /**
-     * Suggestions of default URLs that are supposed to be
-     * presented to the user via AutoCompleteTextView. Currently
-     * broken
+     * Suggestions of default URLs that are supposed to be presented
+     * to the user via AutoCompleteTextView. 
      */
     private final String[] SUGGESTIONS = new String[] {        
         "http://www.mariowiki.com/images/thumb/1/19/GoldMushroomNSMB2.png/200px-GoldMushroomNSMB2.png,"
@@ -44,8 +42,8 @@ public class MainActivity extends Activity {
     };
     
     /**
-     * The adapter responsible for recommending suggestions
-     * of URLs to download images from
+     * The adapter responsible for recommending suggestions of URLs to
+     * download images from.
      */
     private ArrayAdapter<String> mSuggestions;
 	
@@ -73,17 +71,12 @@ public class MainActivity extends Activity {
         new Runnable() {
             @Override
             public void run() {
-                // @@ Nolan, I don't think we need to run the
-                // displayResults() method on the UI Thread since
-                // startActivity() can be called from a background
-                // Thread.  Can you please experiment with this a bit
-                // to see if we can zap the call to runOnUiThread()
-                // here?
-            	// @@ Doug, see email
+                // Run the displayResults() method on the UI Thread so
+                // that startActivity() occurs in that context.
                 MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                        	setButtonsEnabled(true);
+                            setButtonsEnabled(true);
                             displayResults();
                         }
                     });
@@ -99,7 +92,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 		
-        mListUrlGroups = (LinearLayout) findViewById(R.id.listOfURLLists);
+        mListUrlGroups =
+            (LinearLayout) findViewById(R.id.listOfURLLists);
 
         // Initializes the Platform singleton with the appropriate
         // Platform strategy, which in this case will be the
@@ -113,47 +107,44 @@ public class MainActivity extends Activity {
     }
     
     /**
-     * Hook method that is called first when the 
-     * activity context has been created. 
-     * Set the mSuggestions in onStart() so we are
-     * sure the context exists and will not throw
-     * a NullPointerException
+     * Hook method that is called first when the activity context has
+     * been created.  Set the mSuggestions in onStart() so we are sure
+     * the context exists and will not throw a NullPointerException
      */
     @Override
     protected void onStart() {
     	super.onStart();
-    	 mSuggestions =
-    			 new ArrayAdapter<String>(this,
-                         				  R.layout.suggestion_item,
-                         				  SUGGESTIONS);
+    	 mSuggestions = 
+             new ArrayAdapter<String>(this,
+                                      R.layout.suggestion_item,
+                                      SUGGESTIONS);
     }
 	
     /**
-     * Adds a list to the ListView to allow for variable
-     * number of lists to process (i.e. variable number
-     * of cycles in the TaskGang).
+     * Adds a list to the ListView to allow for variable number of
+     * lists to process (i.e. variable number of cycles in the
+     * TaskGang).
      */
     @SuppressLint("InflateParams")
 	public void addList(View view) {
         AutoCompleteTextView newList = 
-        		(AutoCompleteTextView) 
-        		LayoutInflater.from(this).inflate (R.layout.list_item,
-        										   null);
+            (AutoCompleteTextView) 
+            LayoutInflater.from(this).inflate (R.layout.list_item,
+                                               null);
         newList.setAdapter(mSuggestions);
         mListUrlGroups.addView(newList);
         mListUrlGroups.invalidate();
     }
 	
     /**
-     * Run the gang using a default set of URL lists 
-     * hardcoded into the application rather than 
-     * reading the input lists
+     * Run the gang using a default set of URL lists hardcoded into
+     * the application rather than reading the input lists
      */
     public void useDefault(View view) {
         new Thread(new ImageTaskGang(FILTERS,
-        		PlatformStrategy.instance().getUrlIterator(
-        				PlatformStrategy.InputSource.DEFAULT),
-                displayResultsRunnable)).start();
+        		PlatformStrategy.instance().getUrlIterator
+                                     (PlatformStrategy.InputSource.DEFAULT),
+                                     displayResultsRunnable)).start();
         
         setButtonsEnabled(false);
     }
@@ -163,39 +154,40 @@ public class MainActivity extends Activity {
      */
     public void runGang(View view) {
     	Iterator<List<URL>> iterator = 
-    			PlatformStrategy.instance().getUrlIterator(
-    					PlatformStrategy.InputSource.USER);
+            PlatformStrategy.instance().getUrlIterator
+            (PlatformStrategy.InputSource.USER);
     	
-    	// Check to see if the user entered any lists
+    	// Check to see if the user entered any lists.
     	if (iterator != null) {
-    		if (iterator.hasNext() && !isEmpty()) {
-		        new Thread(new ImageTaskGang(FILTERS,
-		        							 iterator,
-		        							 displayResultsRunnable)).start();
-		        setButtonsEnabled(false);
-    		}
-	    	else {
-	    		showToast("No user lists entered");
-	    	}
+            if (iterator.hasNext() && !isEmpty()) {
+                new Thread(new ImageTaskGang(FILTERS,
+                                             iterator,
+                                             displayResultsRunnable)).start();
+                setButtonsEnabled(false);
+            }
+            else 
+                showToast("No user lists entered");
     	}
     }
     
     /**
-     * Checks to see if all the lists are empty
+     * Checks to see if all the lists are empty.
      */
     private boolean isEmpty() {
     	int listCount = mListUrlGroups.getChildCount();
     	for (int i = 0; i < listCount; ++i) {
-    		AutoCompleteTextView list = 
-    				(AutoCompleteTextView) mListUrlGroups.getChildAt(i);
-    		if (list.getText().length() > 0) {
-    			return false;
-    		}
+            AutoCompleteTextView list = 
+                (AutoCompleteTextView) mListUrlGroups.getChildAt(i);
+            if (list.getText().length() > 0) 
+                return false;
     	}
     	return true;
     }
 
-	private void setButtonsEnabled(boolean enabled) {
+    /**
+     * @@ Nolan, please document this method!
+     */
+    private void setButtonsEnabled(boolean enabled) {
     	LinearLayout buttonLayout = 
     			(LinearLayout) findViewById(R.id.buttonLayout);
     	int buttonCount = buttonLayout.getChildCount();
@@ -205,58 +197,58 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * Delete the previously downloaded pictures and directories
+     * Delete the previously downloaded pictures and directories.
      */
     public void clearFilterDirectories(View view) {
     	setButtonsEnabled(false);
         for (Filter filter : FILTERS) {
-            deleteSubFolders(
-            		new File(PlatformStrategy.instance().getDirectoryPath(), 
-                             filter.getName()).getAbsolutePath());
+            deleteSubFolders
+                (new File(PlatformStrategy.instance().getDirectoryPath(), 
+                          filter.getName()).getAbsolutePath());
         }
         setButtonsEnabled(true);
         showToast("Previously downloaded files deleted");
     }
 	
     /**
-     * A helper method that recursively deletes files in a 
-     * specified directory. Android does not allow you to
-     * delete a directory with child files.
+     * A helper method that recursively deletes files in a specified
+     * directory. Android does not allow you to delete a directory
+     * with child files.
      */
     private void deleteSubFolders(String path) {
         File currentFolder = new File(path);        
         File files[] = currentFolder.listFiles();
 
-        if (files == null) {
+        if (files == null) 
             return;
-        }
+
         for (File f : files) {          
-            if (f.isDirectory()) {
+            if (f.isDirectory()) 
                 deleteSubFolders(f.toString());
-            }
             f.delete();
         }
         currentFolder.delete();
     }
 	
     /**
-     * Starts the intent to view the results via ResultsActivity
+     * Starts the intent to view the results via ResultsActivity.
      */
     private void displayResults() {
-        // Pass a list of filterNames to the ResultsActivity
-    	// so it knows what buttons to generate to allow
-    	// the user to view all the downloaded results.
+        // Pass a list of filterNames to the ResultsActivity so it
+    	// knows what buttons to generate to allow the user to view
+    	// all the downloaded results.
         String[] filterNames = new String[FILTERS.length];
         for (int i = 0; i < filterNames.length; ++i) {
             filterNames[i] = FILTERS[i].getName();
         }
         
-        // Create the intent and add the list of filterNames as an extra
-        Intent resultsIntent = new Intent(this,
-                                          ResultsActivity.class);
+        // Create the intent and add the list of filterNames as an
+        // extra.
+        Intent resultsIntent =
+            new Intent(this,
+                       ResultsActivity.class);
         resultsIntent.putExtra(FILTER_EXTRA, 
                                filterNames);
-        
         // Start the ResultsActivity
         startActivity(resultsIntent);
     }
@@ -269,5 +261,4 @@ public class MainActivity extends Activity {
                        msg,
                        Toast.LENGTH_SHORT).show();
     }
-    
 }
