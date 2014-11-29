@@ -1,6 +1,9 @@
 package example.imagetaskgang;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -86,17 +89,6 @@ public class MainActivity extends Activity {
                     });
             }
         };
-        
-    /**
-     * Runnable to run if getURLIterator() fails 
-     */
-    final Runnable errorRunnable = 
-	    new Runnable() {
-	        @Override
-	        public void run() {
-	        	showToast("Error getting URL input. Check URLs and input source");
-	        }
-	    };
 
     /**
      * Hook method called when the Activity is first launched to
@@ -170,12 +162,37 @@ public class MainActivity extends Activity {
      * Run the gang by reading the input lists of URLs
      */
     public void runGang(View view) {
-        new Thread(new ImageTaskGang(FILTERS,
-        		PlatformStrategy.instance().getUrlIterator(
-        				PlatformStrategy.InputSource.USER),
-                displayResultsRunnable)).start();
-        
-        setButtonsEnabled(false);
+    	Iterator<List<URL>> iterator = 
+    			PlatformStrategy.instance().getUrlIterator(
+    					PlatformStrategy.InputSource.USER);
+    	
+    	// Check to see if the user entered any lists
+    	if (iterator != null) {
+    		if (iterator.hasNext() && !isEmpty()) {
+		        new Thread(new ImageTaskGang(FILTERS,
+		        							 iterator,
+		        							 displayResultsRunnable)).start();
+		        setButtonsEnabled(false);
+    		}
+	    	else {
+	    		showToast("No user lists entered");
+	    	}
+    	}
+    }
+    
+    /**
+     * Checks to see if all the lists are empty
+     */
+    private boolean isEmpty() {
+    	int listCount = mListUrlGroups.getChildCount();
+    	for (int i = 0; i < listCount; ++i) {
+    		AutoCompleteTextView list = 
+    				(AutoCompleteTextView) mListUrlGroups.getChildAt(i);
+    		if (list.getText().length() > 0) {
+    			return false;
+    		}
+    	}
+    	return true;
     }
 
 	private void setButtonsEnabled(boolean enabled) {

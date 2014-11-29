@@ -43,11 +43,48 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      * Create an Image.
      */
     public Image makeImage(byte[] imageData){
-        return new BufferedImage(imageData); // @@ Nolan, need to fix this.
+        return new BufferedImage(imageData);
     }
      
     public InputEntity applyGrayscaleFilter(InputEntity inputEntity) {
-        // @@ Nolan, need to fix this.
+//    	Image imageAdapter = ((ImageEntity) inputEntity).getImage();
+//    	java.awt.image.BufferedImage originalImage = ((BufferedImage) imageAdapter).mBufferedImage;
+//        java.awt.image.BufferedImage grayScaleImg =
+//        		new java.awt.image.BufferedImage(originalImage.getColorModel(),
+//                                  originalImage.copyData(null),
+//                                  originalImage.getColorModel().isAlphaPremultiplied(),
+//                                  null);
+//
+//        boolean hasTransparent = grayScaleImg.getColorModel().hasAlpha();
+//        int width = grayScaleImg.getWidth();
+//        int height = grayScaleImg.getHeight();
+//
+//        // A common pixel-by-pixel grayscale conversion algorithm 
+//        // using values obtained from http://en.wikipedia.org/wiki/Grayscale
+//        for (int i = 0; i < height; ++i) {
+//            for (int j = 0; j < width; ++j) {
+//            	
+//            	// Check if the pixel is transparent in the original
+//                if (hasTransparent 
+//                    && (grayScaleImg.getRGB(j, i) >> 24) == 0x00) {
+//                    continue;
+//                }
+//                
+//                // Convert the pixel to grayscale
+//                Color c = new Color(grayScaleImg.getRGB(j, i));
+//                int grayConversion = (int) (c.getRed() * 0.299)
+//                    + (int) (c.getGreen() * 0.587)
+//                    + (int) (c.getBlue() * 0.114);
+//                Color grayScale = new Color(grayConversion, grayConversion,
+//                                            grayConversion);
+//                grayScaleImg.setRGB(j, i, grayScale.getRGB());
+//            }
+//        }
+//   	
+//    	  BufferedImage grayScaleImage = new BufferedImage(grayScaleImg);
+//
+//        return new ImageEntity(processResult.getSourceURL(),
+//                               grayScaleImage);
     	return inputEntity;
     }
     
@@ -69,6 +106,10 @@ public class PlatformStrategyConsole extends PlatformStrategy {
                         + errorMessage);
     }
 
+    /**
+     * Overrides the getURLIterator method to return the
+     * Console-specific input sources.
+     */
 	public Iterator<List<URL>> getUrlIterator(InputSource source) {
 		List<List<URL>> variableNumberOfInputURLs = 
                 new ArrayList<List<URL>>();

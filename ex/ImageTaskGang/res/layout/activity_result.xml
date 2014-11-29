@@ -3,8 +3,7 @@
     android:id="@+id/resultLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal" >
+    android:orientation="vertical" >
     
     <HorizontalScrollView
         android:id="@+id/scrollView"
@@ -16,14 +15,17 @@
             android:id="@+id/buttonList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"
+            android:gravity="left" />
         
     </HorizontalScrollView>
-    
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8" />
+   
+    <GridView
+	    android:id="@+id/imageGrid"
+	    android:layout_width="match_parent"
+	    android:layout_height="0dp"
+	    android:layout_weight="8"
+	    android:stretchMode="columnWidth"
+	    android:gravity="center" />
     
 </LinearLayout>

@@ -28,10 +28,9 @@ public class OutputFilterDecorator extends FilterDecorator {
 	@Override
 	protected InputEntity decorate(InputEntity inputEntity) {
 		// Call the applyFilter() hook method.
-        //ImageEntity result = (ImageEntity) super.filter(inputEntity);
 		ImageEntity result = (ImageEntity) inputEntity;
 		
-        // @@ Nolan use a try with resources
+        // @@ Nolan use a try with resources once we upgrade to 1.7
         try {
             // Make a directory for the filter if it does not already
             // exist.

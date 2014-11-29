@@ -67,12 +67,22 @@ public abstract class PlatformStrategy {
     public abstract void errorLog(String javaFile,
                                   String errorMessage);
     
+    /**
+     * An enumeration of each different input source
+     */
     public static enum InputSource {
     	DEFAULT, USER, FILE, ERROR
     }
     
+    /**
+     * Return an Iterator over a list of input URL lists
+     */
     public abstract Iterator<List<URL>> getUrlIterator(InputSource source);
     
+    /**
+     * Returns a List of default URL Lists that is usable in either
+     * platform.
+     */
     protected List<List<URL>> getDefaultList() throws MalformedURLException {
     	final List<List<URL>> variableNumberOfInputURLs = 
                 new ArrayList<List<URL>>();
@@ -92,6 +102,10 @@ public abstract class PlatformStrategy {
     	return variableNumberOfInputURLs;
     }
     
+    /**
+     * Takes a string input and returns the corresponding
+     * InputSource
+     */
     public InputSource getInputSource(String inputSource) {
 		if (inputSource.equalsIgnoreCase("DEFAULT")) {
 			return InputSource.DEFAULT;
