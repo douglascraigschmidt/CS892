@@ -31,33 +31,41 @@ public class OutputFilterDecorator extends FilterDecorator {
     @SuppressLint("NewApi")
     @Override
     protected InputEntity decorate(InputEntity inputEntity) {
-        // Call the applyFilter() hook method.
-        ImageEntity result = (ImageEntity) inputEntity;
+        if (android.os.Environment.getExternalStorageState().equals
+            (android.os.Environment.MEDIA_MOUNTED)) {
+            // Call the applyFilter() hook method.
+            ImageEntity result = (ImageEntity) inputEntity;
 		
-        // Make a directory for the filter if it does not already
-        // exist.
-        File externalFile = 
-            new File(PlatformStrategy.instance().getDirectoryPath(),
-                     this.getName());
-        externalFile.mkdirs();
+            // Make a directory for the filter if it does not already
+            // exist.
+            File externalFile = 
+                new File(PlatformStrategy.instance().getDirectoryPath(),
+                         this.getName());
+            externalFile.mkdirs();
         
-        // We will store the filtered image as its original filename,
-        // within the appropriate filter directory to organize the
-        // filtered results.
-        File newImage = 
-            new File(externalFile, 
-                     result.getFileName());
+            // We will store the filtered image as its original filename,
+            // within the appropriate filter directory to organize the
+            // filtered results.
+            File newImage = 
+                new File(externalFile, 
+                         result.getFileName());
         
-        // Write the compressed image to the appropriate directory.
-        try (FileOutputStream outputFile = new FileOutputStream(newImage)) {
-             PlatformStrategy.instance().storeImage(result.getImage(),
-                                                    outputFile);
-        } catch (Exception e) {
-            // Try-with-resources will clean up resources.
-            e.printStackTrace();
+            // Write the compressed image to the appropriate directory.
+            try (FileOutputStream outputFile = new FileOutputStream(newImage)) {
+                    PlatformStrategy.instance().storeImage(result.getImage(),
+                                                           outputFile);
+                } catch (Exception e) {
+                // Try-with-resources will clean up resources.
+                e.printStackTrace();
+                return null;
+            }
+
+            return result;
+        } else {
+            PlatformStrategy.instance().errorLog
+                ("OutoutFileDecorator",
+                 "sdcard isn't mounted");
             return null;
         }
-
-        return result;
     }
 }
