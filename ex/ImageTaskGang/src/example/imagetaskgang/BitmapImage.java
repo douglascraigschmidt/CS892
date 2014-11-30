@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory;
 /**
  * @class BitmapImage
  *
- * @brief Encapsulates the Android Bitmap class via a
- *        platform-independent interface.
+ * @brief Encapsulates the Android Bitmap class by extending
+ *        the platform-independent Image interface.
  */
 class BitmapImage implements Image {
     /**
@@ -23,7 +23,8 @@ class BitmapImage implements Image {
     private static final int IMAGE_HEIGHT = 250;
 
     /**
-     * Constructor that converts @a imageData into an Android Bitmap.
+     * Constructor that converts an @a imageData raw byte array into
+     * an Android Bitmap.
      */
     public BitmapImage(byte[] imageData) {
         mBitmap = decodeSampledBitmapFromByteArray(imageData,
@@ -69,7 +70,7 @@ class BitmapImage implements Image {
     }
     
     /**
-     * Calculates the sampling rate of the bitmap to fit the given
+     * Calculates the Bitmap's sampling rate to fit the given
      * dimensions. Adapted from
      * developer.android.com/training/displaying-bitmaps/load-bitmap.html
      */

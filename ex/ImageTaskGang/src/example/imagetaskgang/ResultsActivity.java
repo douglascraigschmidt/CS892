@@ -24,12 +24,12 @@ import android.widget.LinearLayout;
 /**
  * @class ResultsActivity
  *
- * @brief Shows the results of the ImageDownloadTask in an easily
- *        understood and clear format on the Android platform.
+ * @brief Shows the results Images downloaded by the ImageTaskGang in
+ *        on the Android platform.
  */
 public class ResultsActivity extends Activity {
     /**
-     * The names of the filters used in the ImageDownloadTask. This is
+     * The names of the filters used in the ImageTaskGang, which is
      * used to organize the results into groups.
      */
     private String[] mFilterNames;
@@ -56,15 +56,15 @@ public class ResultsActivity extends Activity {
     private final int COL_WIDTH = 300;
 
     /**
-     * The adapter responsible for loading the results into
-     * the GridView.
+     * The adapter responsible for loading the results into the
+     * GridView.
      */
-    private ImageAdapter bitmapAdapter;
+    private ImageAdapter imageAdapter;
 	
     /**
      * Creates the activity and generates a button for each filter
      * applied to the images. These buttons load change the
-     * bitmapAdapter's source to a new directory, from which it will
+     * imageAdapter's source to a new directory, from which it will
      * load images into the GridView.
      */
     @Override
@@ -72,22 +72,22 @@ public class ResultsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
         
-        // Retrieve the Layout that buttons will be added to
+        // Retrieve the Layout that buttons will be added to.
         mLayout = (LinearLayout) findViewById(R.id.buttonList);
 		
-        // Configure the GridView adapter and dimensions
-        bitmapAdapter = new ImageAdapter(this);
+        // Configure the GridView adapter and dimensions.
+        imageAdapter = new ImageAdapter(this);
         GridView imageGrid = (GridView) findViewById(R.id.imageGrid);
-        imageGrid.setAdapter(bitmapAdapter);
+        imageGrid.setAdapter(imageAdapter);
         configureGridView(imageGrid);
         
-        // Retrieves the names of the filters applied to this
-        // set of downloads.
+        // Retrieves the names of the filters applied to this set of
+        // downloads.
         mFilterNames =
             getIntent().getStringArrayExtra(MainActivity.FILTER_EXTRA);
 
-        // Iterate over the filter names and generate a button for 
-        // each filter
+        // Iterate over the filter names and generate a button for
+        // each filter.
         for (String filterName : mFilterNames) 
             addResultButton(filterName);
     }
@@ -98,7 +98,7 @@ public class ResultsActivity extends Activity {
      * GridView
      */
     @SuppressLint("InflateParams")
-	private void addResultButton(String filterName) {
+    private void addResultButton(String filterName) {
     	// Create a new button with the layout of "result_button".
         Button resultButton = 
             (Button) LayoutInflater.from(this).inflate 
@@ -109,7 +109,7 @@ public class ResultsActivity extends Activity {
         resultButton.setText(filterName);
         resultButton.setTag(filterName);
         
-        // When the button is clicked, change the bitmapAdapter source
+        // When the button is clicked, change the imageAdapter source
         // to the appropriate filter directory.
         resultButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -118,33 +118,33 @@ public class ResultsActivity extends Activity {
                         (Button) view;
                     
                     // Find the filter directory and load the
-                    // directory as the source of the bitmapAdapter.
-                    bitmapAdapter.setBitmaps
+                    // directory as the source of the imageAdapter.
+                    imageAdapter.setBitmaps
                         (new File(PlatformStrategy.instance().getDirectoryPath(),
                                   button.getText().toString()).getAbsolutePath());
 				
                 }
             });
         
-        // Add the button to the layout
+        // Add the button to the layout.
         mLayout.addView(resultButton);
     }
     
     /**
      * Configures the GridView with an appropriate column number and
-     * width based on the screen size
+     * width based on the screen size.
      */
     private void configureGridView(GridView imageGrid) {
-    	// Retrieve the Screen dimensions
+    	// Retrieve the Screen dimensions.
         Display display = getWindowManager().getDefaultDisplay();
     	Point size = new Point();
     	display.getSize(size);
     	
-    	// Calculate appropriate values
+    	// Calculate appropriate values.
     	mNumCols = size.x/COL_WIDTH;
     	mColWidth = size.x/mNumCols;
     	
-    	// Configure the GridView with dynamic values
+    	// Configure the GridView with dynamic values.
     	imageGrid.setColumnWidth(mColWidth);
     	imageGrid.setNumColumns(mNumCols);
     }
@@ -152,8 +152,8 @@ public class ResultsActivity extends Activity {
     /**
      * @class ImageAdapter
      *
-     * @brief The Adapter that loads the images into the
-     * Layout's GridView
+     * @brief The Adapter that loads the Images into the Layout's
+     *        GridView.
      */
     public class ImageAdapter extends BaseAdapter {
         /**
@@ -167,12 +167,12 @@ public class ResultsActivity extends Activity {
         private int mPadding = 8;
 
         /**
-         * the ArrayList of bitmaps that hold the thumbnail images
+         * The ArrayList of bitmaps that hold the thumbnail images.
          */
         private ArrayList<Bitmap> mBitmaps;
 
         /**
-         * Creates the ImageAdapter in the given context
+         * Creates the ImageAdapter in the given context.
          */
         public ImageAdapter(Context c) {
             mContext = c;
@@ -180,7 +180,7 @@ public class ResultsActivity extends Activity {
         }
 
         /**
-         * Returns the count of bitmaps in the list
+         * Returns the count of bitmaps in the list.
          */
         @Override
             public int getCount() {
@@ -188,7 +188,7 @@ public class ResultsActivity extends Activity {
         }
 
         /**
-         * Returns the bitmap at the given position
+         * Returns the bitmap at the given position.
          */
         @Override
             public Object getItem(int position) {
@@ -196,9 +196,9 @@ public class ResultsActivity extends Activity {
         }
 
         /**
-         * Returns the given position as the Id of the bitmap.
-         * This works because the bitmaps are stored in a
-         * sequential manner.
+         * Returns the given position as the Id of the bitmap.  This
+         * works because the bitmaps are stored in a sequential
+         * manner.
          */
         @Override
             public long getItemId(int position) {
@@ -206,8 +206,8 @@ public class ResultsActivity extends Activity {
         }
 
         /**
-         * Returns the view. This method is necessary for
-         * filling the GridView appropriately
+         * Returns the view. This method is necessary for filling the
+         * GridView appropriately.
          */
         @Override
         public View getView(int position,
@@ -230,8 +230,8 @@ public class ResultsActivity extends Activity {
         }
 
         /**
-         * Resets the bitmaps of the GridView to the one's
-         * found at the given filterPath
+         * Resets the bitmaps of the GridView to the ones found at the
+         * given filterPath.
          */
         private void setBitmaps(String filterPath) {
             File[] bitmaps = new File(filterPath).listFiles();

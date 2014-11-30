@@ -25,13 +25,13 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     /**
      * A LinearLayout where each element is an AutoCompleteTextview
-     * that holds a comma-separated list of URLs to download
+     * that holds a comma-separated list of URLs to download.
      */
     protected LinearLayout mListUrlGroups;
 	
     /**
      * Suggestions of default URLs that are supposed to be presented
-     * to the user via AutoCompleteTextView. 
+     * to the user via AutoCompleteTextView.
      */
     private final String[] SUGGESTIONS = new String[] {        
         "http://www.mariowiki.com/images/thumb/1/19/GoldMushroomNSMB2.png/200px-GoldMushroomNSMB2.png,"
@@ -56,16 +56,16 @@ public class MainActivity extends Activity {
     };
 	
     /**
-     * The name of the extra attached to the intent that
-     * starts ResultActivity. This allows the ResultActivity
-     * to divide the output into groups for viewing the results 
-     * more clearly.
+     * The name of the extra attached to the intent that starts
+     * ResultActivity, which allows the ResultActivity to divide the
+     * output into groups for viewing the results more clearly.
      */
     static final String FILTER_EXTRA = "filter_extra";
 
     /**
-     * Define a completion hook that's called back when the
-     * ImageTaskGang is finished to display the results.
+     * Define a completion hook that's called back to display the
+     * results after the ImageTaskGang finishes downloading,
+     * processing, and storing Images provided by the List of URLs.
      */
     final Runnable displayResultsRunnable = 
         new Runnable() {
@@ -90,26 +90,31 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set the main view.
         setContentView(R.layout.activity_main);
 		
+        // Cache a LinearLayout where each element is an
+        // AutoCompleteTextview that holds a comma-separated list of
+        // URLs to download.
         mListUrlGroups =
             (LinearLayout) findViewById(R.id.listOfURLLists);
 
-        // Initializes the Platform singleton with the appropriate
+        // Initialize the Platform singleton with the appropriate
         // Platform strategy, which in this case will be the
         // AndroidPlatform.
         PlatformStrategy.instance
             (new PlatformStrategyFactory(this)
              .makePlatformStrategy());
 
-        // Initializes the Options singleton.
+        // Initialize the Options singleton.
         Options.instance().parseArgs(null);
     }
     
     /**
      * Hook method that is called first when the activity context has
      * been created.  Set the mSuggestions in onStart() so we are sure
-     * the context exists and will not throw a NullPointerException
+     * the context exists and will not throw a NullPointerException.
      */
     @Override
     protected void onStart() {
@@ -126,7 +131,7 @@ public class MainActivity extends Activity {
      * TaskGang).
      */
     @SuppressLint("InflateParams")
-	public void addList(View view) {
+    public void addList(View view) {
         AutoCompleteTextView newList = 
             (AutoCompleteTextView) 
             LayoutInflater.from(this).inflate (R.layout.list_item,
@@ -138,19 +143,18 @@ public class MainActivity extends Activity {
 	
     /**
      * Run the gang using a default set of URL lists hardcoded into
-     * the application rather than reading the input lists
+     * the application rather than reading the input lists.
      */
     public void useDefault(View view) {
         new Thread(new ImageTaskGang(FILTERS,
         		PlatformStrategy.instance().getUrlIterator
                                      (PlatformStrategy.InputSource.DEFAULT),
                                      displayResultsRunnable)).start();
-        
         setButtonsEnabled(false);
     }
 	
     /**
-     * Run the gang by reading the input lists of URLs
+     * Run the gang by reading the input lists of URLs.
      */
     public void runGang(View view) {
     	Iterator<List<URL>> iterator = 
@@ -164,8 +168,7 @@ public class MainActivity extends Activity {
                                              iterator,
                                              displayResultsRunnable)).start();
                 setButtonsEnabled(false);
-            }
-            else 
+            } else 
                 showToast("No user lists entered");
     	}
     }
@@ -185,10 +188,10 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Sets the list of buttons to disabled. This shows
-     * that the application is processing visually, and is 
-     * a (slightly forceful) way to keep multiple task gangs
-     * from being started accidentally.
+     * Sets the list of buttons to disabled, which shows that the
+     * application is processing visually, and is a (slightly
+     * forceful) way to keep multiple task gangs from being started
+     * accidentally.
      */
     private void setButtonsEnabled(boolean enabled) {
     	LinearLayout buttonLayout = 
@@ -215,8 +218,7 @@ public class MainActivity extends Activity {
 	
     /**
      * A helper method that recursively deletes files in a specified
-     * directory. Android does not allow you to delete a directory
-     * with child files.
+     * directory. 
      */
     private void deleteSubFolders(String path) {
         File currentFolder = new File(path);        
@@ -225,6 +227,9 @@ public class MainActivity extends Activity {
         if (files == null) 
             return;
 
+        // Android does not allow you to delete a directory with child
+        // files, so we need to write code that handles this
+        // recursively.
         for (File f : files) {          
             if (f.isDirectory()) 
                 deleteSubFolders(f.toString());
@@ -234,16 +239,18 @@ public class MainActivity extends Activity {
     }
 	
     /**
-     * Starts the intent to view the results via ResultsActivity.
+     * Creates an Intent that's used to start the ResultsActivity,
+     * which can be used to view the results.
      */
     private void displayResults() {
         // Pass a list of filterNames to the ResultsActivity so it
     	// knows what buttons to generate to allow the user to view
     	// all the downloaded results.
-        String[] filterNames = new String[FILTERS.length];
-        for (int i = 0; i < filterNames.length; ++i) {
+        String[] filterNames =
+            new String[FILTERS.length];
+
+        for (int i = 0; i < filterNames.length; ++i) 
             filterNames[i] = FILTERS[i].getName();
-        }
         
         // Create the intent and add the list of filterNames as an
         // extra.
@@ -252,7 +259,7 @@ public class MainActivity extends Activity {
                        ResultsActivity.class);
         resultsIntent.putExtra(FILTER_EXTRA, 
                                filterNames);
-        // Start the ResultsActivity
+        // Start the ResultsActivity.
         startActivity(resultsIntent);
     }
     

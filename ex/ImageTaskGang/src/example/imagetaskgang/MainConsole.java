@@ -21,20 +21,18 @@ public class MainConsole {
     };
 
     /**
-     * The Java virtual machine requires the instantiation of a main
-     * method to run the console version of the PlayPingPong app.
+     * The JVM requires the instantiation of a main() method to run
+     * the console version of the ImageTaskGang application.
      */
     public static void main(String[] args) {
-        /** 
-         * Initializes the Platform singleton with the appropriate
-         * PlatformStrategy, which in this case will be the
-         * ConsolePlatform.
-         */
+        // Initializes the Platform singleton with the appropriate
+        // PlatformStrategy, which in this case will be the
+        // ConsolePlatform.
         PlatformStrategy.instance
             (new PlatformStrategyFactory
              (System.out).makePlatformStrategy());
 
-        /** Initializes the Options singleton. */
+        // Initializes the Options singleton.
         Options.instance().parseArgs(args);
 
         PlatformStrategy.instance().errorLog("MainConsole", 
@@ -60,8 +58,8 @@ public class MainConsole {
         // download and process.
         Iterator<List<URL>> urlIterator = 
             PlatformStrategy.instance().getUrlIterator
-                (PlatformStrategy.instance().getInputSource
-                     (Options.instance().getInputSource()));
+            (PlatformStrategy.instance().getInputSource
+             (Options.instance().getInputSource()));
 
         // Create an anonymous Thread to run a new instance of
         // ImageTaskGang.

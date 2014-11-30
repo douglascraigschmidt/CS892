@@ -28,7 +28,10 @@ import android.annotation.SuppressLint;
  *        displayed to users via various means defined by the context
  *        in which this class is used.
  *
- *        This class implements the "..." in the Proactor pattern.
+ *        This class implements the roles of the "Proactive Initiator"
+ *        and "Completion Handler" in the Proactor pattern and also
+ *        plays the role of the "Concrete Class" in the Template
+ *        Method pattern.
  */
 public class ImageTaskGang extends TaskGang<URL> {
     /**
@@ -37,28 +40,30 @@ public class ImageTaskGang extends TaskGang<URL> {
     private List<Filter> mFilters;
 
     /**
-     * An iterator to the input URLs from which we will download
-     * images.
+     * An iterator to the List of input URLs that are used to download
+     * Images.
      */
     private Iterator<List<URL>> mUrlIterator;
 
     /**
      * An ExecutorCompletionService that executes image filtering
-     * tasks on designated URLs.
+     * tasks on designated URLs.  This plays the role of the
+     * "Asynchronous Operation Processor" in the Proactor pattern.
      */
     private ExecutorCompletionService<InputEntity> mCompletionService;
 
     /**
-     * Set the completion hook that's called when all the images are
-     * downloaded and processed.
+     * Clients of ImageTaskGang supply this hook so they know when the
+     * images have been downloaded, processed, and stored, at which
+     * point they typically display the stored images.
      */
     private Runnable mCompletionHook;
 
     /**
      * The barrier that's used to coordinate each cycle, i.e., each
-     * Thread must await on mIterationBarrier for all the other
-     * Threads to complete their processing before they all attempt to
-     * move to the next cycle en masse.
+     * Thread in the TaskGang must await on mIterationBarrier for all
+     * the other Threads to complete their processing before they all
+     * attempt to move to the next cycle en masse.
      */
     protected CountDownLatch mIterationBarrier = null;
 
@@ -71,7 +76,7 @@ public class ImageTaskGang extends TaskGang<URL> {
         // Create an Iterator for the array of URLs to download.
         mUrlIterator = urlIterator;
 
-        // Store the Filters to apply.
+        // Store the Filters to apply as a List.
         mFilters = Arrays.asList(filters);
 
         // Initialize the Executor with a cached pool of Threads,
@@ -79,7 +84,7 @@ public class ImageTaskGang extends TaskGang<URL> {
         setExecutor(Executors.newCachedThreadPool());
 
         // Connect the Executor with the CompletionService to process
-        // SearchResults concurrently.
+        // result Futures concurrently.
         mCompletionService =
             new ExecutorCompletionService<InputEntity>(getExecutor());
 
@@ -122,7 +127,7 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
-     * Initiate the TaskGang to run each task in a pool of Threads
+     * Initiate the TaskGang to run each task in a pool of Threads.
      */
     @Override
     protected void initiateTaskGang(int inputSize) {
@@ -130,7 +135,8 @@ public class ImageTaskGang extends TaskGang<URL> {
         mIterationBarrier = new CountDownLatch(inputSize);
 
         // Enqueue each item in the input List for execution in the
-        // Executor's Thread pool.
+        // Executor's Thread pool, which will ensure there's a Thread
+        // allocated for each task.
         for (int i = 0; i < inputSize; ++i)
             getExecutor().execute(makeTask(i));
     }
@@ -163,7 +169,6 @@ public class ImageTaskGang extends TaskGang<URL> {
                      + (inputEntity.succeeded() == true 
                         ? " succeeded" 
                         : " failed"));
-                     
             } catch (ExecutionException e) {
                 PlatformStrategy.instance().errorLog("ImageTaskGang",
                                                      "get() ExecutionException");
@@ -183,6 +188,7 @@ public class ImageTaskGang extends TaskGang<URL> {
             // Keeps track of the number of result Futures to process.
             int resultsCount = 0;
 
+            // Loop for each iteration cycle of input URLs.
             for (;;) {
                 // Increment the number of URLs to download.
                 resultsCount += getInput().size();
@@ -194,10 +200,10 @@ public class ImageTaskGang extends TaskGang<URL> {
                 // Check to see if there's any input remaining to
                 // process.
                 if (setInput(getNextInput()) == null)
-                    break;
+                    break; // No more input, so we're done.
                 else
-                    // Invoke hook method to initialize the gang of
-                    // tasks for the next iteration cycle.
+                    // Invoke this hook method to initialize the gang
+                    // of tasks for the next iteration cycle.
                     initiateTaskGang(getInput().size());
             } 
 
@@ -230,18 +236,18 @@ public class ImageTaskGang extends TaskGang<URL> {
             e.printStackTrace();
         }
 
-        // Run the completion hook now that all the image processing
-        // is done.
+        // Run the completion hook now that all the image downloading,
+        // processing and storing is done.
         mCompletionHook.run();
     }
 
     /**
-     * Run in a background Thread, download an image, and perform
-     * processing/storing on the image via ExecutorCompletionService.
+     * Run in a background Thread to download, process, and store an
+     * Image via the ExecutorCompletionService.
      */
     @Override
     protected boolean processInput(URL urlToDownload) {
-        // Download an image and store it in an ImageEntity object.
+        // Download an image into an ImageEntity object.
     	final ImageEntity originalImage =
             new ImageEntity(urlToDownload,
                             downloadContent(urlToDownload));
@@ -255,7 +261,7 @@ public class ImageTaskGang extends TaskGang<URL> {
         	
             // The ExecutorCompletionService receives a callable and
             // invokes its call() method, which returns the filtered
-            // InputEntity, which is an ImageEntity.
+            // InputEntity (that's actually an ImageEntity).
             mCompletionService.submit(new Callable<InputEntity>() {
                     @Override
                     public InputEntity call() {
@@ -295,17 +301,18 @@ public class ImageTaskGang extends TaskGang<URL> {
         int bytes;
         
         // Open an InputStream from the inputUrl from which to read
-    	// the image data.
+    	// the Image data.
         try (InputStream istream = (InputStream) url.openStream()) {
 
-            // While the is unread data from the inputStream, continue
-            // writing data to the byte array.
-            while ((bytes = istream.read(readBuffer)) > 0) {
+            // While there is unread data from the inputStream,
+            // continue writing data to the byte array.
+            while ((bytes = istream.read(readBuffer)) > 0) 
                 ostream.write(readBuffer, 0, bytes);
-            }
+
             return ostream.toByteArray();
         } catch (IOException e) {
-            // "Try-with-resources" will handle cleaning up the istream
+            // "Try-with-resources" will clean up the istream
+            // automatically.
             e.printStackTrace();
             return null;
         }

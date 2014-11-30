@@ -18,8 +18,10 @@ import android.widget.AutoCompleteTextView;
 /**
  * @class PlatformStrategyAndroid
  * 
- * @brief Implements a platform-independent API for ... It plays the
- *        role of the "Concrete Strategy" in the Strategy pattern.
+ * @brief Provides methods that define a platform-independent
+ *        mechanism for getting URLs to download, as well as creating,
+ *        processing, and storing URLs.  It plays the role of the
+ *        "Concrete Strategy" in the Strategy pattern.
  */
 public class PlatformStrategyAndroid extends PlatformStrategy {
     /** 
@@ -40,6 +42,68 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
         /** The current activity window (succinct or verbose). */
         mOuterClass = new WeakReference<MainActivity>
             ((MainActivity) output);
+    }
+
+    /**
+     * Gets an iterator over a list of lists of URLs from which
+     * we want to download images.
+     */
+    public Iterator<List<URL>> getUrlIterator(InputSource source) {
+    	List<List<URL>> variableNumberOfInputURLs = 
+            new ArrayList<List<URL>>();
+    	
+    	try {
+            switch (source) {
+            // If the user selects the defaults source, return
+            // the default list of URL lists. Works on both console
+            // and Android platforms
+            case DEFAULT:
+                variableNumberOfInputURLs = super.getDefaultList();
+                break;
+	            
+            // Take input from the Android UI
+            case USER:
+            	
+            	// Check if the Activity still exists
+                if (mOuterClass.get() != null) {
+                	
+                	// Iterate over the children of the LinearLayout
+                	// that holds the list of URL lists
+                    int numChildViews = 
+                        mOuterClass.get().mListUrlGroups.getChildCount();
+                    for (int i = 0; i < numChildViews; ++i) {
+                        AutoCompleteTextView child = 
+                            (AutoCompleteTextView) 
+                            mOuterClass.get().mListUrlGroups.getChildAt(i);
+                        
+                        // Create a new URL list and add each URL
+                        // separated by commas to the list
+                        List<URL> urls = new ArrayList<URL>();
+                        StringTokenizer tokenizer = 
+                            new StringTokenizer(child.getText().toString(), ", ");
+                        while (tokenizer.hasMoreTokens()) {
+                            urls.add(new URL(tokenizer.nextToken().trim()));
+                        }
+                        
+                        // Add the list of URLs to the main list
+                        variableNumberOfInputURLs.add(urls);
+                    }
+                }
+                break;
+    			
+            default:
+                if (mOuterClass.get() != null) 
+                    mOuterClass.get().showToast("Invalid Source");
+                return null;
+            }
+    	} catch (MalformedURLException e) {
+            if (mOuterClass.get() != null) 
+                mOuterClass.get().showToast("Invalid URL");
+            return null;
+    	}
+    	
+    	// Return an iterator over the list of URL lists
+        return variableNumberOfInputURLs.iterator();
     }
 
     /**
@@ -123,67 +187,5 @@ public class PlatformStrategyAndroid extends PlatformStrategy {
     public void errorLog(String javaFile,
                          String errorMessage) {
         Log.e(javaFile, errorMessage);
-    }
-    
-    /**
-     * Gets an iterator over a list of lists of URLs from which
-     * we want to download images.
-     */
-    public Iterator<List<URL>> getUrlIterator(InputSource source) {
-    	List<List<URL>> variableNumberOfInputURLs = 
-            new ArrayList<List<URL>>();
-    	
-    	try {
-            switch (source) {
-            // If the user selects the defaults source, return
-            // the default list of URL lists. Works on both console
-            // and Android platforms
-            case DEFAULT:
-                variableNumberOfInputURLs = super.getDefaultList();
-                break;
-	            
-            // Take input from the Android UI
-            case USER:
-            	
-            	// Check if the Activity still exists
-                if (mOuterClass.get() != null) {
-                	
-                	// Iterate over the children of the LinearLayout
-                	// that holds the list of URL lists
-                    int numChildViews = 
-                        mOuterClass.get().mListUrlGroups.getChildCount();
-                    for (int i = 0; i < numChildViews; ++i) {
-                        AutoCompleteTextView child = 
-                            (AutoCompleteTextView) 
-                            mOuterClass.get().mListUrlGroups.getChildAt(i);
-                        
-                        // Create a new URL list and add each URL
-                        // separated by commas to the list
-                        List<URL> urls = new ArrayList<URL>();
-                        StringTokenizer tokenizer = 
-                            new StringTokenizer(child.getText().toString(), ", ");
-                        while (tokenizer.hasMoreTokens()) {
-                            urls.add(new URL(tokenizer.nextToken().trim()));
-                        }
-                        
-                        // Add the list of URLs to the main list
-                        variableNumberOfInputURLs.add(urls);
-                    }
-                }
-                break;
-    			
-            default:
-                if (mOuterClass.get() != null) 
-                    mOuterClass.get().showToast("Invalid Source");
-                return null;
-            }
-    	} catch (MalformedURLException e) {
-            if (mOuterClass.get() != null) 
-                mOuterClass.get().showToast("Invalid URL");
-            return null;
-    	}
-    	
-    	// Return an iterator over the list of URL lists
-        return variableNumberOfInputURLs.iterator();
     }
 }

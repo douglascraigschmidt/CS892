@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class OutputFilterDecorator extends FilterDecorator {
     /**
-     * Constructs the filter decorator with the @a filter to apply
+     * Constructs the filter decorator with the @a filter to apply.
      */
     public OutputFilterDecorator(Filter filter) {
     	super(filter);
@@ -24,12 +24,12 @@ public class OutputFilterDecorator extends FilterDecorator {
 
     /**
      * The hook method that is called on the InputEntity once it has
-     * been filtered with mFilter. This method stores the filtered
-     * InputEntity in a file by delegating the storing to the platform-
-     * specific implementation of storeImage(...).
+     * been filtered with mFilter.  This method stores the filtered
+     * InputEntity in a file by delegating the storing to the
+     * platform- specific implementation of storeImage(...).
      */
     @SuppressLint("NewApi")
-	@Override
+    @Override
     protected InputEntity decorate(InputEntity inputEntity) {
         // Call the applyFilter() hook method.
         ImageEntity result = (ImageEntity) inputEntity;
@@ -41,29 +41,23 @@ public class OutputFilterDecorator extends FilterDecorator {
                      this.getName());
         externalFile.mkdirs();
         
-        // We will store the filtered image as its original
-        // filename, within the appropriate filter directory to
-        // organize the filtered results.
+        // We will store the filtered image as its original filename,
+        // within the appropriate filter directory to organize the
+        // filtered results.
         File newImage = 
             new File(externalFile, 
                      result.getFileName());
         
-        // Write the compressed image to the appropriate
-        // directory.
-		try (FileOutputStream outputFile = new FileOutputStream(newImage)) {
-			PlatformStrategy.instance().storeImage(result.getImage(), 
-                    outputFile);
-		} catch (FileNotFoundException e) {
-			// try-with-resources will clean up resources
-			e.printStackTrace();
-			return null;
-		} catch (IOException e1) {
-			// try-with-resources will clean up resources
-			e1.printStackTrace();
-			return null;
-		}
+        // Write the compressed image to the appropriate directory.
+        try (FileOutputStream outputFile = new FileOutputStream(newImage)) {
+             PlatformStrategy.instance().storeImage(result.getImage(),
+                                                    outputFile);
+        } catch (Exception e) {
+            // Try-with-resources will clean up resources.
+            e.printStackTrace();
+            return null;
+        }
 
         return result;
     }
-
 }

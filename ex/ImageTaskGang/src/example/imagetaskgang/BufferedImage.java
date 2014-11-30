@@ -15,7 +15,8 @@ class BufferedImage implements Image {
 	//import javax.imageio.ImageIO;
 
     /**
-     * Constructor that converts @a imageData into a Java @a BufferedImage.
+     * Constructor that converts an @a imageData of raw bytes into a
+     * Java @a BufferedImage.
      */
     public BufferedImage(byte[] imageData) {
 //    	try {
