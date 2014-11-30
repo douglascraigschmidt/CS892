@@ -54,13 +54,14 @@ public abstract class PlatformStrategy {
                 new ArrayList<List<URL>>();
 
         final URL[] urls1 = {        
-            new URL("http://www.mariowiki.com/images/thumb/1/19/GoldMushroomNSMB2.png/200px-GoldMushroomNSMB2.png"),
-            new URL("http://png-1.findicons.com/files/icons/2297/super_mario/256/mushroom_life.png")
+            new URL("http://www.dre.vanderbilt.edu/~schmidt/ka.png"),
+            new URL("http://www.dre.vanderbilt.edu/~schmidt/uci.png"),
+            new URL("http://www.cs.wustl.edu/~schmidt/gifs/douglass.jpg")
         };
         final URL[] urls2 = {
-            new URL("http://img4.wikia.nocookie.net/__cb20080812195802/nintendo/en/images/1/12/1upshroom.png"),
-            new URL("http://www.mariowiki.com/images/thumb/5/57/Powerup-mini-mushroom-sm.png/200px-Powerup-mini-mushroom-sm.png"),
-            new URL("http://a66c7b.medialib.glogster.com/media/92/92a90af3755a6e3de9faad540af216bc3cdd7839add09a7735c22844b725d55b/propeller-mushroom-jpg.jpg")
+            new URL("http://www.cs.wustl.edu/~schmidt/gifs/lil-doug.jpg"),
+            new URL("http://www.cs.wustl.edu/~schmidt/gifs/wm.jpg"),
+            new URL("http://www.cs.wustl.edu/~schmidt/gifs/ironbound.jpg")
         };
         variableNumberOfInputURLs.add(Arrays.asList(urls1));
         variableNumberOfInputURLs.add(Arrays.asList(urls2));
