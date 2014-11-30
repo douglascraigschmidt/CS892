@@ -14,24 +14,24 @@
 	        android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
-	        android:text="@string/use_default"
-	        android:onClick="useDefault"
+	        android:text="@string/use_default_urls"
+	        android:onClick="useDefaultURLs"
 	        style="?android:attr/borderlessButtonStyle" />
 	    
 	    <Button android:id="@+id/addList"
 	        android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
-	        android:text="@string/add_list"
-	        android:onClick="addList"
+	        android:text="@string/add_urls"
+	        android:onClick="addURLs"
 	        style="?android:attr/borderlessButtonStyle" />
 	    
 	    <Button android:id="@+id/runGang"
 	        android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
-	        android:text="@string/run_gang"
-	        android:onClick="runGang"
+	        android:text="@string/run_image_taskgang"
+	        android:onClick="runImageTaskGang"
 	        style="?android:attr/borderlessButtonStyle" />
 	    
 	    <Button android:id="@+id/clear"

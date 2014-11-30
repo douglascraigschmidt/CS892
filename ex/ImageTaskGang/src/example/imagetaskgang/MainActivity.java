@@ -35,10 +35,10 @@ public class MainActivity extends Activity {
      */
     private final String[] SUGGESTIONS = new String[] {        
         "http://www.mariowiki.com/images/thumb/1/19/GoldMushroomNSMB2.png/200px-GoldMushroomNSMB2.png,"
-    		+ "http://png-1.findicons.com/files/icons/2297/super_mario/256/mushroom_life.png",
+        + "http://png-1.findicons.com/files/icons/2297/super_mario/256/mushroom_life.png",
         "http://img4.wikia.nocookie.net/__cb20080812195802/nintendo/en/images/1/12/1upshroom.png,"
-        	+ "http://www.mariowiki.com/images/thumb/5/57/Powerup-mini-mushroom-sm.png/200px-Powerup-mini-mushroom-sm.png,"
-        	+ "http://a66c7b.medialib.glogster.com/media/92/92a90af3755a6e3de9faad540af216bc3cdd7839add09a7735c22844b725d55b/propeller-mushroom-jpg.jpg"
+        + "http://www.mariowiki.com/images/thumb/5/57/Powerup-mini-mushroom-sm.png/200px-Powerup-mini-mushroom-sm.png,"
+        + "http://a66c7b.medialib.glogster.com/media/92/92a90af3755a6e3de9faad540af216bc3cdd7839add09a7735c22844b725d55b/propeller-mushroom-jpg.jpg"
     };
     
     /**
@@ -70,12 +70,12 @@ public class MainActivity extends Activity {
     final Runnable displayResultsRunnable = 
         new Runnable() {
             @Override
-            public void run() {
+                public void run() {
                 // Run the displayResults() method on the UI Thread so
                 // that startActivity() occurs in that context.
                 MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
-                        public void run() {
+                            public void run() {
                             setButtonsEnabled(true);
                             displayResults();
                         }
@@ -119,19 +119,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
     	super.onStart();
-    	 mSuggestions = 
-             new ArrayAdapter<String>(this,
-                                      R.layout.suggestion_item,
-                                      SUGGESTIONS);
+        mSuggestions = 
+            new ArrayAdapter<String>(this,
+                                     R.layout.suggestion_item,
+                                     SUGGESTIONS);
     }
 	
     /**
-     * Adds a list to the ListView to allow for variable number of
-     * lists to process (i.e. variable number of cycles in the
-     * TaskGang).
+     * Adds a List of URLs to the ListView to allow for variable
+     * number of URL Lists to process (i.e., variable number of
+     * iteration cycles by the ImageTaskGang).
      */
     @SuppressLint("InflateParams")
-    public void addList(View view) {
+    public void addURLs(View view) {
         AutoCompleteTextView newList = 
             (AutoCompleteTextView) 
             LayoutInflater.from(this).inflate (R.layout.list_item,
@@ -145,9 +145,9 @@ public class MainActivity extends Activity {
      * Run the gang using a default set of URL lists hardcoded into
      * the application rather than reading the input lists.
      */
-    public void useDefault(View view) {
+    public void useDefaultURLs(View view) {
         new Thread(new ImageTaskGang(FILTERS,
-        		PlatformStrategy.instance().getUrlIterator
+                                     PlatformStrategy.instance().getUrlIterator
                                      (PlatformStrategy.InputSource.DEFAULT),
                                      displayResultsRunnable)).start();
         setButtonsEnabled(false);
@@ -156,7 +156,7 @@ public class MainActivity extends Activity {
     /**
      * Run the gang by reading the input lists of URLs.
      */
-    public void runGang(View view) {
+    public void runImageTaskGang(View view) {
     	Iterator<List<URL>> iterator = 
             PlatformStrategy.instance().getUrlIterator
             (PlatformStrategy.InputSource.USER);
@@ -169,7 +169,7 @@ public class MainActivity extends Activity {
                                              displayResultsRunnable)).start();
                 setButtonsEnabled(false);
             } else 
-                showToast("No user lists entered");
+                showToast("No list of URLs entered");
     	}
     }
     
@@ -195,10 +195,10 @@ public class MainActivity extends Activity {
      */
     private void setButtonsEnabled(boolean enabled) {
     	LinearLayout buttonLayout = 
-    			(LinearLayout) findViewById(R.id.buttonLayout);
+            (LinearLayout) findViewById(R.id.buttonLayout);
     	int buttonCount = buttonLayout.getChildCount();
     	for (int i = 0; i < buttonCount; ++i) {
-    		buttonLayout.getChildAt(i).setEnabled(enabled);
+            buttonLayout.getChildAt(i).setEnabled(enabled);
     	}
     }
 	
