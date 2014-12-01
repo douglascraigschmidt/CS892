@@ -2,9 +2,7 @@ package example.imagetaskgang;
 
 import android.annotation.SuppressLint;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * @class OutputFilterDecorator

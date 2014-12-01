@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -28,17 +29,24 @@ public class MainActivity extends Activity {
      * that holds a comma-separated list of URLs to download.
      */
     protected LinearLayout mListUrlGroups;
+    
+    /**
+     * The button to run the gang using the user
+     * input
+     */
+    private Button mRunButton;
 	
     /**
      * Suggestions of default URLs that are supposed to be presented
      * to the user via AutoCompleteTextView.
      */
     private final String[] SUGGESTIONS = new String[] {        
-        "http://www.mariowiki.com/images/thumb/1/19/GoldMushroomNSMB2.png/200px-GoldMushroomNSMB2.png,"
-        + "http://png-1.findicons.com/files/icons/2297/super_mario/256/mushroom_life.png",
-        "http://img4.wikia.nocookie.net/__cb20080812195802/nintendo/en/images/1/12/1upshroom.png,"
-        + "http://www.mariowiki.com/images/thumb/5/57/Powerup-mini-mushroom-sm.png/200px-Powerup-mini-mushroom-sm.png,"
-        + "http://a66c7b.medialib.glogster.com/media/92/92a90af3755a6e3de9faad540af216bc3cdd7839add09a7735c22844b725d55b/propeller-mushroom-jpg.jpg"
+        "http://www.dre.vanderbilt.edu/~schmidt/ka.png,"
+        + "http://www.dre.vanderbilt.edu/~schmidt/uci.png,"
+        + "http://www.cs.wustl.edu/~schmidt/gifs/douglass.jpg",
+        "http://www.cs.wustl.edu/~schmidt/gifs/lil-doug.jpg,"
+        + "http://www.cs.wustl.edu/~schmidt/gifs/wm.jpg,"
+        + "http://www.cs.wustl.edu/~schmidt/gifs/ironbound.jpg"
     };
     
     /**
@@ -99,6 +107,11 @@ public class MainActivity extends Activity {
         // URLs to download.
         mListUrlGroups =
             (LinearLayout) findViewById(R.id.listOfURLLists);
+        
+        // Cache a reference to the button to run the gang
+        // on user input, so that it can become visible
+        // when a valid input is given
+        mRunButton = (Button) findViewById(R.id.runGang);
 
         // Initialize the Platform singleton with the appropriate
         // Platform strategy, which in this case will be the
@@ -132,13 +145,23 @@ public class MainActivity extends Activity {
      */
     @SuppressLint("InflateParams")
     public void addURLs(View view) {
+    	
+    	// Create the new list from R.layout.list_item
         AutoCompleteTextView newList = 
             (AutoCompleteTextView) 
             LayoutInflater.from(this).inflate (R.layout.list_item,
                                                null);
+        
+        // Set the adapter to the given suggestions
         newList.setAdapter(mSuggestions);
+        
+        // Add the view and invalidate it so that the
+        // layout is redrawn by the framework
         mListUrlGroups.addView(newList);
         mListUrlGroups.invalidate();
+        
+        // Set the "Run" button to visible
+        mRunButton.setVisibility(View.VISIBLE);
     }
 	
     /**
@@ -157,19 +180,21 @@ public class MainActivity extends Activity {
      * Run the gang by reading the input lists of URLs.
      */
     public void runImageTaskGang(View view) {
-    	Iterator<List<URL>> iterator = 
-            PlatformStrategy.instance().getUrlIterator
-            (PlatformStrategy.InputSource.USER);
-    	
-    	// Check to see if the user entered any lists.
-    	if (iterator != null) {
-            if (iterator.hasNext() && !isEmpty()) {
-                new Thread(new ImageTaskGang(FILTERS,
-                                             iterator,
-                                             displayResultsRunnable)).start();
-                setButtonsEnabled(false);
-            } else 
-                showToast("No list of URLs entered");
+    	if (mRunButton.getVisibility() == View.VISIBLE) {
+	    	Iterator<List<URL>> iterator =
+	            PlatformStrategy.instance().getUrlIterator
+	            (PlatformStrategy.InputSource.USER);
+	    	
+	    	// Check to see if the user entered any lists.
+	    	if (iterator != null) {
+	            if (iterator.hasNext() && !isEmpty()) {
+	                new Thread(new ImageTaskGang(FILTERS,
+	                                             iterator,
+	                                             displayResultsRunnable)).start();
+	                setButtonsEnabled(false);
+	            } else 
+	                showToast("No list of URLs entered");
+	    	}
     	}
     }
     
@@ -179,6 +204,8 @@ public class MainActivity extends Activity {
     private boolean isEmpty() {
     	int listCount = mListUrlGroups.getChildCount();
     	for (int i = 0; i < listCount; ++i) {
+    		// Obtain a reference to the child list and check if
+    		// text has been entered
             AutoCompleteTextView list = 
                 (AutoCompleteTextView) mListUrlGroups.getChildAt(i);
             if (list.getText().length() > 0) 
