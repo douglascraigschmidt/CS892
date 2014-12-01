@@ -26,7 +26,7 @@ public class NullFilter extends Filter {
      * at all.
      */
     @Override
-    public InputEntity applyFilter(InputEntity inputEntity) {
+    protected InputEntity applyFilter(InputEntity inputEntity) {
         return new ImageEntity(((ImageEntity) inputEntity).getSourceURL(),
                                ((ImageEntity) inputEntity).getImage());
     }
