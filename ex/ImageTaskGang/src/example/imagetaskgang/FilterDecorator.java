@@ -24,7 +24,7 @@ public abstract class FilterDecorator extends Filter {
     }
 
     /**
-     * This template method forwards to the decorated filter to filter the 
+     * This hook method forwards to the decorated filter to filter the
      * @a inputEntity parameter.
      */
     @Override

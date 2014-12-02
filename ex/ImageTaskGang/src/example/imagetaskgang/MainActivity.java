@@ -75,17 +75,17 @@ public class MainActivity extends Activity {
      * results after the ImageTaskGang finishes downloading,
      * processing, and storing Images provided by the List of URLs.
      */
-    final Runnable displayResultsRunnable = 
+    final Runnable displayImagesRunnable = 
         new Runnable() {
             @Override
-                public void run() {
-                // Run the displayResults() method on the UI Thread so
+            public void run() {
+                // Run the displayImages() method on the UI Thread so
                 // that startActivity() occurs in that context.
                 MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
+                @Override
                             public void run() {
                             setButtonsEnabled(true);
-                            displayResults();
+                            displayImages();
                         }
                     });
             }
@@ -172,7 +172,7 @@ public class MainActivity extends Activity {
         new Thread(new ImageTaskGang(FILTERS,
                                      PlatformStrategy.instance().getUrlIterator
                                      (PlatformStrategy.InputSource.DEFAULT),
-                                     displayResultsRunnable)).start();
+                                     displayImagesRunnable)).start();
         setButtonsEnabled(false);
     }
 	
@@ -190,7 +190,7 @@ public class MainActivity extends Activity {
 	            if (iterator.hasNext() && !isEmpty()) {
 	                new Thread(new ImageTaskGang(FILTERS,
 	                                             iterator,
-	                                             displayResultsRunnable)).start();
+	                                             displayImagesRunnable)).start();
 	                setButtonsEnabled(false);
 	            } else 
 	                showToast("No list of URLs entered");
@@ -269,7 +269,7 @@ public class MainActivity extends Activity {
      * Creates an Intent that's used to start the ResultsActivity,
      * which can be used to view the results.
      */
-    private void displayResults() {
+    private void displayImages() {
         // Pass a list of filterNames to the ResultsActivity so it
     	// knows what buttons to generate to allow the user to view
     	// all the downloaded results.

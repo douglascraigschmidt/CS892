@@ -3,7 +3,7 @@ package example.imagetaskgang;
 /**
  * @class BufferedImage
  *
- * @brief Encapsulates the Android Buffered class via a
+ * @brief Encapsulates the Java BufferedImage class via a
  *        platform-independent interface.
  */
 class BufferedImage implements Image {

@@ -60,10 +60,11 @@ public class ImageTaskGang extends TaskGang<URL> {
     private Runnable mCompletionHook;
 
     /**
-     * The barrier that's used to coordinate each cycle, i.e., each
-     * Thread in the TaskGang must await on mIterationBarrier for all
-     * the other Threads to complete their processing before they all
-     * attempt to move to the next cycle en masse.
+     * The iteration barrier that's used to coordinate each cycle,
+     * i.e., each Thread in the TaskGang must await on
+     * mIterationBarrier for all the other Threads to complete their
+     * processing before they all attempt to move to the next cycle en
+     * masse.
      */
     protected CountDownLatch mIterationBarrier = null;
 
@@ -91,20 +92,6 @@ public class ImageTaskGang extends TaskGang<URL> {
         // Set the completion hook that's called when all the images
         // are downloaded and processed.
         mCompletionHook = completionHook;
-    }
-
-    /**
-     * Each task in the gang uses the CountDownLatch countDown()
-     * method indicate that they are done with their processing.
-     */
-    @Override
-    protected void taskDone(int index) throws IndexOutOfBoundsException {
-        try {
-            // Indicate that this task is done with its computations.
-            mIterationBarrier.countDown();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        } 
     }
 
     /**
@@ -142,40 +129,94 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
-     * Block on the ExecutorCompletionService's completion queue until
-     * all the processed downloads have been received and then print
-     * diagnostics indicating if the downloading and processing worked
-     * properly.
+     * Run in a background Thread to download, process, and store an
+     * Image via the ExecutorCompletionService.
      */
-    protected void concurrentlyProcessFilteredResults(int resultsCount) {
-        // Loop for the designated number of results.
-        for (int i = 0; i < resultsCount; ++i) 
-            try {
-                // Take the next ready Future off the
-                // CompletionService's queue.
-                final Future<InputEntity> resultFuture =
-                    mCompletionService.take();
+    @Override
+    protected boolean processInput(URL urlToDownload) {
+        // Download an image into an ImageEntity object.
+    	final ImageEntity originalImage =
+            new ImageEntity(urlToDownload,
+                            downloadContent(urlToDownload));
 
-                // The get() call will not block since the results
-                // should be ready before they are added to the
-                // completion queue.
-                InputEntity inputEntity = resultFuture.get();
-    
-                // Indicate success or failure for this URL.
-                PlatformStrategy.instance().errorLog
-                    ("ImageTaskGang",
-                     "Operations on file " 
-                     + inputEntity.getSourceURL()
-                     + (inputEntity.succeeded() == true 
-                        ? " succeeded" 
-                        : " failed"));
-            } catch (ExecutionException e) {
-                PlatformStrategy.instance().errorLog("ImageTaskGang",
-                                                     "get() ExecutionException");
-            } catch (InterruptedException e) {
-                PlatformStrategy.instance().errorLog("ImageTaskGang",
-                                                     "get() InterruptedException");
-            }
+        // For each filter in the List of Filters, submit a task to
+        // the ExecutorCompletionService that filters the image
+        // downloaded from the given URL, stores the results in a
+        // file, and puts the results of the filtered image in the
+        // completion queue.
+        for (final Filter filter : mFilters) {
+        	
+            // The ExecutorCompletionService receives a callable and
+            // invokes its call() method, which returns the filtered
+            // InputEntity (that's actually an ImageEntity).
+            mCompletionService.submit(new Callable<InputEntity>() {
+                    @Override
+                    public InputEntity call() {
+                    	// Create an OutputFilterDecorator that
+                        // contains the original filter and the
+                        // original Image.
+                        Filter decoratedFilter =
+                            new OutputFilterDecorator(filter);
+
+                        // Filter the original image and store it in a
+                        // file.
+                        return decoratedFilter.filter(originalImage);
+                    }
+                });
+        }
+
+        return true;
+    }
+
+    /**
+     * Download the contents found at the given URL and return them as
+     * a raw byte array.
+     */
+    @SuppressLint("NewApi")
+    private byte[] downloadContent(URL url) {
+        // The size of the image downloading buffer
+        final int BUFFER_SIZE = 4096;
+
+        // Opens a new ByteArrayOutputStream to write the downloaded
+        // contents to a byte array, which is a generic form of the
+        // image.
+        ByteArrayOutputStream ostream = 
+            new ByteArrayOutputStream();
+        
+        // This is the buffer in which the input data will be stored
+        byte[] readBuffer = new byte[BUFFER_SIZE];
+        int bytes;
+        
+        // Open an InputStream from the inputUrl from which to read
+    	// the Image data.
+        try (InputStream istream = (InputStream) url.openStream()) {
+
+            // While there is unread data from the inputStream,
+            // continue writing data to the byte array.
+            while ((bytes = istream.read(readBuffer)) > 0) 
+                ostream.write(readBuffer, 0, bytes);
+
+            return ostream.toByteArray();
+        } catch (IOException e) {
+            // "Try-with-resources" will clean up the istream
+            // automatically.
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Each task in the gang uses the CountDownLatch countDown()
+     * method indicate that they are done with their processing.
+     */
+    @Override
+    protected void taskDone(int index) throws IndexOutOfBoundsException {
+        try {
+            // Indicate that this task is done with its computations.
+            mIterationBarrier.countDown();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } 
     }
 
     /**
@@ -242,79 +283,39 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
-     * Run in a background Thread to download, process, and store an
-     * Image via the ExecutorCompletionService.
+     * Block on the ExecutorCompletionService's completion queue until
+     * all the processed downloads have been received and then print
+     * diagnostics indicating if the downloading and processing worked
+     * properly.
      */
-    @Override
-    protected boolean processInput(URL urlToDownload) {
-        // Download an image into an ImageEntity object.
-    	final ImageEntity originalImage =
-            new ImageEntity(urlToDownload,
-                            downloadContent(urlToDownload));
+    protected void concurrentlyProcessFilteredResults(int resultsCount) {
+        // Loop for the designated number of results.
+        for (int i = 0; i < resultsCount; ++i) 
+            try {
+                // Take the next ready Future off the
+                // CompletionService's queue.
+                final Future<InputEntity> resultFuture =
+                    mCompletionService.take();
 
-        // For each filter in the List of Filters, submit a task to
-        // the ExecutorCompletionService that filters the image
-        // downloaded from the given URL, stores the results in a
-        // file, and puts the results of the filtered image in the
-        // completion queue.
-        for (final Filter filter : mFilters) {
-        	
-            // The ExecutorCompletionService receives a callable and
-            // invokes its call() method, which returns the filtered
-            // InputEntity (that's actually an ImageEntity).
-            mCompletionService.submit(new Callable<InputEntity>() {
-                    @Override
-                    public InputEntity call() {
-                    	// Create an OutputFilterDecorator that
-                        // contains the original filter and the
-                        // original Image.
-                        Filter decoratedFilter =
-                            new OutputFilterDecorator(filter);
-
-                        // Filter the original image and store it in a
-                        // file.
-                        return decoratedFilter.filter(originalImage);
-                    }
-                });
-        }
-
-        return true;
-    }
-
-    /**
-     * Download the contents found at the given URL and return them as
-     * a raw byte array.
-     */
-    @SuppressLint("NewApi")
-    private byte[] downloadContent(URL url) {
-        // The size of the image downloading buffer
-        final int BUFFER_SIZE = 4096;
-
-        // Opens a new ByteArrayOutputStream to write the 
-        // downloaded contents to a byte array, which is
-        // a generic form of the image.
-        ByteArrayOutputStream ostream = 
-            new ByteArrayOutputStream();
-        
-        // This is the buffer in which the input data will be stored
-        byte[] readBuffer = new byte[BUFFER_SIZE];
-        int bytes;
-        
-        // Open an InputStream from the inputUrl from which to read
-    	// the Image data.
-        try (InputStream istream = (InputStream) url.openStream()) {
-
-            // While there is unread data from the inputStream,
-            // continue writing data to the byte array.
-            while ((bytes = istream.read(readBuffer)) > 0) 
-                ostream.write(readBuffer, 0, bytes);
-
-            return ostream.toByteArray();
-        } catch (IOException e) {
-            // "Try-with-resources" will clean up the istream
-            // automatically.
-            e.printStackTrace();
-            return null;
-        }
+                // The get() call will not block since the results
+                // should be ready before they are added to the
+                // completion queue.
+                InputEntity inputEntity = resultFuture.get();
+    
+                // Indicate success or failure for this URL.
+                PlatformStrategy.instance().errorLog
+                    ("ImageTaskGang",
+                     "Operations on file " 
+                     + inputEntity.getSourceURL()
+                     + (inputEntity.succeeded() == true 
+                        ? " succeeded" 
+                        : " failed"));
+            } catch (ExecutionException e) {
+                PlatformStrategy.instance().errorLog("ImageTaskGang",
+                                                     "get() ExecutionException");
+            } catch (InterruptedException e) {
+                PlatformStrategy.instance().errorLog("ImageTaskGang",
+                                                     "get() InterruptedException");
+            }
     }
 }

@@ -26,7 +26,7 @@ public class PlatformStrategyFactory {
      * Keep track of the type of platform.  This value won't change at
      * runtime.
      */
-    private PlatformType mPlatformType =
+    private final PlatformType mPlatformType =
         System.getProperty("java.specification.vendor").indexOf("Android") >= 0
             ? PlatformType.ANDROID
             : PlatformType.PLAIN_JAVA;
@@ -79,8 +79,8 @@ public class PlatformStrategyFactory {
     }
 
     /**
-     * Create a new @a PlatformStrategy object based on underlying Java
-     * platform.
+     * Factory method that creates and returns a new @a
+     * PlatformStrategy object based on underlying Java platform.
      */
     public PlatformStrategy makePlatformStrategy() {
         return mPlatformStrategyMap.get(mPlatformType).execute();
