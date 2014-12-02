@@ -129,15 +129,23 @@ public class ImageTaskGang extends TaskGang<URL> {
     }
 
     /**
+     * Factory method that downloads a URL and creates an ImageEntity
+     * to encapsulate it.
+     */
+    private ImageEntity makeImageEntity(URL urlToDownload) {
+        return new ImageEntity(urlToDownload,
+                               downloadContent(urlToDownload));
+    }
+
+    /**
      * Run in a background Thread to download, process, and store an
      * Image via the ExecutorCompletionService.
      */
     @Override
     protected boolean processInput(URL urlToDownload) {
-        // Download an image into an ImageEntity object.
-    	final ImageEntity originalImage =
-            new ImageEntity(urlToDownload,
-                            downloadContent(urlToDownload));
+        // Download an image into a new ImageEntity object.
+    	final ImageEntity originalImage = 
+            makeImageEntity(urlToDownload);
 
         // For each filter in the List of Filters, submit a task to
         // the ExecutorCompletionService that filters the image
