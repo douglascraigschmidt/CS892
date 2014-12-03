@@ -1,6 +1,5 @@
 package example.imagetaskgang;
 
-import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +12,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import android.annotation.SuppressLint;
 
 /**
  * @class PlatformStrategyConsole
@@ -167,9 +168,9 @@ public class PlatformStrategyConsole extends PlatformStrategy {
     public void storeImage(Image imageAdapter,
                            FileOutputStream outputFile) {
     	// Write the image to the appropriate directory
-        //    	ImageIO.write(((BufferedImage) imageAdapter).mBufferedImage,
-        //                	  "png",
-        //                	  outputFile);
+        // ImageIO.write(((BufferedImage) imageAdapter).mBufferedImage,
+        // "png",
+        // outputFile);
     }
 
     /**

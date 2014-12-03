@@ -63,7 +63,7 @@ public class ImageEntity extends InputEntity {
      * arrays in different ways.
      */
     @Override
-    public ImageEntity decodeBytesToResult(byte[] data) {
+    public InputEntity decodeBytesToResult(byte[] data) {
         setImage(data);
         return this;
     }
