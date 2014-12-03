@@ -1,5 +1,6 @@
 package example.imagetaskgang;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +13,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 /**
  * @class PlatformStrategyConsole
@@ -118,45 +121,45 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      * Apply a grayscale filter to the @a inputEntity and return it.
      */
     public InputEntity applyGrayscaleFilter(InputEntity inputEntity) {
-        //    	Image imageAdapter = ((ImageEntity) inputEntity).getImage();
-        //    	java.awt.image.BufferedImage originalImage = ((BufferedImage) imageAdapter).mBufferedImage;
-        //        java.awt.image.BufferedImage grayScaleImg =
-        //        		new java.awt.image.BufferedImage(originalImage.getColorModel(),
-        //                                  originalImage.copyData(null),
-        //                                  originalImage.getColorModel().isAlphaPremultiplied(),
-        //                                  null);
-        //
-        //        boolean hasTransparent = grayScaleImg.getColorModel().hasAlpha();
-        //        int width = grayScaleImg.getWidth();
-        //        int height = grayScaleImg.getHeight();
-        //
-        //        // A common pixel-by-pixel grayscale conversion algorithm 
-        //        // using values obtained from http://en.wikipedia.org/wiki/Grayscale
-        //        for (int i = 0; i < height; ++i) {
-        //            for (int j = 0; j < width; ++j) {
-        //            	
-        //            	// Check if the pixel is transparent in the original
-        //                if (hasTransparent 
-        //                    && (grayScaleImg.getRGB(j, i) >> 24) == 0x00) {
-        //                    continue;
-        //                }
-        //                
-        //                // Convert the pixel to grayscale
-        //                Color c = new Color(grayScaleImg.getRGB(j, i));
-        //                int grayConversion = (int) (c.getRed() * 0.299)
-        //                    + (int) (c.getGreen() * 0.587)
-        //                    + (int) (c.getBlue() * 0.114);
-        //                Color grayScale = new Color(grayConversion, grayConversion,
-        //                                            grayConversion);
-        //                grayScaleImg.setRGB(j, i, grayScale.getRGB());
-        //            }
-        //        }
-        //   	
-        //    	  BufferedImage grayScaleImage = new BufferedImage(grayScaleImg);
-        //
-        //        return new ImageEntity(processResult.getSourceURL(),
-        //                               grayScaleImage);
-    	return inputEntity;
+    	Image imageAdapter = ((ImageEntity) inputEntity).getImage();
+        java.awt.image.BufferedImage originalImage = 
+        		((BufferedImage) imageAdapter).mBufferedImage;
+        java.awt.image.BufferedImage grayScaleImg =
+        		new java.awt.image.BufferedImage(originalImage.getColorModel(),
+                              originalImage.copyData(null),
+                              originalImage.getColorModel().isAlphaPremultiplied(),
+                              null);
+    
+        boolean hasTransparent = grayScaleImg.getColorModel().hasAlpha();
+        int width = grayScaleImg.getWidth();
+        int height = grayScaleImg.getHeight();
+    
+        // A common pixel-by-pixel grayscale conversion algorithm 
+        // using values obtained from http://en.wikipedia.org/wiki/Grayscale
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+            	
+            	// Check if the pixel is transparent in the original
+                if (hasTransparent 
+                    && (grayScaleImg.getRGB(j, i) >> 24) == 0x00) {
+                    continue;
+                }
+                
+                // Convert the pixel to grayscale
+                Color c = new Color(grayScaleImg.getRGB(j, i));
+                int grayConversion = (int) (c.getRed() * 0.299)
+                    + (int) (c.getGreen() * 0.587)
+                    + (int) (c.getBlue() * 0.114);
+                Color grayScale = new Color(grayConversion, grayConversion,
+                                            grayConversion);
+                grayScaleImg.setRGB(j, i, grayScale.getRGB());
+            }
+        }
+   	
+    	BufferedImage grayScaleImage = new BufferedImage(grayScaleImg);
+
+        return new ImageEntity(inputEntity.getSourceURL(),
+                               grayScaleImage);
     }
     
     /**
@@ -165,9 +168,14 @@ public class PlatformStrategyConsole extends PlatformStrategy {
     public void storeImage(Image imageAdapter,
                            FileOutputStream outputFile) {
     	// Write the image to the appropriate directory
-        // ImageIO.write(((BufferedImage) imageAdapter).mBufferedImage,
-        // "png",
-        // outputFile);
+         try {
+			ImageIO.write(((BufferedImage) imageAdapter).mBufferedImage,
+						  "png",
+						  outputFile);
+		} catch (IOException e) {
+			mOutput.println("ImageIO write failure");
+			e.printStackTrace();
+		}
     }
 
     /**
