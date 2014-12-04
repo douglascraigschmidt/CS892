@@ -8,7 +8,7 @@ import java.net.URL;
  * @brief Extends InputEntity and defines the logic for decoding raw
  *        byte arrays into an Image that can be used in the rest of
  *        the application. Also handles common file-related tasks,
- *        such as retrieval of the native format and the original file
+ *        such as retrieving the native format and the original file
  *        name of the Image.
  */
 public class ImageEntity extends InputEntity {
@@ -55,17 +55,6 @@ public class ImageEntity extends InputEntity {
      */
     public void setImage(byte[] imageData) {
         mImage = PlatformStrategy.instance().makeImage(imageData);
-    }
-
-    /**
-     * This method is not strictly needed by our ImageEntity, but is a
-     * place holder for future enhancements that must manipulate byte
-     * arrays in different ways.
-     */
-    @Override
-    public InputEntity decodeBytesToResult(byte[] data) {
-        setImage(data);
-        return this;
     }
 
     /**

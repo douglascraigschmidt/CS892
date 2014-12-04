@@ -1,6 +1,6 @@
 package example.imagetaskgang;
 
-import java.awt.Color;
+import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +24,7 @@ import java.util.List;
  *        processing, and storing URLs.  It plays the role of the
  *        "Concrete Strategy" in the Strategy pattern.
  */
+@SuppressLint("NewApi")
 public class PlatformStrategyConsole extends PlatformStrategy {
     /**
      * Contains information for printing output to the console window.
@@ -41,7 +42,8 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      * Overrides the getURLIterator method to return the
      * Console-specific input sources.
      */
-    public Iterator<List<URL>> getUrlIterator(InputSource source) {
+    @SuppressLint("NewApi")
+	public Iterator<List<URL>> getUrlIterator(InputSource source) {
         List<List<URL>> variableNumberOfInputURLs = 
             new ArrayList<List<URL>>();
     	
@@ -118,6 +120,7 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      */
     public Image makeImage(byte[] imageData){
         // @@ return new BufferedImage(imageData);
+    	return null;
     }
      
     /**
