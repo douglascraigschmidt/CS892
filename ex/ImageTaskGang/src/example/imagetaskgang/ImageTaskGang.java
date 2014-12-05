@@ -132,7 +132,7 @@ public class ImageTaskGang extends TaskGang<URL> {
 
     /**
      * Hook method that runs in a background Thread to download,
-     * process, and store an Image via the ExecutorCompletionService.
+     * process, and store an image via the ExecutorCompletionService.
      */
     @Override
     protected boolean processInput(URL urlToDownload) {
@@ -160,7 +160,7 @@ public class ImageTaskGang extends TaskGang<URL> {
 
                         // Process the downloaded image, store it
                         // into a file, return the result.
-                        return (ImageEntity) decoratedFilter.filter(downloadedImage);
+                        return decoratedFilter.filter(downloadedImage);
                     }
                 });
         }
@@ -270,7 +270,7 @@ public class ImageTaskGang extends TaskGang<URL> {
                     ("ImageTaskGang",
                      "Operations on file " 
                      + imageEntity.getSourceURL()
-                     + (imageEntity.succeeded() == true 
+                     + (imageEntity.getSucceeded() == true 
                         ? " succeeded" 
                         : " failed"));
             } catch (ExecutionException e) {
@@ -311,7 +311,7 @@ public class ImageTaskGang extends TaskGang<URL> {
         int bytes;
         
         // Creates an InputStream from the inputUrl from which to read
-    	// the Image data.
+    	// the image data.
         try (InputStream istream = (InputStream) url.openStream()) {
             // While there is unread data from the inputStream,
             // continue writing data to the byte array.

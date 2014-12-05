@@ -54,7 +54,7 @@ public class PlatformStrategyConsole extends PlatformStrategy {
             // Android platforms.
             case DEFAULT:
                 variableNumberOfInputURLs =
-                    super.getDefaultList();
+                    super.getDefaultUrlList();
                 break;
 	           
             // Read a list of URL lists from a delimited file.
@@ -124,12 +124,12 @@ public class PlatformStrategyConsole extends PlatformStrategy {
     }
      
     /**
-     * Apply a grayscale filter to the @a inputEntity and return it.
+     * Apply a grayscale filter to the @a imageEntity and return it.
      */
-    public InputEntity applyGrayscaleFilter(InputEntity inputEntity) {
+    public ImageEntity grayScaleFilter(ImageEntity imageEntity) {
         /* @@
     	Image imageAdapter =
-            ((ImageEntity) inputEntity).getImage();
+            ((ImageEntity) imageEntity).getImage();
         java.awt.image.BufferedImage originalImage = 
             ((BufferedImage) imageAdapter).mBufferedImage;
         java.awt.image.BufferedImage grayScaleImg =
@@ -172,7 +172,7 @@ public class PlatformStrategyConsole extends PlatformStrategy {
     	BufferedImage grayScaleImage = 
             new BufferedImage(grayScaleImg);
 
-        return new ImageEntity(inputEntity.getSourceURL(),
+        return new ImageEntity(imageEntity.getSourceURL(),
                                grayScaleImage);
         */
         return null;

@@ -25,17 +25,17 @@ public abstract class FilterDecorator extends Filter {
 
     /**
      * This hook method forwards to the decorated filter to filter the
-     * @a inputEntity parameter.
+     * @a imageEntity parameter.
      */
-    // @Override
-    protected InputEntity applyFilter(InputEntity inputEntity) {
-        return decorate(mFilter.filter(inputEntity));
+    @Override
+    protected ImageEntity applyFilter(ImageEntity imageEntity) {
+        return decorate(mFilter.filter(imageEntity));
     }
     
     /**
      * An abstract hook method that "decorates" the data member
-     * filter, which is applied to the inputEntity after it's been
+     * filter, which is applied to the imageEntity after it's been
      * filtered.
      */
-    protected abstract InputEntity decorate(InputEntity inputEntity);
+    protected abstract ImageEntity decorate(ImageEntity imageEntity);
 }

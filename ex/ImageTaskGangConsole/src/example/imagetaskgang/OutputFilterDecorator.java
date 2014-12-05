@@ -20,16 +20,16 @@ public class OutputFilterDecorator extends FilterDecorator {
     }
 
     /**
-     * The hook method that is called on the InputEntity once it has
+     * The hook method that is called on the ImageEntity once it has
      * been filtered with mFilter.  This method stores the filtered
-     * InputEntity in a file by delegating the storing to the
+     * ImageEntity in a file by delegating the storing to the
      * platform- specific implementation of storeImage(...).
      */
     @Override
-    protected InputEntity decorate(InputEntity inputEntity) {
+    protected ImageEntity decorate(ImageEntity imageEntity) {
         if (true) {
             // Call the applyFilter() hook method.
-            ImageEntity result = (ImageEntity) inputEntity;
+            ImageEntity result = (ImageEntity) imageEntity;
 		
             // Make a directory for the filter if it does not already
             // exist.

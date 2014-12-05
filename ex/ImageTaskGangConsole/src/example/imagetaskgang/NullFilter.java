@@ -22,11 +22,11 @@ public class NullFilter extends Filter {
     }
 	
     /**
-     * Constructs a new InputEntity that does not change the original
+     * Constructs a new ImageEntity that does not change the original
      * at all.
      */
     @Override
-    protected InputEntity applyFilter(InputEntity inputEntity) {
-        return inputEntity;
+    protected ImageEntity applyFilter(ImageEntity imageEntity) {
+        return imageEntity;
     }
 }

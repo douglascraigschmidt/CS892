@@ -48,7 +48,7 @@ public class MainConsole {
         // by one so its count equals 0.
         final Runnable completionHook = 
             new Runnable() {
-                // @Override
+                @Override
                 public void run() {
                     mExitBarrier.countDown();
                 }

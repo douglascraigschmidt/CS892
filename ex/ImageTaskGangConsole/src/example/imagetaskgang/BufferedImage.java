@@ -23,7 +23,7 @@ class BufferedImage implements Image {
      * Java @a BufferedImage.
      */
     public BufferedImage(byte[] imageData) {
-    	try {
+        try {
             mBufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
         } catch (IOException e) {
             e.printStackTrace();

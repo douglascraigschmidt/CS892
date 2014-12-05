@@ -48,20 +48,20 @@ public abstract class Filter {
 
     /**
      * This template method calls the applyFilter() hook method (which
-     * must be defined by a subclass) to filter the @a inputEntity
+     * must be defined by a subclass) to filter the @a imageEntity
      * parameter and sets the filterName of the result to the name of
      * the filter.
      */
-    public InputEntity filter(InputEntity inputEntity) {
+    public ImageEntity filter(ImageEntity imageEntity) {
         // Call the applyFilter() hook method.
-        InputEntity filteredResult = applyFilter(inputEntity);
+        ImageEntity filteredResult = applyFilter(imageEntity);
         filteredResult.setFilterName(this);
         return filteredResult;
     }
 
     /**
      * This abstract hook method must be overridden by a subclass to
-     * define the logic for processing the given @a inputEntity.
+     * define the logic for processing the given @a imageEntity.
      */
-    protected abstract InputEntity applyFilter(InputEntity inputEntity);
+    protected abstract ImageEntity applyFilter(ImageEntity imageEntity);
 }

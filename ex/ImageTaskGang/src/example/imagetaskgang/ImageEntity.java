@@ -5,26 +5,44 @@ import java.net.URL;
 /**
  * @class ImageEntity
  *
- * @brief Extends InputEntity and defines the logic for decoding raw
- *        byte arrays into an Image that can be used in the rest of
- *        the application. Also handles common file-related tasks,
- *        such as retrieving the native format and the original file
- *        name of the Image.
+ * @brief Stores meta-data about an Image and also provides methods
+ *        for common image- and file-related tasks, such as decoding
+ *        raw byte arrays into an Image and setting/getting filter and
+ *        file names.
  */
-public class ImageEntity extends InputEntity {
+public class ImageEntity {
     /**
      * The Image our ImageEntity stores.
      */
     private Image mImage;
 
     /**
+     * The source URL from which the result was downloaded.
+     */
+    protected URL mSourceUrl;
+
+    /**
+     * The name of the filter that was applied to this result.
+     */
+    protected String mFilterName;
+    
+    /**
+     * Keeps track of whether operations on this ImageEntity succeed.
+     */
+    protected boolean mSucceeded;
+
+    /**
      * Construct an ImageEntity from a byte array of @a imageData
      * downloaded from a URL @a source.
      */
-    public ImageEntity(URL source,
+    public ImageEntity(URL sourceURL,
                        byte[] imageData) {
-        // Call up to the superclass constructor.
-        super(source);
+        // Set the URL.
+        mSourceUrl = sourceURL;
+
+        // Initialize other data members.
+        mFilterName = null;
+        mSucceeded = true;
         
         // Decode the imageData into a Bitmap.
         setImage(imageData);
@@ -33,13 +51,25 @@ public class ImageEntity extends InputEntity {
     /**
      * Construct a new ImageEntity from an @a Image.
      */
-    public ImageEntity(URL source,
+    public ImageEntity(URL sourceURL,
                        Image image) {
-        // Call up to the superclass constructor.
-        super(source);
+        // Set the URL.
+        mSourceUrl = sourceURL;
+
+        // Initialize other data members.
+        mFilterName = null;
+        mSucceeded = true;
 
         // Store the image in the data member.
         mImage = image;
+    }
+
+    /**
+     * Decodes a byte[] into an @a Image that can be used in the rest
+     * of the application.
+     */
+    public void setImage(byte[] imageData) {
+        mImage = PlatformStrategy.instance().makeImage(imageData);
     }
 
     /**
@@ -50,11 +80,47 @@ public class ImageEntity extends InputEntity {
     }
 
     /**
-     * Decodes a byte[] into an @a Image that can be used in the rest
-     * of the application.
+     * Modifies the source URL of this result. Necessary for when the
+     * result is constructed before it is associated with data.
      */
-    public void setImage(byte[] imageData) {
-        mImage = PlatformStrategy.instance().makeImage(imageData);
+    public void setSourceURL(URL url) {
+        mSourceUrl = url;
+    }
+
+    /**
+     * Returns the source URL this result was constructed from.
+     */
+    public URL getSourceURL() {
+        return mSourceUrl;
+    }
+
+    /**
+     * Sets the name of the filter applied to this result.
+     */
+    public void setFilterName(Filter filter) {
+        mFilterName = filter.getName();
+    }
+
+    /**
+     * Returns the name of the filter applied to this result.
+     */
+    public String getFilterName() {
+        return mFilterName;
+    }
+
+    /**
+     * Sets whether operations on the ImageEntity succeeded or failed.
+     */
+    public void setSucceeded(boolean succeeded) {
+        mSucceeded = succeeded;
+    }
+
+    /**
+     * Returns true if operations on the ImageEntity succeeded, else
+     * false.
+     */
+    public boolean getSucceeded() {
+        return mSucceeded;
     }
 
     /**
@@ -76,5 +142,4 @@ public class ImageEntity extends InputEntity {
         format = format.equalsIgnoreCase("jpeg") ? "jpg" : format;
         return format;
     }
-    
 }
