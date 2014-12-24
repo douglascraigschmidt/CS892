@@ -52,9 +52,7 @@ public class CyclicSearchWithCyclicBarrier
         // corresponds to each element in the input List and (2)
         // barrier action gets the next List of input data (if any).
         mCyclicBarrier = new CyclicBarrier
-            (size,
-             new Runnable() {
-                 public void run() {
+            (size, () -> {
                      setInput(getNextInput());
                      if (getInput() != null)
                          BarrierTaskGangTest.printDebugging
@@ -62,7 +60,7 @@ public class CyclicSearchWithCyclicBarrier
                               + currentCycle()
                               + " @@@@@");
                  }
-             });
+             );
         BarrierTaskGangTest.printDebugging
             ("@@@@@ Started cycle 1 with "
              + size

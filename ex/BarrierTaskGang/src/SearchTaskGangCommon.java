@@ -82,10 +82,9 @@ public abstract class SearchTaskGangCommon
      * a background task run by a Java Thread.
      */
     protected Runnable makeTask(final int index) {
-        return new Runnable() {
-
-            // This method runs in background task provided by a Java Thread.
-            public void run() {
+        return () ->
+            // This lambda runs in background task provided by a Java Thread.
+             {
             	// Since this task runs in a distinct Thread it can
             	// block in a loop.
                 do {
@@ -111,9 +110,7 @@ public abstract class SearchTaskGangCommon
                 // Keep looping until all the iteration cycles are
                 // done.
                 } while (advanceTaskToNextCycle());
-            }
-        };
-    }
+    }; }
 
     /**
      * Runs in a background Thread and searches the inputData for all
