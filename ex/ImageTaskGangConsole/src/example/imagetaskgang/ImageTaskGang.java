@@ -145,17 +145,17 @@ public class ImageTaskGang extends TaskGang<URL> {
         // file, and puts the results of the filtered image in the
         // completion queue.
     	mFilters.forEach
-	 		(filter -> mCompletionService.submit
-	 			(() -> {
-	 				// Create an OutputFilterDecorator that
-                    // encapsulates the original filter.
-                    Filter decoratedFilter =
-                        new OutputFilterDecorator(filter);
+            (filter -> mCompletionService.submit
+             (() -> {
+                 // Create an OutputFilterDecorator that
+                 // encapsulates the original filter.
+                 Filter decoratedFilter =
+                     new OutputFilterDecorator(filter);
 
-                    // Process the downloaded image, store it
-                    // into a file, return the result.
-                    return decoratedFilter.filter(downloadedImage);
-	 			}));
+                 // Process the downloaded image, store it
+                 // into a file, return the result.
+                 return decoratedFilter.filter(downloadedImage);
+             }));
 
         return true;
     }
