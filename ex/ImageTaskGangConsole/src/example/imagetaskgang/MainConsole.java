@@ -46,13 +46,7 @@ public class MainConsole {
 
         // Create a completion hook that decrements the exit barrier
         // by one so its count equals 0.
-        final Runnable completionHook = 
-            new Runnable() {
-                @Override
-                public void run() {
-                    mExitBarrier.countDown();
-                }
-            };
+        final Runnable completionHook = () -> mExitBarrier.countDown();
 
         // Create an Iterator that contains all the image URLs to
         // download and process.

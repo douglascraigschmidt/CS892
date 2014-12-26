@@ -145,12 +145,10 @@ public abstract class TaskGang<E> implements Runnable {
      * the Executor.
      */
     protected Runnable makeTask(final int index) {
-        return new Runnable() {
-
-            // This method runs in background task provided by the
+        return () -> {
+            // This lambda runs in background task provided by the
             // Executor.
-            public void run() {
-                try {
+              try {
                     // Get the input data element associated with
                     // this index.
                     E element = getInput().get(index);
@@ -164,10 +162,9 @@ public abstract class TaskGang<E> implements Runnable {
                         // A problem occurred, so return.
                         return;
 
-                } catch (IndexOutOfBoundsException e) {
-                    return;
-                }
-            }
-        };
+               } catch (IndexOutOfBoundsException e) {
+                   return;
+               }
+         };
     }
 }

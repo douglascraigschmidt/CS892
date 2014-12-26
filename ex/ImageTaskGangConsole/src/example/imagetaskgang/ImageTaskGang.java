@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 /**
  * @class ImageTaskGang
@@ -124,8 +125,8 @@ public class ImageTaskGang extends TaskGang<URL> {
         // Enqueue each item in the input List for execution in the
         // Executor's Thread pool, which ensures there's a Thread
         // available to run each task concurrently.
-        for (int i = 0; i < initialNumberOfURLs; ++i)
-            getExecutor().execute(makeTask(i));
+        IntStream.range(0, initialNumberOfURLs)
+            .forEach(i -> getExecutor().execute(makeTask(i)));
     }
 
     /**
@@ -138,30 +139,23 @@ public class ImageTaskGang extends TaskGang<URL> {
     	final ImageEntity downloadedImage = 
             makeImageEntity(urlToDownload);
 
-        // For each filter in the List of Filters, submit a task to
-        // the ExecutorCompletionService that filters the image
+        // For each filter in the List of Filters, submit a Callable 
+        // task to the ExecutorCompletionService that filters the image
         // downloaded from the given URL, stores the results in a
         // file, and puts the results of the filtered image in the
         // completion queue.
-        for (final Filter filter : mFilters) {
-        	
-            // The ExecutorCompletionService receives a Callable and
-            // invokes its call() method, which returns the filtered
-            // ImageEntity.
-            mCompletionService.submit(new Callable<ImageEntity>() {
-                    @Override
-                    public ImageEntity call() {
-                    	// Create an OutputFilterDecorator that
-                        // encapsulates the original filter.
-                        Filter decoratedFilter =
-                            new OutputFilterDecorator(filter);
+    	mFilters.forEach
+	 		(filter -> mCompletionService.submit
+	 			(() -> {
+	 				// Create an OutputFilterDecorator that
+                    // encapsulates the original filter.
+                    Filter decoratedFilter =
+                        new OutputFilterDecorator(filter);
 
-                        // Process the downloaded image, store it
-                        // into a file, return the result.
-                        return decoratedFilter.filter(downloadedImage);
-                    }
-                });
-        }
+                    // Process the downloaded image, store it
+                    // into a file, return the result.
+                    return decoratedFilter.filter(downloadedImage);
+	 			}));
 
         return true;
     }

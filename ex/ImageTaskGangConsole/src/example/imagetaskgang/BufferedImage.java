@@ -15,7 +15,6 @@ class BufferedImage implements Image {
     /**
      * A Java BufferedImage object.
      */
-    // @@ Need to fix 
     public java.awt.image.BufferedImage mBufferedImage;
 
     /**

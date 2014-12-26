@@ -45,7 +45,7 @@ public class PlatformStrategyFactory {
      * appropriate type of @a PlatformStrategy subclass object.
      */
     private HashMap<PlatformType, IPlatformStrategyFactoryCommand> mPlatformStrategyMap =
-        new HashMap<PlatformType, IPlatformStrategyFactoryCommand>();
+        new HashMap<>();
 
     /**
      * Constructor stores the objects that perform output and
@@ -71,13 +71,10 @@ public class PlatformStrategyFactory {
                   * creates an @a ConsolePlatformStrategy implementation.
                   */
                  mPlatformStrategyMap.put(PlatformType.PLAIN_JAVA,
-                                          new IPlatformStrategyFactoryCommand() {
-                                              // Creates the PlatformStrategyConsole.
-                                              public PlatformStrategy execute() {
-                                                  return new PlatformStrategyConsole(output);
-                                              }
-                                          });
-    }
+                		                  // Creates the PlatformStrategyConsole.
+                                          () -> new PlatformStrategyConsole(output));
+                                              
+        }
 
     /**
      * Factory method that creates and returns a new @a
