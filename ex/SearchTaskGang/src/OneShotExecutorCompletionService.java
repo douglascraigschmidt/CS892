@@ -1,7 +1,12 @@
-import java.util.concurrent.Callable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @class OneShotExecutorCompletionService
@@ -74,22 +79,13 @@ public class OneShotExecutorCompletionService
      */
     protected boolean processInput(final String inputData) {
 
-        // Iterate through each word and submit a Callable that will
-        // search concurrently for this word in the inputData.
-        for (final String word : mWordsToFind) {
-
-            // This submit() call stores the Future result in the
-            // ExecutorCompletionService for concurrent results
-            // processing.
-            mCompletionService.submit (new Callable<SearchResults>() {
-                    @Override
-                    // call() runs in a background task.
-                    public SearchResults call() throws Exception {
-                        return searchForWord(word,
-                                             inputData);
-                    }
-                });
-        }
+        // Iterate through each word and submit a call to searchForWord() concurrently 
+    	// for each word in the inputData. The searchForWord() result is stored in
+    	// the ExecutorCompletionService for asynchronous Future processing.
+    	Arrays.asList(mWordsToFind).forEach
+    	 	(word -> mCompletionService.submit
+    	 			(() -> searchForWord(word, 
+    	 							     inputData)));
         return true;
     }
 
@@ -100,8 +96,8 @@ public class OneShotExecutorCompletionService
     protected void initiateTaskGang(int inputSize) {
         // Enqueue each item in the input List for execution in the
         // Executor's Thread pool.
-        for (int i = 0; i < inputSize; ++i) 
-            getExecutor().execute(makeTask(i));
+    	IntStream.range(0, inputSize)
+		 .forEach(i -> getExecutor().execute(makeTask(i)));
 
         // Process all the Futures concurrently via the
         // ExecutorCompletionService's completion queue.

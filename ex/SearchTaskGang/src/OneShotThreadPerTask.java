@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -37,15 +38,13 @@ public class OneShotThreadPerTask
     protected void initiateTaskGang(int inputSize) {
         // Create a fixed-size Thread pool.
         if (getExecutor() == null) 
-            // Create an Executor that runs each worker task in a
-            // separate Thread.
-            setExecutor (new Executor() {
-                    public void execute(Runnable r) {
-                        Thread thread = new Thread(r);
-                        mWorkerThreads.add (thread);
-                        thread.start();
-                    }
-                });
+            // Create an Executor whose execute() method runs each 
+        	// worker task in a separate Thread.
+            setExecutor (r -> { Thread t = new Thread(r);
+            					mWorkerThreads.add(t);
+            					t.start();
+                              }
+                         );
 
         // Enqueue each item in the input List for execution in a
         // separate Thread.
@@ -61,18 +60,17 @@ public class OneShotThreadPerTask
     protected boolean processInput (String inputData) {
         // Iterate through each word we're searching for and try to
         // find it in the inputData.
-        for (String word : mWordsToFind) {
-            SearchResults results = searchForWord(word, 
-                                                  inputData);
-
-            // Each time a match is found the SearchResult.print()
+    	Arrays.asList(mWordsToFind).forEach(word -> { 
+    		SearchResults results = searchForWord(word, inputData);
+    		 // Each time a match is found the SearchResult.print()
             // method is called to print the output.  We put this
             // call in a synchronized block so the output isn't
             // scrambled.
             synchronized(System.out) {
                 results.print();
             }
-        }
+    	});
+    	
         return true;
     }
 
@@ -81,12 +79,14 @@ public class OneShotThreadPerTask
      * for the gang of tasks to exit.
      */
     protected void awaitTasksDone() {
-        for (Thread thread : mWorkerThreads)
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                System.out.println("awaitTasksDone interrupted");
-            }
+    	mWorkerThreads.forEach
+    		(thread -> {
+    			try {
+    				thread.join();
+    			} catch (InterruptedException e) {
+    				System.out.println("awaitTasksDone interrupted");
+    			}
+    		});                 
     }
 }
 

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -6,6 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.IntStream;
 
 /**
  * @class OneShotExecutorService
@@ -78,13 +80,13 @@ public class OneShotExecutorService
         // Create a new collection that will contain all the
         // Worker Runnables.
         List<Callable<Object>> workerCollection =
-            new ArrayList<Callable<Object>>(inputSize);
+            new ArrayList<>(inputSize);
 
         // Create a Runnable for each item in the input List and add
         // it as a Callable adapter into the collection.
-        for (int i = 0; i < inputSize; ++i) 
-            workerCollection.add(Executors.callable(makeTask(i)));
-
+        IntStream.range(1, inputSize)
+        		 .forEach(i -> workerCollection.add(Executors.callable(makeTask(i))));
+        
         try {
             // Downcast to get the ExecutorService.
             ExecutorService executorService = 
@@ -104,16 +106,14 @@ public class OneShotExecutorService
      */
     @Override
     protected boolean processInput (String inputData) {
-        // Iterate through each word we're searching for
-        // and try to find it in the inputData.
-        for (String word : mWordsToFind) 
-
-            // Each time a match is found the queueResults() method is
-            // called to pass the search results to a background
-            // Thread for concurrent processing.
-            queueResults(searchForWord(word, 
-                                       inputData));
-        return true;
+    	// Iterate through each word we're searching for and try to
+        // find it in the inputData. Each time a match is found the 
+    	// queueResults() method is called to pass the search results 
+    	// to a background Thread for concurrent processing.
+    	Arrays.asList(mWordsToFind).forEach
+    		(word -> queueResults(searchForWord(word, 
+    				                            inputData)));
+    	return true;
     }
 
     /**
@@ -121,7 +121,6 @@ public class OneShotExecutorService
      */
     @Override
     protected void taskDone(int index) throws IndexOutOfBoundsException {
-
         // Decrements the CountDownLatch, which releases the main
         // Thread when count drops to 0.
         mExitBarrier.countDown();
@@ -184,26 +183,19 @@ public class OneShotExecutorService
      * Thread.
      */
     protected void processQueuedResults(final int resultCount) {
-        // This runnable processes all queued results.
-        Runnable processQueuedResultsRunnable =
-            new Runnable() {
-                public void run() {
-                    try {
-                        for (int i = 0; i < resultCount; ++i)
-                            // Extract each SearchResults from the
-                            // queue (blocking if necessary) until
-                            // we're done.
-                            getQueue().take().print();
-
-                    } catch (InterruptedException e) {
-                        System.out.println("run() interrupted");
-                    }
-                }
-            };
-
-        // Create a new Thread that will process the results
-        // concurrently in the background.
-        Thread t = new Thread(processQueuedResultsRunnable);
+        // Create a new Thread that will process all the
+        // queued results concurrently in the background.
+        Thread t = new Thread(() -> {
+            				try {
+            					for (int i = 0; i < resultCount; ++i)
+            						// Extract each SearchResults from the
+            						// queue (blocking if necessary) until
+            						// we're done.
+            						getQueue().take().print();
+            				} catch (InterruptedException e) {
+            					System.out.println("run() interrupted");
+            				}
+            			});
         t.start();
 
         try {

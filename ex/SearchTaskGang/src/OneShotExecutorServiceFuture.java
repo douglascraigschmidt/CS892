@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * @class OneShotExecutorServiceFuture
@@ -21,7 +22,7 @@ public class OneShotExecutorServiceFuture
     /**
      * A List of Futures that contain SearchResults.
      */
-    protected List<Future<SearchResults>> mResultFutures;
+    protected List<CompletableFuture<SearchResults>> mResultFutures;
 
     /**
      * Constructor initializes the superclass and data members.
@@ -40,20 +41,10 @@ public class OneShotExecutorServiceFuture
     /**
      * Process all the Futures containing search results.
      */
-    protected void processFutureResults(List<Future<SearchResults>> resultFutures) {
-
+    protected void processFutureResults(List<CompletableFuture<SearchResults>> resultFutures) {
         // Iterate through the List of Futures and print the search
         // results.
-        for (Future<SearchResults> resultFuture : resultFutures) {
-            try {
-
-                // The get() call may block if the results aren't
-                // ready yet.
-                resultFuture.get().print();
-            } catch (Exception e) {
-                System.out.println("get() exception");
-            }
-        }
+    	resultFutures.stream().map(CompletableFuture::join).forEach(SearchResults::print);   
     }
 
     /**
@@ -65,26 +56,13 @@ public class OneShotExecutorServiceFuture
         ExecutorService executorService = 
             (ExecutorService) getExecutor();
 
-        // Iterate through each word.
-        for (final String word : mWordsToFind) {
-
-            // Submit a Callable that will search concurrently for
-            // this word in the inputData & create a Future to store
-            // the results.
-            final Future<SearchResults> resultFuture = 
-                executorService.submit(new Callable<SearchResults>() {
-                        @Override
-                        // call() runs in a background task.
-                        public SearchResults call() throws Exception {
-                            return searchForWord(word,
-                                                 inputData);
-                        }
-                    });
-
-            // Add the Future to the List so it can be processed
-            // later.
-            mResultFutures.add(resultFuture);
-        }
+        mResultFutures = 
+        	Arrays.asList(mWordsToFind).stream()
+        	                           .map(word -> CompletableFuture.supplyAsync
+        	                        		   (() -> searchForWord(word, 
+        													        inputData), 
+              						        executorService)).
+              					    collect(Collectors.toList());
         return true;
     }
 
@@ -96,14 +74,13 @@ public class OneShotExecutorServiceFuture
         // Preallocate the List of Futures to hold all the
         // SearchResults.
         mResultFutures = 
-            new ArrayList<Future<SearchResults>> 
+            new ArrayList<CompletableFuture<SearchResults>> 
             (inputSize * mWordsToFind.length);
 
         // Process each String of inputData via the processInput()
         // method.  Note that input Strings aren't run concurrently,
         // just eacd word that's being searched for.
-        for (final String inputData : getInput())
-            processInput(inputData);
+        getInput().forEach(inputData -> processInput(inputData));
 
         // Process all the Futures.
         processFutureResults(mResultFutures);
