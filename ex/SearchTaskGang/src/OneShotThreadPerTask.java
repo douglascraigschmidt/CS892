@@ -60,7 +60,7 @@ public class OneShotThreadPerTask
     protected boolean processInput (String inputData) {
         // Iterate through each word we're searching for and try to
         // find it in the inputData.
-    	Arrays.asList(mWordsToFind).forEach(word -> { 
+    	Arrays.stream(mWordsToFind).forEach(word -> { 
     		SearchResults results = searchForWord(word, inputData);
     		 // Each time a match is found the SearchResult.print()
             // method is called to print the output.  We put this

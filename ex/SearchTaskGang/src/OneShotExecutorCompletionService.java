@@ -82,7 +82,7 @@ public class OneShotExecutorCompletionService
         // Iterate through each word and submit a call to searchForWord() concurrently 
     	// for each word in the inputData. The searchForWord() result is stored in
     	// the ExecutorCompletionService for asynchronous Future processing.
-    	Arrays.asList(mWordsToFind).forEach
+    	Arrays.stream(mWordsToFind).forEach
     	 	(word -> mCompletionService.submit
     	 			(() -> searchForWord(word, 
     	 							     inputData)));

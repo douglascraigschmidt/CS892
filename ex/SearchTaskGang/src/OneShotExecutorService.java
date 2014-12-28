@@ -110,7 +110,7 @@ public class OneShotExecutorService
         // find it in the inputData. Each time a match is found the 
     	// queueResults() method is called to pass the search results 
     	// to a background Thread for concurrent processing.
-    	Arrays.asList(mWordsToFind).forEach
+    	Arrays.stream(mWordsToFind).forEach
     		(word -> queueResults(searchForWord(word, 
     				                            inputData)));
     	return true;

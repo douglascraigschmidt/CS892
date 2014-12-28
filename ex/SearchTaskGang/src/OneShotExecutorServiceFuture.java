@@ -57,12 +57,12 @@ public class OneShotExecutorServiceFuture
             (ExecutorService) getExecutor();
 
         mResultFutures = 
-        	Arrays.asList(mWordsToFind).stream()
-        	                           .map(word -> CompletableFuture.supplyAsync
-        	                        		   (() -> searchForWord(word, 
-        													        inputData), 
-              						        executorService)).
-              					    collect(Collectors.toList());
+        	Arrays.stream(mWordsToFind)
+        	      .map(word -> CompletableFuture.supplyAsync
+        	                         (() -> searchForWord(word, 
+        											      inputData), 
+              						  executorService)).
+                       collect(Collectors.toList());
         return true;
     }
 
