@@ -35,46 +35,43 @@ public class ImageStreamCompletableFuture extends ImageStream {
 
         // Concurrently process each filter in the mFilters List.
     	mFilters.parallelStream()
-                .forEach(filter -> {
-                         List<URL> urls = getInput();
-                         // Use Java streams and CompletableFutures to
-                         // download and filter all urls concurrently.
-                         List<CompletableFuture<ImageEntity>> imageFutures =
-                             urls.stream()
+            .forEach(filter -> {
+                    List<URL> urls = getInput();
+                    // Use Java streams and CompletableFutures to
+                    // download and filter all urls concurrently.
+                    List<CompletableFuture<ImageEntity>> imageFutures =
+                        urls.stream()
 
-                                 // Concurrently supply an async
-                                 // Callable task to the Executor
-                                 // framework that calls
-                                 // processInput() to download and
-                                 // filter an image retrieved from a
-                                 // given URL, stores the results in a
-                                 // file.
-                                 .map(url -> CompletableFuture.supplyAsync
-                                              (() -> processInput(url, 
-                                                                  filter),
-                                               getExecutor()))
-                                 // Put futures returns from
-                                 // supplyAsync() into in List.
-                                 .collect(Collectors.toList());
+                        // Concurrently supply an async Callable task
+                        // to the Executor framework that calls
+                        // processInput() to download and filter an
+                        // image retrieved from a given URL, stores
+                        // the results in a file.
+                        .map(url -> CompletableFuture.supplyAsync
+                                      (() -> processInput(url, 
+                                                          filter),
+                              getExecutor()))
+                        // Put futures returns from supplyAsync() into
+                        // in List.
+                        .collect(Collectors.toList());
                          
-                         // Sequentially process image Future results.
-                         imageFutures.stream()
-                                     // Join with CompletableFutures
-                                     // and then indicate if they
-                                     // succeeded or not.
-                                     .map(CompletableFuture::join)
-                                     .forEach(image ->
-                                              // Indicate success or failure.
-                                              PlatformStrategy.instance().errorLog
-                                                ("ImageStreamCompletableFuture",
-                                                 "Operations"
-                                                 + (image.getSucceeded() == true 
-                                                   ? " succeeded" 
-                                                   : " failed")
-                                                 + " on file " 
-                                                 + image.getSourceURL())
-                                                 );
-                    });
+                    // Sequentially process image Future results.
+                    imageFutures.stream()
+                        // Join with CompletableFutures and then
+                        // indicate if they succeeded or not.
+                        .map(CompletableFuture::join)
+                        .forEach(image ->
+                                 // Indicate success or failure.
+                                 PlatformStrategy.instance().errorLog
+                                 ("ImageStreamCompletableFuture",
+                                  "Operations"
+                                  + (image.getSucceeded() == true 
+                                     ? " succeeded" 
+                                     : " failed")
+                                  + " on file " 
+                                  + image.getSourceURL())
+                                 );
+                });
 
         // Indicate all computations in this iteration are done.
         try {

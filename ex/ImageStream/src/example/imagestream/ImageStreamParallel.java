@@ -32,28 +32,28 @@ public class ImageStreamParallel extends ImageStream {
 
         // Concurrently process each filter in the mFilters List.
     	mFilters.parallelStream()
-                .forEach(filter -> {
-                        List<URL> urls = getInput();
-                        // Use Java 8 streams to download and filter all
-                        // urls concurrently.
-                        urls.parallelStream()
-                            // Call processInput() to download and filter the
-                            // image retrieved from the given URL, store the
-                            // results in a file, and indicate success or
-                            // failure.
-                            .map(url -> processInput(url, filter))
-                            .forEach(image ->
-                                     // Indicate success or failure.
-                                     PlatformStrategy.instance().errorLog
-                                     ("ImageStreamParallel",
-                                      "Operations"
-                                      + (image.getSucceeded() == true 
-                                         ? " succeeded" 
-                                         : " failed")
-                                      + " on file " 
-                                      + image.getSourceURL())
-                                     );
-                    });
+            .forEach(filter -> {
+                    List<URL> urls = getInput();
+                    // Use Java 8 streams to download and filter all
+                    // urls concurrently.
+                    urls.parallelStream()
+                        // Call processInput() to download and filter
+                        // the image retrieved from the given URL,
+                        // store the results in a file, and indicate
+                        // success or failure.
+                        .map(url -> processInput(url, filter))
+                        .forEach(image ->
+                                 // Indicate success or failure.
+                                 PlatformStrategy.instance().errorLog
+                                 ("ImageStreamParallel",
+                                  "Operations"
+                                  + (image.getSucceeded() == true 
+                                     ? " succeeded" 
+                                     : " failed")
+                                  + " on file " 
+                                  + image.getSourceURL())
+                                 );
+                });
 
         // Indicate all computations in this iteration are done.
         try {
