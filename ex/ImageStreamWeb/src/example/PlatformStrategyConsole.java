@@ -1,6 +1,6 @@
-package example.imagetaskgang;
+package example;
 
-import android.annotation.SuppressLint;
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,8 +13,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-
-// @@ import javax.imageio.ImageIO;
+import javax.imageio.ImageIO;
 
 /**
  * @class PlatformStrategyConsole
@@ -24,12 +23,11 @@ import java.util.List;
  *        processing, and storing URLs.  It plays the role of the
  *        "Concrete Strategy" in the Strategy pattern.
  */
-@SuppressLint("NewApi")
 public class PlatformStrategyConsole extends PlatformStrategy {
     /**
      * Contains information for printing output to the console window.
      */
-    private final PrintStream mOutput;
+    protected final PrintStream mOutput;
 
     /** 
      * Constructor initializes the data member.
@@ -115,15 +113,13 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      * Factory method that creates an @a Image from a byte array.
      */
     public Image makeImage(byte[] imageData){
-        // @@ return new BufferedImage(imageData);
-    	return null;
+        return new BufferedImage(imageData);
     }
      
     /**
      * Apply a grayscale filter to the @a imageEntity and return it.
      */
     public ImageEntity grayScaleFilter(ImageEntity imageEntity) {
-        /* @@
     	Image imageAdapter =
             ((ImageEntity) imageEntity).getImage();
         java.awt.image.BufferedImage originalImage = 
@@ -170,8 +166,6 @@ public class PlatformStrategyConsole extends PlatformStrategy {
 
         return new ImageEntity(imageEntity.getSourceURL(),
                                grayScaleImage);
-        */
-        return null;
     }
     
     /**
@@ -179,7 +173,6 @@ public class PlatformStrategyConsole extends PlatformStrategy {
      */
     public void storeImage(Image imageAdapter,
                            FileOutputStream outputFile) {
-        /* @@
     	// Write the image to the appropriate directory.
         try {
             ImageIO.write(((BufferedImage) imageAdapter).mBufferedImage,
@@ -189,7 +182,6 @@ public class PlatformStrategyConsole extends PlatformStrategy {
             mOutput.println("ImageIO write failure");
             e.printStackTrace();
         }
-        */
     }
 
     /**

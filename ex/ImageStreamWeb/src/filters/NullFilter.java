@@ -1,14 +1,13 @@
-package example.imagetaskgang;
+package filters;
+
+import example.ImageEntity;
 
 /**
  * @class NullFilter
  *
  * @brief The NullFilter will return the image as it was downloaded.
- *        It's purpose is to show the original image, as well as to
+ *        It's main purpose is to show the "Control" image, and to
  *        exemplify how filters are supposed to work on a basic level.
- *        It plays the role of the "Concrete Component" in the
- *        Decorator pattern and the "Concrete Class" in the Template
- *        Method pattern.
  */
 public class NullFilter extends Filter {
     /**

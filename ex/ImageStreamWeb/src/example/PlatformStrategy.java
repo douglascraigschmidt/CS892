@@ -1,4 +1,4 @@
-package example.imagetaskgang;
+package example;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-
-import android.annotation.SuppressLint;
 
 /** 
  * @class PlatformStrategy
@@ -68,7 +65,6 @@ public abstract class PlatformStrategy {
      * A method to make the directories and get a file reference
      * on the current platform, returning the success or failure
      */
-    @SuppressLint("NewApi")
     public boolean storeExternalImage(String pathName,
     			String fileName, Image image) {
     	// Ensure that the path exists
