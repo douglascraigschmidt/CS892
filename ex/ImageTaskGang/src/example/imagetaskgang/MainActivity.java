@@ -144,8 +144,7 @@ public class MainActivity extends Activity {
         RestAdapter restAdapter =
         		new RestAdapter.Builder()
 					.setClient(new ExtendedTimeoutUrlConnectionClient())
-					//change to 10.0.0.2/ImageStreamWeb if running emulator
-					.setEndpoint("http://3b658e21.ngrok.com/ImageStreamWeb/")
+					.setEndpoint("10.0.0.2/ImageStreamWeb/")
 					.build();
         
         mImageService = restAdapter.create(ImageStreamService.class);

@@ -175,7 +175,7 @@ public abstract class ImageStream extends StreamGang<URL> {
      * Factory method that retrieves the image associated with the @a
      * urlToDownload and creates an ImageEntity to encapsulate it.
      */
-    private ImageEntity makeImageEntity(URL urlToDownload) {
+    protected ImageEntity makeImageEntity(URL urlToDownload) {
         return new ImageEntity(urlToDownload,
                                downloadContent(urlToDownload));
     }

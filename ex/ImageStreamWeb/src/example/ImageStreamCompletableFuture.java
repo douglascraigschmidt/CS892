@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 import filters.Filter;
+import filters.OutputFilterDecorator;
 
 /**
  * @class ImageStreamCompletableFuture
