@@ -53,7 +53,8 @@ public class ImageStreamSequential extends ImageStream {
 	    			// decorate each filter to write the images to files
 	    			.map(filter -> new OutputFilterDecorator(filter))
 	    			// filter the image
-	    			.forEach(dfilter -> dfilter.filter(image));
+	    			.forEach(decoratedFilter -> 
+	    				decoratedFilter.filter(image));
 	    	});
 
         // Indicate all computations in this iteration are done.
