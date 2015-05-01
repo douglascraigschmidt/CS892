@@ -34,26 +34,26 @@ public class ImageStreamParallel extends ImageStream {
         mIterationBarrier = new CountDownLatch(1);
         
         getInput().parallelStream()
-        	// transform URL -> ImageEntity
-        	.map(url -> makeImageEntity(url))
-        	// Check to see if the download was successful
-        	.peek(image -> 
-        		PlatformStrategy.instance().errorLog
-                             ("ImageStreamParallel",
-                              "Operations"
-                              + (image.getSucceeded() == true 
-                                 ? " succeeded" 
-                                 : " failed")
-                              + " on file " 
-                              + image.getSourceURL()))
+            // transform URL -> ImageEntity
+            .map(url -> makeImageEntity(url))
+            // Check to see if the download was successful
+            .peek(image -> 
+                  PlatformStrategy.instance().errorLog
+                  ("ImageStreamParallel",
+                   "Operations"
+                   + (image.getSucceeded() == true 
+                      ? " succeeded" 
+                      : " failed")
+                   + " on file " 
+                   + image.getSourceURL()))
             // collect each image and apply each filter in parallel
-        	.forEach(image -> {
-        		mFilters.parallelStream()
-        			// decorate each filter to write the images to files
-        			.map(filter -> new OutputFilterDecorator(filter))
-        			// filter the image
-        			.forEach(decoratedFilter -> 
-        				decoratedFilter.filter(image));
+            .forEach(image -> {
+                    mFilters.parallelStream()
+                        // decorate each filter to write the images to files
+                        .map(filter -> new OutputFilterDecorator(filter))
+                        // filter the image
+                        .forEach(decoratedFilter -> 
+                                 decoratedFilter.filter(image));
         	});
 
         // Indicate all computations in this iteration are done.
