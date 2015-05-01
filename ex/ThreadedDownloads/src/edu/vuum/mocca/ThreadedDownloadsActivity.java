@@ -56,8 +56,8 @@ public class ThreadedDownloadsActivity extends Activity {
         setContentView(R.layout.main);
 
         // Initialize the ButtonStrategyMapper that efficiently maps
-        // button ids to strategies for downloading and displaying
-        // images concurrently.
+        // button ids to ButtonStrategy objects for downloading and
+        // displaying images concurrently.
         mButtonStrategyMapper = 
             new ButtonStrategyMapper
                (new int[] { 

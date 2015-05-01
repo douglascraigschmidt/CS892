@@ -9,9 +9,16 @@ import android.util.SparseArray;
  *        ButtonStrategy implementations.
  */
 public class ButtonStrategyMapper {
+    /**
+     * Data structure that maps button Ids to ButtonStrategy objects.
+     */
     private SparseArray<ButtonStrategy> mButtonStrategyArray =
-        new SparseArray<ButtonStrategy>();
+        new SparseArray<>();
             
+    /**
+     * Constructor that uses SparseArray maps button Ids to
+     * ButtonStrategy objects.
+     */ 
     public ButtonStrategyMapper(int[] buttonIds,
                                 ButtonStrategy[] buttonStrategys) {
         // Map buttons pushed by the user to the requested type of
@@ -23,7 +30,7 @@ public class ButtonStrategyMapper {
 
     /**
      * Factory method that returns the request ButtonStrategy
-     * implementation.
+     * implementation given a button Id.
      */
     public ButtonStrategy getButtonStrategy(int buttonId) {
         // Return the designated ButtonStrategy.

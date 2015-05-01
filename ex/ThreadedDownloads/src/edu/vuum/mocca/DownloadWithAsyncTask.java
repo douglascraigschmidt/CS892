@@ -82,7 +82,8 @@ public class DownloadWithAsyncTask implements ButtonStrategy {
      * Thread in the pool of Threads.
      */
     @Override
-    public void downloadAndDisplayImage(final DownloadContext downloadContext) {
+    public void downloadAndDisplayImage
+        (final DownloadContext downloadContext) {
         mDownloader = new DownloadAsyncTask(downloadContext);
 
         mDownloader.execute(downloadContext.getUrlString());
@@ -94,7 +95,8 @@ public class DownloadWithAsyncTask implements ButtonStrategy {
     @Override
     public void cancelDownload(DownloadContext downloadContext) {
         // Let the user know this download is being canceled.
-        downloadContext.showToast("Canceling DownloadWithAsyncTask in progress");
+        downloadContext.showToast
+            ("Canceling DownloadWithAsyncTask in progress");
 
         // Cancel the AsyncTask immediately.
         mDownloader.cancel(true);

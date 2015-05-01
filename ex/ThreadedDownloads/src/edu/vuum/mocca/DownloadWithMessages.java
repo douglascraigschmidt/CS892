@@ -26,13 +26,14 @@ public class DownloadWithMessages implements ButtonStrategy {
      * Thread.
      */
     @Override
-    public void downloadAndDisplayImage(final DownloadContext downloadContext) {
+    public void downloadAndDisplayImage
+        (final DownloadContext downloadContext) {
         // Object used to handle messages sent to it via the
         // background Thread.
         final MessageHandler messageHandler =
             new MessageHandler(downloadContext);
 
-        Runnable downloadRunnable = new Runnable() {
+        final Runnable downloadRunnable = new Runnable() {
             /**
              * Download a bitmap image in a background Thread by
              * sending Messages to the mHandler running in the UI
@@ -43,26 +44,29 @@ public class DownloadWithMessages implements ButtonStrategy {
                 // Factory creates a Message that instructs the
                 // MessageHandler to post the toast to the user.
                 Message msg =
-                    messageHandler.obtainMessage(MessageHandler.SHOW_TOAST);
+                    messageHandler.obtainMessage
+                    (MessageHandler.SHOW_TOAST);
 
                 // Send the Message to show the toast.
                 messageHandler.sendMessage(msg);
 
                 // Download the image.
                 final Bitmap image = 
-                    downloadContext.downloadImage(downloadContext.getUrlString());
+                    downloadContext.downloadImage
+                    (downloadContext.getUrlString());
 
                 // Factory creates a Message that instructs the
                 // MessageHandler to display the image to the user.
                 msg =
-                    messageHandler.obtainMessage(MessageHandler.DISPLAY_IMAGE,
-                                                 image);
+                    messageHandler.obtainMessage
+                    (MessageHandler.DISPLAY_IMAGE,
+                     image);
 
                 // Send the Message to instruct the UI Thread to
                 // display the image.
                 messageHandler.sendMessage(msg);
             }
-            };
+        };
 
         // Create and Start a new Thread to perform the download and
         // display the results to the user.
@@ -76,7 +80,8 @@ public class DownloadWithMessages implements ButtonStrategy {
     @Override
     public void cancelDownload(DownloadContext downloadContext) {
         // Let the user know this download is being canceled.
-        downloadContext.showToast("Canceling DownloadWithMessages in progress");
+        downloadContext.showToast
+            ("Canceling DownloadWithMessages in progress");
 
         // Interrupt the Thread so it will stop the download.
         mThread.interrupt();
@@ -120,14 +125,16 @@ public class DownloadWithMessages implements ButtonStrategy {
          * the designated bitmap image via the ImageView.
          */
         public void handleMessage(Message msg) {
-            DownloadContext context = mContext.get();
+            final DownloadContext context =
+                mContext.get();
 
             if (context == null)
                 return;
                     
             switch (msg.what) {
             case SHOW_TOAST:
-                context.showToast("downloading via Handlers and Messages");
+                context.showToast
+                    ("downloading via Handlers and Messages");
                 break;
 
             case DISPLAY_IMAGE:

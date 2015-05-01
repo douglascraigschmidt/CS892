@@ -22,5 +22,6 @@ public class ResetImage implements ButtonStrategy {
      */
     @Override
     public void cancelDownload(DownloadContext downloadContext) {
+        // No-op.
     }
 }
