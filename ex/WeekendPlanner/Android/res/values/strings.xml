@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Weekendizer</string>
+    <string name="action_settings">Settings</string>
+    <string name="originCity">Origin City:</string>
+    <string name="originCityPrompt">What city are you in now?</string>
+    <string name="budget">Budget:</string>
+    <string name="budgetPrompt">What is your budget?</string>
+    <string name="destinationCity">Destination City:</string>
+    <string name="destinationCityPrompt">What city do you want to see?</string>
+    <string name="enterDestination">Enter Destination</string>
+    <string name="removeDestination">Remove Destination</string>
+    <string name="weekendize">Weekendize</string>
+    
+    <string name="weekendPlan">Weekend Plan</string>
+    <string name="origin">Origin:</string>
+    <string name="destination">Dest:</string>
+    <string name="departing">Depart:</string>
+    <string name="returning">Return:</string>
+    <string name="departingFlight">Departing Flight:</string>
+    <string name="returningFlight">Returning Flight:</string>
+    <string name="initBudget">Budget:</string>
+    <string name="flightCost">Flight:</string>
+    
+    <string name="remainingBudget">Remaining:</string>
+    <string name="ticketCategories">Ticket Categories:</string>
+    <string name="placeTypes">Place Types:</string>
+    
+    <string name="places">Places:</string>
+    <string name="events">Events:</string>
+
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <LinearLayout
+        android:id="@+id/detailBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       	android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+        <TextView
+            android:id="@+id/variantTitle"
+        	android:layout_width="0dp"
+        	android:layout_weight="4"
+        	android:layout_height="wrap_content"
+        	android:textSize="20sp"
+        	android:textStyle="bold"/>
+        
+        <TextView
+            android:id="@+id/detailBudget"
+        	android:layout_width="0dp"
+        	android:layout_weight="3"
+        	android:layout_height="wrap_content"
+        	android:text="@string/remainingBudget"
+        	android:textSize="20sp"
+        	android:textStyle="bold"/>
+        
+        <TextView
+            android:id="@+id/detailAmount"
+        	android:layout_width="0dp"
+        	android:layout_weight="2"
+        	android:layout_height="wrap_content"
+        	android:textSize="20sp"/>
+    </LinearLayout>
+    
+    <ListView
+        android:id="@+id/dayList"
+        android:layout_below="@id/detailBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp">
+   	</ListView>
+
+</RelativeLayout>

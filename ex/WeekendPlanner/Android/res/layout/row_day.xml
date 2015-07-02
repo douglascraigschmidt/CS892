@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+ 	<LinearLayout 
+        android:id="@+id/dayBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+        <TextView
+            android:id="@+id/day"
+        	android:layout_width="0dp"
+        	android:layout_weight="1"
+        	android:layout_height="wrap_content"
+        	android:textSize="18sp"
+        	android:textStyle="bold"/>
+      
+        <TextView
+            android:id="@+id/dayWeather"
+        	android:layout_width="0dp"
+        	android:layout_weight="1"
+        	android:layout_height="wrap_content"
+        	android:textSize="18sp"/>
+    </LinearLayout>
+     
+    <TextView
+    	android:id="@+id/places"
+   		android:layout_width="match_parent"
+   		android:layout_height="wrap_content"
+   		android:layout_margin="3dp"
+   		android:text="@string/places"
+   		android:textSize="15sp"
+   		android:textStyle="bold"/>
+      
+   <LinearLayout
+        android:id="@+id/placeList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="3dp" >
+   </LinearLayout>
+    
+   <TextView
+    	android:id="@+id/events"
+   		android:layout_width="match_parent"
+   		android:layout_height="wrap_content"
+   		android:layout_margin="3dp"
+   		android:text="@string/events"
+   		android:textSize="15sp"
+   		android:textStyle="bold"/>
+
+   <LinearLayout
+        android:id="@+id/eventList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="3dp" >
+   </LinearLayout>
+    
+</LinearLayout>

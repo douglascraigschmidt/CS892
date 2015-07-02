@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <TextView 
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/weekendPlan"
+        android:textSize="40sp"
+        android:textStyle="bold"/>
+    
+    <LinearLayout
+        android:id="@+id/originDestination"
+        android:layout_below="@id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+        <TextView 
+            android:id="@+id/origin"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/origin"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+        
+        <TextView 
+            android:id="@+id/originCity"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"/>
+        
+        <TextView 
+            android:id="@+id/destination"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/destination"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+        
+        <TextView 
+            android:id="@+id/destinationCity"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"/>
+    </LinearLayout>
+        
+    <LinearLayout
+        android:id="@+id/departureReturn"
+        android:layout_below="@id/originDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+       	android:layout_margin="3dp">
+        
+        <TextView 
+            android:id="@+id/departing"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/departing"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+        
+        <TextView 
+            android:id="@+id/departingDate"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"/>
+        
+        <TextView 
+            android:id="@+id/returning"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/returning"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+        
+        <TextView 
+            android:id="@+id/returningDate"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/budgetInfo"
+        android:layout_below="@id/departureReturn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+	    <TextView 
+	        android:id="@+id/budget"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:layout_height="wrap_content"
+	        android:text="@string/initBudget"
+	        android:textSize="15sp"
+	        android:textStyle="bold"/>
+	    
+	    <TextView 
+	        android:id="@+id/initBudget"
+	        android:layout_width="0dp"
+	        android:layout_weight="2"
+	        android:layout_height="wrap_content"
+	        android:textSize="15sp"/>
+	    
+	    <TextView 
+	        android:id="@+id/flight"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:layout_height="wrap_content"
+	        android:text="@string/flightCost"
+	        android:textSize="15sp"
+	        android:textStyle="bold"/>
+	    
+	    <TextView 
+	        android:id="@+id/flightCost"
+	        android:layout_width="0dp"
+	        android:layout_weight="2"
+	        android:layout_height="wrap_content"
+	        android:textSize="15sp"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/departingFlightInfo"
+        android:layout_below="@id/budgetInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+	    <TextView 
+	        android:id="@+id/departingFlight"
+	        android:layout_width="0dp"
+	        android:layout_weight="2"
+	        android:layout_height="wrap_content"
+	        android:text="@string/departingFlight"
+	        android:textSize="15sp"
+	        android:textStyle="bold"/>
+	    
+	    <TextView 
+	        android:id="@+id/departingInfo"
+	        android:layout_width="0dp"
+	        android:layout_weight="3"
+	        android:layout_height="wrap_content"
+	        android:textSize="15sp"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/returningFlightInfo"
+        android:layout_below="@id/departingFlightInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+	    <TextView 
+	        android:id="@+id/returningFlight"
+	        android:layout_width="0dp"
+	        android:layout_weight="2"
+	        android:layout_height="wrap_content"
+	        android:text="@string/returningFlight"
+	        android:textSize="15sp"
+	        android:textStyle="bold"/>
+	    
+	    <TextView 
+	        android:id="@+id/returningInfo"
+	        android:layout_width="0dp"
+	        android:layout_weight="3"
+	        android:layout_height="wrap_content"
+	        android:textSize="15sp"/>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/tripVariants"
+        android:layout_below="@id/returningFlightInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp" >
+    </ListView>
+
+</RelativeLayout>
