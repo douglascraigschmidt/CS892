@@ -37,60 +37,60 @@ import filters.NullFilter;
  */
 @WebServlet("/ImageStreamServlet")
 public class ImageStreamServlet extends HttpServlet {
-	/**
-	 * A required field of the HttpServlet.
-	 * Unnecessary to us
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * A required field of the HttpServlet.
+     * Unnecessary to us
+     */
+    private static final long serialVersionUID = 1L;
 	
-	/**
-	 * The list of filters to apply to the downloaded images
-	 */
-	private static Filter[] FILTERS = {
+    /**
+     * The list of filters to apply to the downloaded images
+     */
+    private static Filter[] FILTERS = {
         new NullFilter(),
         new GrayScaleFilter()
     };
 	
-	/**
-	 * The Gson JSON converter responsible for parsing the
-	 * request URL Lists
-	 */
-	private final Gson gson = new Gson();
+    /**
+     * The Gson JSON converter responsible for parsing the
+     * request URL Lists
+     */
+    private final Gson gson = new Gson();
 	
-	/**
-	 * @see Servlet#init(ServletConfig)
-	 */
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-	}
+    /**
+     * @see Servlet#init(ServletConfig)
+     */
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
 		
-		// Coerce the JSON string into a usable list of string lists
-		String json = request.getReader().readLine();
-		String[][] inputStrings = gson.fromJson(json, String[][].class);
+        // Coerce the JSON string into a usable list of string lists
+        String json = request.getReader().readLine();
+        String[][] inputStrings = gson.fromJson(json, String[][].class);
 		
-		// Perform a conversion of strings to URLs
-		List<List<URL>> inputUrls = new ArrayList<List<URL>>();
-		for(String[] sList : inputStrings) {
-			List<URL> urlList = new ArrayList<URL>();
-			for(String s : sList) {
-				urlList.add(new URL(s));
-			}
-			inputUrls.add(urlList);
-		}
+        // Perform a conversion of strings to URLs
+        List<List<URL>> inputUrls = new ArrayList<List<URL>>();
+        for(String[] sList : inputStrings) {
+            List<URL> urlList = new ArrayList<URL>();
+            for(String s : sList) {
+                urlList.add(new URL(s));
+            }
+            inputUrls.add(urlList);
+        }
 			
-		// Initializes the Platform singleton with the appropriate
+        // Initializes the Platform singleton with the appropriate
         // PlatformStrategy, which in this case will be the
         // ConsolePlatform.
         PlatformStrategy.instance
             (new PlatformStrategyProxy((System.out), 
-            						   getServletContext(),
-            						   inputUrls));
+                                       getServletContext(),
+                                       inputUrls));
         
         PlatformStrategy.instance().errorLog("MainConsole", 
                                              "Starting all the tests");
@@ -109,10 +109,10 @@ public class ImageStreamServlet extends HttpServlet {
         // designated ImageStream and then run it in a separate
         // Thread.
         new Thread(new ImageStreamParallel(FILTERS, 
-						   				   PlatformStrategy.instance()
-						   				   		.getUrlIterator(InputSource.NETWORK),
-						   				   new RetrieveAndSendDataTask(response, 
-						   						completionHook))).start();
+                                           PlatformStrategy.instance()
+                                           .getUrlIterator(InputSource.NETWORK),
+                                           new RetrieveAndSendDataTask(response, 
+                                                                       completionHook))).start();
         try {
             // Barrier synchronizer that wait for the ImageStream
             // to finish all its processing.
@@ -123,148 +123,148 @@ public class ImageStreamServlet extends HttpServlet {
         }
         
         PlatformStrategy.instance().errorLog("MainConsole", 
-                "Ending all the tests");
+                                             "Ending all the tests");
 			
-	}
+    }
 	
-	/**
-	 * A wrapper around the completionHook to the ImageStream that
-	 * builds and sends the response JSON string
-	 */
-	private class RetrieveAndSendDataTask implements Runnable {
+    /**
+     * A wrapper around the completionHook to the ImageStream that
+     * builds and sends the response JSON string
+     */
+    private class RetrieveAndSendDataTask implements Runnable {
 		
-		private final HttpServletResponse mResponse;
-		private final Runnable mEndTask;
+        private final HttpServletResponse mResponse;
+        private final Runnable mEndTask;
 		
-		public RetrieveAndSendDataTask(HttpServletResponse response, Runnable endTask) {
-			mResponse = response;
-			mEndTask = endTask;
-		}
+        public RetrieveAndSendDataTask(HttpServletResponse response, Runnable endTask) {
+            mResponse = response;
+            mEndTask = endTask;
+        }
 
-		@Override
-		public void run() {
-			// Begin at the top level directory
-			File externalFile = 
-	                new File(PlatformStrategy.instance().getDirectoryPath());
+        @Override
+            public void run() {
+            // Begin at the top level directory
+            File externalFile = 
+                new File(PlatformStrategy.instance().getDirectoryPath());
 			
-			ImageVisitor imageVisitor = new ImageVisitor();
+            ImageVisitor imageVisitor = new ImageVisitor();
 			
-			try {
-				// Visit all subdirectories, building the JSON String
-				Files.walkFileTree(externalFile.toPath(), imageVisitor);
+            try {
+                // Visit all subdirectories, building the JSON String
+                Files.walkFileTree(externalFile.toPath(), imageVisitor);
 				
-				// Write the response string
-				mResponse.setContentLength(imageVisitor.getJsonString().length());
-				mResponse.getWriter().write(imageVisitor.getJsonString());
+                // Write the response string
+                mResponse.setContentLength(imageVisitor.getJsonString().length());
+                mResponse.getWriter().write(imageVisitor.getJsonString());
 				
-				// Clean the tmp directory
-				FileUtils.cleanDirectory(externalFile);
+                // Clean the tmp directory
+                FileUtils.cleanDirectory(externalFile);
 				
-				// Run the completionHook originally intended for the
-				// ImageStream
-				mEndTask.run();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+                // Run the completionHook originally intended for the
+                // ImageStream
+                mEndTask.run();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 	
-		/**
-		 * A custom FileVisitor that constructs the JSON string based
-		 * on the files downloaded by the ImageStream
-		 */
-		private class ImageVisitor implements FileVisitor<Path> {
+        /**
+         * A custom FileVisitor that constructs the JSON string based
+         * on the files downloaded by the ImageStream
+         */
+        private class ImageVisitor implements FileVisitor<Path> {
 			
-			/**
-			 * Allows us to efficiently build a JSON string
-			 */
-			private final StringBuilder mJsonBuilder;
+            /**
+             * Allows us to efficiently build a JSON string
+             */
+            private final StringBuilder mJsonBuilder;
 			
-			public ImageVisitor() {
-				mJsonBuilder = new StringBuilder();
-			}
+            public ImageVisitor() {
+                mJsonBuilder = new StringBuilder();
+            }
 	
-			@Override
-			public FileVisitResult preVisitDirectory(Path dir,
-					BasicFileAttributes attrs) throws IOException {
-				// Begin the JSON object string if we are at the parent,
-				// otherwise append a new object representing the next filter
-				mJsonBuilder.append(
-						isParentDir(dir) ? "{\"filterList\":[" :
-							   "{\"filterName\":\"" + dir.getFileName() + "\","
-								+ "\"imageData\":[");
-				return FileVisitResult.CONTINUE;
-			}
+            @Override
+                public FileVisitResult preVisitDirectory(Path dir,
+                                                         BasicFileAttributes attrs) throws IOException {
+                // Begin the JSON object string if we are at the parent,
+                // otherwise append a new object representing the next filter
+                mJsonBuilder.append(
+                                    isParentDir(dir) ? "{\"filterList\":[" :
+                                    "{\"filterName\":\"" + dir.getFileName() + "\","
+                                    + "\"imageData\":[");
+                return FileVisitResult.CONTINUE;
+            }
 	
-			@Override
-			public FileVisitResult visitFile(Path file,
-					BasicFileAttributes attrs) throws IOException {
-				// Open the file and read its bytes
-		        File imgFile = file.toFile();
+            @Override
+                public FileVisitResult visitFile(Path file,
+                                                 BasicFileAttributes attrs) throws IOException {
+                // Open the file and read its bytes
+                File imgFile = file.toFile();
 		        
-		        // Ignore hidden files
-		        if (imgFile.isHidden()) {
-		        	return FileVisitResult.CONTINUE;
-		        }
+                // Ignore hidden files
+                if (imgFile.isHidden()) {
+                    return FileVisitResult.CONTINUE;
+                }
 		        
-				FileInputStream fstream = new FileInputStream(imgFile);
-				byte fileContent[] = new byte[(int) imgFile.length()];
-	            fstream.read(fileContent);
-	            fstream.close();
+                FileInputStream fstream = new FileInputStream(imgFile);
+                byte fileContent[] = new byte[(int) imgFile.length()];
+                fstream.read(fileContent);
+                fstream.close();
 	            
-	            // Encode the bytes of the image as a string
-	            String encodedImage = 
-	            		DatatypeConverter.printBase64Binary(fileContent);
+                // Encode the bytes of the image as a string
+                String encodedImage = 
+                    DatatypeConverter.printBase64Binary(fileContent);
 	            
-	            // Append the file specifics as part of the 
-	            // imageData list for this filter
-	            mJsonBuilder.append("{\"imageName\":\"" 
-	            					+ file.getFileName() + "\","
-	            					+ "\"image\":\"" 
-	            					+ encodedImage + "\"},");
-				return FileVisitResult.CONTINUE;
-			}
+                // Append the file specifics as part of the 
+                // imageData list for this filter
+                mJsonBuilder.append("{\"imageName\":\"" 
+                                    + file.getFileName() + "\","
+                                    + "\"image\":\"" 
+                                    + encodedImage + "\"},");
+                return FileVisitResult.CONTINUE;
+            }
 	
-			@Override
-			public FileVisitResult visitFileFailed(Path file, IOException exc)
-					throws IOException {
-				// Handle error - for now, we don't care if a file visit fails
-				return FileVisitResult.CONTINUE;
-			}
+            @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc)
+                throws IOException {
+                // Handle error - for now, we don't care if a file visit fails
+                return FileVisitResult.CONTINUE;
+            }
 	
-			@Override
-			public FileVisitResult postVisitDirectory(Path dir, IOException exc)
-					throws IOException {
-				// end the entire object string if we are leaving
-				// the parent directory, otherwise end the current imageData
-				// object
-				clean(mJsonBuilder).append((isParentDir(dir) ? "]}" : "]},"));
-				return FileVisitResult.CONTINUE;
-			}
+            @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+                throws IOException {
+                // end the entire object string if we are leaving
+                // the parent directory, otherwise end the current imageData
+                // object
+                clean(mJsonBuilder).append((isParentDir(dir) ? "]}" : "]},"));
+                return FileVisitResult.CONTINUE;
+            }
 			
-			// Allows us to reference the string outside of the class
-			public String getJsonString() {
-				return mJsonBuilder.toString();
-			}
+            // Allows us to reference the string outside of the class
+            public String getJsonString() {
+                return mJsonBuilder.toString();
+            }
 			
-			// Clean the string. Currently, this method only removes an
-			// unnecessary comma from the end of a list, as this will
-			// invalidate a JSON string
-			private StringBuilder clean(StringBuilder jsonBuilder) {
-				if (jsonBuilder.charAt(jsonBuilder.length() - 1) == ',')
-					return jsonBuilder.deleteCharAt(
-							jsonBuilder.lastIndexOf(","));
-				return jsonBuilder;
-			}
+            // Clean the string. Currently, this method only removes an
+            // unnecessary comma from the end of a list, as this will
+            // invalidate a JSON string
+            private StringBuilder clean(StringBuilder jsonBuilder) {
+                if (jsonBuilder.charAt(jsonBuilder.length() - 1) == ',')
+                    return jsonBuilder.deleteCharAt(
+                                                    jsonBuilder.lastIndexOf(","));
+                return jsonBuilder;
+            }
 			
-			// Helper method for determining whether the visitor
-			// is at the top directory or a subdirectory
-			private boolean isParentDir(Path dir) {
-				return dir.toString().equalsIgnoreCase(
-						PlatformStrategy.instance().getDirectoryPath());
-			}
+            // Helper method for determining whether the visitor
+            // is at the top directory or a subdirectory
+            private boolean isParentDir(Path dir) {
+                return dir.toString().equalsIgnoreCase(
+                                                       PlatformStrategy.instance().getDirectoryPath());
+            }
 	
-		}
-	}
+        }
+    }
 
 }

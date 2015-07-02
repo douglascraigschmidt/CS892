@@ -25,8 +25,9 @@ public class DownloadWithRunnable implements ButtonStrategy {
      * Handler.
      */
     @Override
-    public void downloadAndDisplayImage(final DownloadContext downloadContext) {
-        Runnable downloadRunnable = new Runnable() {
+    public void downloadAndDisplayImage
+        (final DownloadContext downloadContext) {
+        final Runnable downloadRunnable = new Runnable() {
             /**
              * Download a bitmap image in a background Thread and then
              * post a Runnable to the UI Thread to set the image to
@@ -36,15 +37,16 @@ public class DownloadWithRunnable implements ButtonStrategy {
             public void run() {
                 // Download the image.
                 final Bitmap image =
-                    downloadContext.downloadImage(downloadContext.getUrlString());
+                    downloadContext.downloadImage
+                    (downloadContext.getUrlString());
 
                 // Display the downloaded image to the user.
                 downloadContext.displayImage(image);
             }
         };
 
-        // Inform the user that the download is starting with
-        // this particular concurrency strategy.
+        // Inform the user that the download is starting with this
+        // particular concurrency strategy.
         downloadContext.showToast
             ("downloading via Handlers and Runnables");
 
@@ -60,7 +62,8 @@ public class DownloadWithRunnable implements ButtonStrategy {
     @Override
     public void cancelDownload(DownloadContext downloadContext) {
         // Let the user know this download is being canceled.
-        downloadContext.showToast("Canceling DownloadWithRunnable in progress");
+        downloadContext.showToast
+            ("Canceling DownloadWithRunnable in progress");
 
         // Interrupt the Thread so it will stop the download.
         mThread.interrupt();

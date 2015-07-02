@@ -67,7 +67,7 @@ class DownloadContext {
         mUrlEditText = new WeakReference<EditText>(editText);
         mImageView = new WeakReference<ImageView>(imageView);
         mActivity = new WeakReference<Activity>(activity);
-        mCompletionCommand = completionCommand; // new WeakReference<Runnable>(completionCommand);
+        mCompletionCommand = completionCommand; 
     }
 
     /**
@@ -130,15 +130,13 @@ class DownloadContext {
         if (url.equals(""))
             url = mDefaultURL;
 
-        try {
-            // Connect to a remote server, download the contents of
-            // the image, and provide access to it via an Input
-            // Stream.
-            InputStream is =
-                (InputStream) new URL(url).getContent();
-
+        // Connect to a remote server, download the contents of
+        // the image, and provide access to it via an Input
+        // Stream.
+        try (InputStream istream =
+             (InputStream) new URL(url).getContent()) {
             // Decode an InputStream into a Bitmap.
-            return BitmapFactory.decodeStream(is);
+            return BitmapFactory.decodeStream(istream);
         } catch (Exception e) {
             Log.e(TAG, "Error downloading image");
             e.printStackTrace();
