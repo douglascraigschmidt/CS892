@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <LinearLayout
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       	android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+        <TextView
+            android:id="@+id/variantName"
+        	android:layout_width="0dp"
+        	android:layout_weight="4"
+        	android:layout_height="wrap_content"
+        	android:textSize="18sp"
+        	android:textStyle="bold"/>
+        
+        <TextView
+            android:id="@+id/remainingBudget"
+        	android:layout_width="0dp"
+        	android:layout_weight="3"
+        	android:layout_height="wrap_content"
+        	android:text="@string/remainingBudget"
+        	android:textSize="18sp"
+        	android:textStyle="bold"/>
+        
+        <TextView
+            android:id="@+id/remainingAmount"
+        	android:layout_width="0dp"
+        	android:layout_weight="2"
+        	android:layout_height="wrap_content"
+        	android:textSize="18sp"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/ticketInfo"
+        android:layout_below="@id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       	android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+        <TextView
+            android:id="@+id/categories"
+        	android:layout_width="0dp"
+        	android:layout_weight="2"
+        	android:layout_height="wrap_content"
+        	android:text="@string/ticketCategories"
+        	android:textSize="12sp"
+        	android:textStyle="bold"/>
+        
+        <TextView
+            android:id="@+id/ticketCategories"
+        	android:layout_width="0dp"
+        	android:layout_weight="4"
+        	android:layout_height="wrap_content"
+        	android:lines="2"
+        	android:textSize="12sp"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/placeInfo"
+        android:layout_below="@id/ticketInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       	android:orientation="horizontal"
+        android:layout_margin="3dp">
+        
+        <TextView
+            android:id="@+id/types"
+        	android:layout_width="0dp"
+        	android:layout_weight="2"
+        	android:layout_height="wrap_content"
+        	android:text="@string/placeTypes"
+        	android:textSize="12sp"
+        	android:textStyle="bold"/>
+        
+        <TextView
+            android:id="@+id/placeTypes"
+        	android:layout_width="0dp"
+        	android:layout_weight="4"
+        	android:layout_height="wrap_content"
+        	android:lines="2"
+        	android:textSize="12sp"/>
+    </LinearLayout>
+    
+
+</RelativeLayout>
