@@ -161,8 +161,8 @@ public class ImageTaskGang extends TaskGang<URL> {
                         Filter decoratedFilter =
                             new OutputFilterDecorator(filter);
 
-                        // Process the downloaded image, store it
-                        // into a file, return the result.
+                        // Filter the downloaded image, store it into
+                        // a file, return the result.
                         return decoratedFilter.filter(downloadedImage);
                     }
                 });

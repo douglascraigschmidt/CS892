@@ -207,18 +207,18 @@ public class MainActivity extends Activity {
         	if(iterator.hasNext() 
         	   && (inputSource == PlatformStrategy.InputSource.USER ?
         			   !isEmpty() : true)) {
-	        	switch(processingContext) {
-	        		default:
-	        		case LOCAL:
-	        			new Thread(new ImageTaskGang(
-	        					mFilters, iterator, mCompletionHook))
-	        				.start();
-	        			break;
-	        		case SERVER:
-	        			new InvokeServerTask().execute(inputSource);
-	        			break;
-	        	}
-	        	setButtonsEnabled(false);
+                    switch(processingContext) {
+                    default:
+                    case LOCAL:
+                        new Thread(new ImageTaskGang(mFilters,
+                                                     iterator,
+                                                     mCompletionHook)).start();
+                        break;
+                    case SERVER:
+                        new InvokeServerTask().execute(inputSource);
+                        break;
+                    }
+                    setButtonsEnabled(false);
 	        }
 	        else {
 	            showToast("No list of URLs entered");
@@ -361,14 +361,14 @@ public class MainActivity extends Activity {
     	}
     	
     	buttonLayout = 
-                (LinearLayout) findViewById(R.id.userButtonLayout);
+            (LinearLayout) findViewById(R.id.userButtonLayout);
     	buttonCount = buttonLayout.getChildCount();
     	for (int i = 0; i < buttonCount; ++i) {
             buttonLayout.getChildAt(i).setEnabled(enabled);
     	}
     	
     	buttonLayout =
-    			(LinearLayout) findViewById(R.id.buttonLayoutBottom);
+            (LinearLayout) findViewById(R.id.buttonLayoutBottom);
     	buttonCount = buttonLayout.getChildCount();
     	for (int i = 0; i < buttonCount; ++i) {
             buttonLayout.getChildAt(i).setEnabled(enabled);

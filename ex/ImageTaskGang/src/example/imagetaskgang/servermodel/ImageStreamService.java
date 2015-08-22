@@ -7,7 +7,6 @@ import retrofit.http.Body;
 import retrofit.http.POST;
 
 public interface ImageStreamService {
-
-	@POST("/ImageStreamServlet")
-	ServerResponse execute(@Body List<List<URL>> inputURLs);
+    @POST("/ImageStreamServlet")
+    ServerResponse execute(@Body List<List<URL>> inputURLs);
 }
