@@ -1,0 +1,157 @@
+<html>
+
+<title>Java Threads and Synchronizers (Assignment 1a)</title>
+
+<BODY text = "#000000"
+link="#000fff"
+vlink="#ff0f0f"
+bgcolor="#ffffff">
+
+<HR>
+<h3>Java Threads and Synchronizers (Assignment 1a)</h3>
+
+<HR width=50% align=left><P>
+<H4>Overview of the Assignment</H4>
+
+In this assignment, you will use Java Thread, Runnable, Semaphore, and
+AtomicLong classes, as well as Java synchronized statements, to
+develop an Android app containing a resource manager that restricts
+the number of Beings from Middle-Earth who can concurrently gaze into
+a fixed number of Palantiri.  If you're not yet a fan of Tolkein's
+Lord of the Ring's trilogy, you can learn more about Palantiri <A
+HREF="http://en.wikipedia.org/wiki/Palantir">here</a>. <P>
+
+This Android program is structured in accordance with the <A
+HREf="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter">Model-View-Presenter</A>
+(MVP) pattern.  The classes in the View layer are provided to you.
+The main PalantiriActivity first prompts the user to enter various
+configuration parameters, such as the number of Palantiri and Beings.
+It then starts the GazingSimulationActivity, which initializes the
+Presenter layer and then starts the Presenter layer's processing
+logic.  The bulk of the concurrent processing is performed by the
+Presenter and Model layers.  If you correctly implement these
+skeletons the Palantiri app should run successfully without throwing
+any exceptions. <P>
+
+This Android application uses various features of Java Threads and
+Runnables, which are described <A
+HREF="https://www.youtube.com/watch?v=eY5E0o56gaw&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK&index=12">here</a>
+and <A
+HREF="https://www.youtube.com/watch?v=wpEeZUjTiS4&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK&index=13">here</a>.
+You'll also need to understand how to use Java Semaphores and
+synchronized statements, which are described <A
+HREF="https://www.youtube.com/watch?v=UoaZTkot6-g&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK&index=20">here</a>
+and <A
+HREF="https://www.youtube.com/watch?v=g3rcTTF45cA&list=PLZ9NgFYEMxp4tbiFYip6tDNIEBRUDyPQK&index=25">here</a>,
+respectively.  I recommend you watch these videos and look at the code
+to ensure you understand how to program Java Threads and
+synchronizers.  Naturally, we'll cover these topics in class, as
+well. <P>
+
+<P><HR width=50% align=left><P>
+<H4>Program Description</H4>
+
+In the src directory you'll find a number of files, all of which you
+should read.  You'll need to modify several files containing the
+skeleton Java code that you'll implement by completing the "TODO - You
+fill in here" comments to provide a working solution.  DO NOT CHANGE
+THE OVERALL STRUCTURE OF THE SKELETON - just fill in the "TODO -- You
+fill in here" portions!!! <P>
+
+In particular, you'll need to do the following: <P>
+
+<UL>
+
+<LI> Finish the implementation of class methods defined by the
+Presenter layer residing in
+<CODE>src/edu/vandy/presenter/PalantiriPresenter.java</CODE>.  In
+particular, you'll need to (1) create/start a BeingThread for each
+Being, which concurrently acquires a Palantir from the Model layer and
+gazes into it for a certain amount of time and (2) start a thread to
+wait for all the Being threads to finish and then inform the View
+layer that the simulation is done. <P>
+
+<LI> Finish the implementation of the Model layer in
+<CODE>src/edu/vandy/model/PalantiriManager.java</CODE>.  In
+particular, you'll use a Java Semaphore, HashMap, and synchronized
+statements to mediate concurrent access to the Palantiri resources and
+keep track of which Palantiri are currently free and which are in
+use. <P>
+
+</UL>
+
+To compile this code you need to use the provided Eclipse ADT project
+(you are also welcome to use Android Studio, but your solution must
+work with Eclipse for the peer assessment phase).  You can run this
+project by right-clicking the project's name in the Package Explorer
+and selecting Run As -> Android Application. Eclipse ADT should
+automatically select an Android Emulator to run, assuming you have one
+created. If you do not have one created you can create it by opening
+Window -> Android Virtual Device Manager. <P>
+
+The program will be considered "correct" if it successfully completes
+a simulation of N Palantiri and M Beings without crashing or throwing
+any exceptions. The Palantir and Beings are color coded to represent
+their state: <P>
+
+<UL>
+
+<LI> <B>Beings</B> - Yellow means the Being is idle, Red means it's
+waiting to acquire a Palantir, Green means it's gazing into a
+Palantir, and Purple means the gazing was interrupted due to the lease
+expiring.<P> 
+
+<LI> <B>Palantiri</B> - Gray means the Palantir is inactive, Green
+means it is available for use, and Red means it is in use (i.e., a
+Being is currently gazing into it).<P>
+
+</UL>
+
+A "correct" simulation should restrict the number of gazing Beings to
+the number of Palantiri.  In other words, if there are four Palantiri
+in the simulation, then only four Being dots should ever be Green on
+the screen at a time. <P>
+
+<P><HR width=50% align=left><P>
+<H4>Additional Work for Graduate Students</H4>
+
+Graduate students (or students who are taking this course for graduate
+credit) must do the following additional work:
+
+<UL>
+
+<LI> In the BeingRunnable class there are two unimplemented methods:
+incrementGazingCountAndCheck() and decrementGazingCount().  You must
+implement those functions as defined in the comments to double check
+that the PalantirManager is properly limiting the number of threads
+that have a Palantir using the Java AtomicLong. <P>
+
+</UL>
+
+Undergraduates are welcome to implement these methods, but it's not
+required.
+
+<P><HR width=50% align=left><P>
+<H4>Skeleton Code</H4>
+
+Skeleton code for this assignment is available from my <A
+HREF="https://github.com/douglascraigschmidt/CS282/tree/master/assignments/assignment1/">GitHub</a>
+account.  Once you've setup your <A
+HREF="https://about.gitlab.com/">GitLab</a> account you can pull this
+skeleton code in your repository, read it carefully, and complete the
+"TODO" markers. The additional work required by graduate students is
+clearly marked. <P>
+
+<HR width=50% align=left><P>
+<H4>Concluding Remarks</H4>
+
+This assignment is designed to help you get familiar with writing
+multi-threaded programs using an Android IDE and Java Threads, as well
+as applying core Java synchronizers (such as Semaphore) and
+synchronized statements to concurrently access collections (such as
+HashMap) .  It doesn't require you to program any Android concurrency
+or communication frameworks, which we'll cover in upcoming
+assignments. <P>
+
+</body>
+</html>
