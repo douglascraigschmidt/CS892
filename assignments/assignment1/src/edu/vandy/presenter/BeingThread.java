@@ -58,19 +58,6 @@ public class BeingThread
     }
 
     /**
-     * Interrupt the BeingThread from gazing.
-     */
-    @Override
-    public void interrupt() {
-        /*
-        Log.d(TAG,
-              "BeingThread.interrupt() called from Thread "
-              + Thread.currentThread().getId());
-        */
-        super.interrupt();
-    }
-
-    /**
      * Shutdown the BeingThread.
      */
     public static void shutdown() {
@@ -80,7 +67,6 @@ public class BeingThread
               + Thread.currentThread().getId());
         */
         mShutdown = true;
-        // super.interrupt();
     }
 
 

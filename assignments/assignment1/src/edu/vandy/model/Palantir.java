@@ -15,7 +15,7 @@ public class Palantir {
     /**
      * Create a new Random number generator.
      */
-    final Random mRandom;
+    private final Random mRandom;
 
     /**
      * Constructor initializes the fields.

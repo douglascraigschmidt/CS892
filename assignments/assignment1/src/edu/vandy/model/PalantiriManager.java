@@ -49,7 +49,8 @@ public class PalantiriManager {
      *        @code Palantiri key in the Java HashMap that are used to
      *        implement the timed lease semantics.
      */
-    protected static class LeaseState implements AutoCloseable {
+    protected static class LeaseState 
+              implements AutoCloseable {
         /**
          * Create a ScheduledThreadPoolExecutor with size 1 to enforce
          * the lease expiration semantics.
