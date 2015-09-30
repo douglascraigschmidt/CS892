@@ -34,21 +34,6 @@ public class FairnessChecker {
      * Palantir.  .
      */
     public void addCurrentThread() {
-        /*
-          Log.d(TAG,
-          "Adding thread " 
-          + Thread.currentThread().getId()
-          + " to the fairness queue: ");
-          print();
-        */
-        /*
-        System.out.println(
-          "Adding thread " 
-          + Thread.currentThread().getId()
-          + " to the end of the following fairness queue: ");
-        print();
-        */
-
         // Add the current thread id to the fairness queue in a
         // thread-safe manner.
         // TODO -- you fill in here.
@@ -62,14 +47,6 @@ public class FairnessChecker {
         // Remove the current thread id from the fairness queue in a
         // thread-safe manner.
         // TODO -- you fill in here.
-
-        /*
-        System.out.println(
-          "Removing thread " 
-          + Thread.currentThread().getId()
-          + " from the updated fairness queue: ");
-        print();
-        */
     }
 
     /**
@@ -81,28 +58,6 @@ public class FairnessChecker {
         // queue matches the current thread id in a thread-safe
         // manner.
         // TODO -- you fill in here.
-    }
-
-    /**
-     * Display the contents of mFairnessQueue.
-     */
-    private void print() {
-        String contents = new String();
-
-        // Append the contents of the fairness queue.
-        for (Long i : mFairnessQueue)
-            contents += i + ", ";
-
-        // Uncomment one of the following, depending on whether you're
-        // debugging in the Android or Java contexts.
-
-        /* 
-           System.out.println(contents);
-        */
-
-        /*
-           Log.d(TAG, contents);
-        */
     }
 
     /**
