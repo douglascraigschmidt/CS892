@@ -66,8 +66,6 @@ public class PalantiriModel
     @Override
     public void makePalantiri(int palantiriCount,
                               Runnable unfairnessCallback) {
-        // @@ TODO - You fill in here.
-
     	// Create a list to hold the generated Palantiri.
         final List<Palantir> palantiri =
             new ArrayList<Palantir>();		
@@ -94,7 +92,6 @@ public class PalantiriModel
      */
     @Override
     public Palantir acquirePalantir(long leaseDurationInMillis) {
-    	// @@ TODO - You fill in here.
         return mPalantiriManager.acquire(leaseDurationInMillis);
     }
 
@@ -104,7 +101,6 @@ public class PalantiriModel
      */
     @Override
     public void releasePalantir(final Palantir palantir) {
-        // @@ TODO - You fill in here.
         mPalantiriManager.release(palantir);
     }
 

@@ -135,13 +135,17 @@ public class PalantiriManager {
      * lease will be sent an interrupt request.
      */
     public Palantir acquire(long leaseDurationInMillis) {
-        // TODO -- you fill in here.
+        // TODO -- you fill in here, using the Specific Notification
+        // pattern.  The code path is very simple if there are no
+        // waiters in the queue and a Palantir is available.
+        // Otherwise, use an instance of the WaitNode to get a
+        // Palantir when it becomes available.
     }		
         
     /**
      * Gets an available Palantir from the HashMap and returns it.
-     * Must be called from within a statement that acquires mLock
-     * since this method is not itself synchronized.
+     * Must be called with the PalantiriManager mLock held since this
+     * method itself is not synchronized.
      */
     private Palantir getPalantir(long leaseDurationInMillis) {
         // Iterate through every entry in the HashMap.
@@ -163,54 +167,6 @@ public class PalantiriManager {
         return null; 
     }
 
-    /** 
-     * Waits for and returns the next available Palantir.  Must not be
-     * called with the PalantiriManager mLock held.
-     */
-    Palantir getPalantirWhenAvailable(WaitNode waitNode,
-                                      long leaseDurationInMillis) {
-        // Acquire the WaitNode lock.
-        // TODO -- you fill in here.
-
-        try {
-            for (;;) 
-                try {
-                    // Add this object to the FIFO queue of threads
-                    // waiting for a turn.
-                    mFairnessChecker.addCurrentThread();
-                    
-                    // Wait for a Palantir to become available.
-                    // TODO -- you fill in here.
-                    break;
-                } catch (InterruptedException ie) {
-                    // Ignore interrupts, but also remove the Thread
-                    // id from the queue so it won't appear multiple
-                    // times.
-                    mFairnessChecker.removeCurrentThread();
-                }
-
-            // Check to ensure that the thread was signaled in
-            // FIFO order.
-            if (!mFairnessChecker.isFifoOrder()) {
-                // If signaling wasn't fair/FIFO invoke the
-                // callback to inform the user.
-                if (mUnfairnessCallback != null)
-                    mUnfairnessCallback.run();
-                    
-                // Reset the FairnessChecker.
-                mFairnessChecker.reset();
-            }
-
-            // Call getPalantir() return the next available palantir
-            // using mLock to properly synchronize the call.
-            // TODO -- you fill in here.
-
-        } finally {
-            // Always release the lock.
-            // TODO -- you fill in here.
-        }
-    }
-
     /**
      * Puts the designated @code palantir back into the
      * PalantiriManager so other BeingThreads can use it.
@@ -221,7 +177,7 @@ public class PalantiriManager {
 
     /**
      * Put the @a palantir (which must not be null) back into the
-     * HashMap.  Must be called from within a synchronized statement
+     * HashMap.  Must be called with the PalantiriManager mLock held
      * since this method itself is not synchronized.
      */
     private void putPalantir(Palantir palantir) {
@@ -236,72 +192,89 @@ public class PalantiriManager {
     }
 
     /**
-     * Complete the logic for releasing a Palantir, which involves
-     * incrementing the Palantiri count and notifying the next waiting
-     * thread (if any) in FIFO order.
-     */
-    private void completeRelease() {
-        // TODO -- you fill in here.
-    }
-
-    /**
      * Returns the amount of time (in milliseconds) remaining on the
      * lease held on the @a palantir.
      */
     public long remainingTime(Palantir palantir) {
-        // TODO -- you fill in here.
+        // TODO -- you fill in here.  Grad student will use the
+        // ReadWriteLock, whereas undergrads can Lock.
     }
 
     /**
-     * When all available Palantiri are in use any subsequent thread
-     * use instances of this class to wait for a Palantir to become
-     * available.
+     * When all available Palantiri are in use any subsequent threads
+     * that want to acquire a Palantir use instances of this class to
+     * wait for the next Palantir to become available.
      */
     private class WaitNode {
         /**
-         * Lock used to serialize access to the WaitNode.  Must be
-         * configured in "fair" mode.
+         * Keep track of whether the WaitNode has already been
+         * released.
          */
-        public final Lock mLock;
+        private boolean mReleased;
 
         /**
          * Condition used to wait until a Palantir is available.
          */
-        public final Condition mCondition;
+        private final Condition mCondition;
 
         /**
          * Constructor initializes the fields.
          */
         public WaitNode() {
-            // TODO -- you fill in here.
+            mReleased = false;
+            mCondition = 
+                // TODO -- you fill in here, initializing the
+                // Condition with PalantiriManager's lock.
         }
-        
-        /**
-         * Acquire the lock.
+
+        /** 
+         * Waits for a Palantir to become available and returns it.
+         * The PalantiriManager's mLock must be held when this method
+         * is called since this method is not synchronized.
          */
-        public void lock() {
-            // TODO -- you fill in here.
+        Palantir getPalantirWhenAvailable(long leaseDurationInMillis) {
+            // Keep looping until wakeupWaitingThread() is called.
+            while (!mReleased) 
+                try {
+                    // Add this object to the FIFO queue of threads
+                    // waiting for a turn.
+                    mFairnessChecker.addCurrentThread();
+                    
+                    // Wait for a Palantir to become available.
+                    // @@ TODO -- you fill in here.
+                    mCondition.await();
+                } catch (InterruptedException ie) {
+                    // Ignore interrupts, but remove the Thread id
+                    // from queue so it won't appear multiple times.
+                    mFairnessChecker.removeCurrentThread();
+                }
+
+            // Check to ensure the thread was signaled in FIFO order.
+            if (!mFairnessChecker.isFifoOrder()) {
+                // If signaling wasn't fair/FIFO invoke the
+                // callback to inform the user.
+                if (mUnfairnessCallback != null)
+                    mUnfairnessCallback.run();
+                    
+                // Reset the FairnessChecker.
+                mFairnessChecker.reset();
+            }
+
+            // Call getPalantir() return the next available palantir.
+            return getPalantir(leaseDurationInMillis);
         }
 
         /**
-         * Release the lock.
+         * Signal a waiting thread when a Palantir has been released.
+         * The PalantiriManager's mLock must be held when this method
+         * is called since this method is not synchronized.
          */
-        public void unlock() {
-            // TODO -- you fill in here.
-        }
+        void wakeupWaitingThread() {
+            // Indicate the node is released.
+            mReleased = true;
 
-        /**
-         * Await the condition being signaled.
-         */
-        public void await() throws InterruptedException {
-            // TODO -- you fill in here.
-        }
-
-        /**
-         * Signal the condition.
-         */
-        public void signal() {
-            // TODO -- you fill in here.
+            // Signal next waiting thread in queue to proceed.
+            // @@ TODO -- you fill in here.
         }
     }
 
@@ -314,7 +287,7 @@ public class PalantiriManager {
      * Returns the number of available Palantiri.
      */
     public long availablePalantiri() {
-        // TODO -- you fill in here (grad students must use a read
-        // lock, undergraduates can use a regular lock).
+        // TODO -- you fill in here (grad students must use a
+        // ReadWriteLock, undergraduates can use a Lock).
     }
 }

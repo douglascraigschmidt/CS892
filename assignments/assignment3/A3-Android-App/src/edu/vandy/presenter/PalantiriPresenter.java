@@ -84,7 +84,7 @@ public class PalantiriPresenter
     // all the BeingRunnable tasks have stopped their gazing logic
     // before informing the View layer that the simulation is done.
     // group.
-    // TODO -- you fill in here.
+    // TODO -- you fill in here (grad students).
 
     /**
      * A ThreadFactory object that spawns an appropriately named
@@ -335,6 +335,8 @@ public class PalantiriPresenter
 
         // Create a ThreadPoolExecutor that runs the Being tasks in a
         // fixed-sized thread pool as large as the number of Beings.
+        // This ThreadPoolExecutor is then assigned to the
+        // mExecutorService field.
         // TODO -- you fill in here.
 
         // Initialize the entry barrier to ensure that no
