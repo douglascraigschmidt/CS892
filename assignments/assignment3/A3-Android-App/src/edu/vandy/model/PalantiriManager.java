@@ -47,7 +47,7 @@ public class PalantiriManager {
     /**
      * FIFO queue of Threads waiting to obtain a Palantir.
      */
-    private final List<WaitNode> mWaitQueue = 
+    private final Queue<WaitNode> mWaitQueue = 
         new LinkedList<>();
 
     /**
@@ -61,7 +61,7 @@ public class PalantiriManager {
      * multiple thread.
      */
     // TODO -- you fill in here (grad students use a
-    // ReentrantReadWriteLock and undergrads can use ReentrantLock).
+    // ReadWriteLock and undergrads can use Lock).
 
     /**
      * A callback object that is invoked to change the fairness
@@ -124,7 +124,7 @@ public class PalantiriManager {
         mAvailablePalantiri = palantiri.size();
         
         // Initialize the lock.
-        // TODO -- you fill in here to create the appropriate lock.
+        // TODO -- you fill in here to create the appropriate lock that's "fair".
     }
 
     /**
@@ -242,7 +242,6 @@ public class PalantiriManager {
                     
                     // Wait for a Palantir to become available.
                     // @@ TODO -- you fill in here.
-                    mCondition.await();
                 } catch (InterruptedException ie) {
                     // Ignore interrupts, but remove the Thread id
                     // from queue so it won't appear multiple times.
