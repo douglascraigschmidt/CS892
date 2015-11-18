@@ -124,7 +124,6 @@ public class GazingSimulationActivity
         // Initialize the Views.
         initializeViews();
 
-
         // Initialize the simulation, passing a parameter that
         // indicates whether this is the first time the Activity has
         // been called or a subsequent call after a runtime
@@ -192,7 +191,6 @@ public class GazingSimulationActivity
         } else
             // Change the button to say "Start Simulation."
             mSimulationButton.setText("Start Simulation");
-
     }
 
     /**

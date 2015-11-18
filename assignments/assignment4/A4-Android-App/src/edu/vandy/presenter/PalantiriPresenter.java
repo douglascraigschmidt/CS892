@@ -206,7 +206,7 @@ public class PalantiriPresenter
     @Override
     public void onDestroy(boolean isChangingConfigurations) {
         // Destroy the model.
-        // getModel().onDestroy(isChangingConfigurations);
+        getModel().onDestroy(isChangingConfigurations);
     }
 
     /**

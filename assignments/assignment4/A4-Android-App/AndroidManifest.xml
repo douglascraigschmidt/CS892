@@ -29,7 +29,6 @@
             </intent-filter>
         </activity>
 
-
         <service
            android:name=".model.service.PalantiriService"
            android:process=":palantirService"> 
