@@ -243,11 +243,10 @@ public class DownloadActivity extends Activity {
      * 
      * @return String value in mUrlEditText
      */
-    String getUrlString() {
+    private String getUrlString() {
         String s = mUrlEditText.getText().toString();
         if (s.equals(""))
             s = mDefaultUrl;
         return s;
     }
-
 }
