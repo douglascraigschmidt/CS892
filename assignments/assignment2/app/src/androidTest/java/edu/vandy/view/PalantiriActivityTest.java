@@ -74,7 +74,22 @@ public class PalantiriActivityTest {
 
         startButton.perform(click());
 
+        setOrientationLandscape(2000);
+
+        stopButton.perform(click());
+
+        onView(withText(
+                startsWith("Exception was thrown or stop button was pressed")))
+                .inRoot(withDecorView(not(activityTestRule.getActivity()
+                                                  .getWindow()
+                                                  .getDecorView())))
+                .check(matches(isDisplayed()));
+
+        SystemClock.sleep(2000);
+        startButton.perform(click());
+
         setOrientationPortrait(2000);
+        // setOrientationPortrait(4000);
 
         stopButton.perform(click());
 
