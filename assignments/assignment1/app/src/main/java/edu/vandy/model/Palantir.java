@@ -36,6 +36,9 @@ public class Palantir {
         try {
             Thread.sleep(mRandom.nextInt(4000) + 1000);
             return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         } catch (Exception e) {
             return false;
         }
