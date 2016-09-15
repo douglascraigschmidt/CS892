@@ -1,7 +1,5 @@
 package edu.vandy.common;
 
-import java.util.Locale;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +9,10 @@ import android.os.Looper;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 /**
  * @class Utils
- *
  * @brief Helper methods shared by various Activities.
  */
 public class Utils {
@@ -21,111 +20,120 @@ public class Utils {
      * Debugging tag.
      */
     private static final String TAG =
-        Utils.class.getCanonicalName();
+            Utils.class.getCanonicalName();
 
     /**
-     * Return an uppercase version of the input or null if user gave
-     * no input.  If user gave no input and @a showToast is true a
-     * toast is displayed to this effect.
+     * A Singleton implementation of the Toaster interface (to support mocking
+     * toast calls).
      */
-    public static String uppercaseInput(Context context, 
-                                        String input,
-                                        boolean showToast) {
+    public static Toaster sToaster;
+
+    /**
+     * Ensure this class is only used as a utility.
+     */
+    private Utils() {
+        throw new AssertionError();
+    }
+
+    /**
+     * Return an uppercase version of the input or null if user gave no input.
+     * If user gave no input and @a showToast is true a toast is displayed to
+     * this effect.
+     */
+    public static String uppercaseInput(
+            Context context,
+            String input,
+            boolean showToast) {
         if (input.isEmpty()) {
-            if (showToast)
+            if (showToast) {
                 Utils.showToast(context,
                                 "no input provided");
+            }
             return null;
         } else
-            // Convert the input entered by the user so it's in
-            // uppercase.
+        // Convert the input entered by the user so it's in
+        // uppercase.
+        {
             return input.toUpperCase(Locale.ENGLISH);
+        }
     }
 
     /**
-     * Show a toast message.
+     * This method is used to hide a keyboard after a user has finished typing
+     * the url.
      */
-    public static void showToast(Context context,
-                                 String message) {
-        Toast.makeText(context,
-                       message,
-                       Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * This method is used to hide a keyboard after a user has
-     * finished typing the url.
-     */
-    public static void hideKeyboard(Activity activity,
-                                    IBinder windowToken) {
+    public static void hideKeyboard(
+            Activity activity,
+            IBinder windowToken) {
         InputMethodManager mgr =
-            (InputMethodManager) activity.getSystemService
-            (Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager) activity.getSystemService
+                        (Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(windowToken, 0);
     }
-        
+
     /**
-     * Set the result of the Activity to indicate whether the
-     * operation on the content succeeded or not.
-     * 
-     * @param activity
-     *          The Activity whose result is being set.
-     * @param pathToContent
-     *          The pathname to the content file.
-     * @param failureReason
-     *          String to add to add as an extra to the Intent passed
-     *          back to the originating Activity if the @a
-     *          pathToContent is null.
+     * Set the result of the Activity to indicate whether the operation on the
+     * content succeeded or not.
+     *
+     * @param activity      The Activity whose result is being set.
+     * @param pathToContent The pathname to the content file.
+     * @param failureReason String to add to add as an extra to the Intent
+     *                      passed back to the originating Activity if the @a
+     *                      pathToContent is null.
      */
-    public static void setActivityResult(Activity activity,
-                                         Uri pathToContent,
-                                         String failureReason) {
+    public static void setActivityResult(
+            Activity activity,
+            Uri pathToContent,
+            String failureReason) {
         if (pathToContent == null)
-            // Indicate why the operation on the content was
-            // unsuccessful or was cancelled.
+        // Indicate why the operation on the content was
+        // unsuccessful or was cancelled.
+        {
             activity.setResult
-                (Activity.RESULT_CANCELED,
-                 new Intent("").putExtra("reason",
-                                         failureReason));
-        else
-            // Set the result of the Activity to designate the path to
-            // the content file resulting from a successful operation.
+                    (Activity.RESULT_CANCELED,
+                     new Intent("").putExtra("reason",
+                                             failureReason));
+        } else
+        // Set the result of the Activity to designate the path to
+        // the content file resulting from a successful operation.
+        {
             activity.setResult(Activity.RESULT_OK,
                                new Intent("",
                                           pathToContent));
+        }
     }
 
     /**
-     * Set the result of the Activity to indicate whether the
-     * operation on the content succeeded or not.
-     * 
-     * @param activity
-     *          The Activity whose result is being set.
-     * @param resultCode
-     *          The result of the Activity, i.e., RESULT_CANCELED or
-     *          RESULT_OK. 
-     * @param failureReason
-     *          String to add to add as an extra to the Intent passed
-     *          back to the originating Activity if the result of the
-     *          Activity is RESULT_CANCELED. 
+     * Set the result of the Activity to indicate whether the operation on the
+     * content succeeded or not.
+     *
+     * @param activity      The Activity whose result is being set.
+     * @param resultCode    The result of the Activity, i.e., RESULT_CANCELED or
+     *                      RESULT_OK.
+     * @param failureReason String to add to add as an extra to the Intent
+     *                      passed back to the originating Activity if the
+     *                      result of the Activity is RESULT_CANCELED.
      */
-    public static void setActivityResult(Activity activity,
-                                         int resultCode,
-                                         String failureReason) {
+    public static void setActivityResult(
+            Activity activity,
+            int resultCode,
+            String failureReason) {
         if (resultCode == Activity.RESULT_CANCELED)
-            // Indicate why the operation on the content was
-            // unsuccessful or was cancelled.
+        // Indicate why the operation on the content was
+        // unsuccessful or was cancelled.
+        {
             activity.setResult(Activity.RESULT_CANCELED,
-                 new Intent("").putExtra("reason",
-                                         failureReason));
-        else 
-            // Everything is ok.
+                               new Intent("").putExtra("reason",
+                                                       failureReason));
+        } else
+        // Everything is ok.
+        {
             activity.setResult(Activity.RESULT_OK);
+        }
     }
 
     /**
-     * @return True if the caller is running on the UI thread, else
-     * false.
+     * @return True if the caller is running on the UI thread, else false.
      */
     public static boolean runningOnUiThread() {
         return Thread.currentThread() == Looper.getMainLooper().getThread();
@@ -144,9 +152,33 @@ public class Utils {
     }
 
     /**
-     * Ensure this class is only used as a utility.
+     * Show a toast message.
      */
-    private Utils() {
-        throw new AssertionError();
-    } 
+    public static void showToast(Context context, String message) {
+        if (sToaster == null) {
+            sToaster = new ToasterImpl();
+        }
+        sToaster.showToast(context, message, Toast.LENGTH_SHORT);
+    }
+
+    /**
+     * Sets the application toast implementation to use a mock. This method
+     * should only be called from test classes.
+     *
+     * @param mockToaster A mock Toaster implementation.
+     */
+    public static void setMockToaster(Toaster mockToaster) {
+        sToaster = mockToaster;
+    }
+
+    /**
+     * An implementation of the Toaster interface that transparenty forwards
+     * all toast messages to a Toast object.
+     */
+    public static class ToasterImpl implements Toaster {
+        @Override
+        public void showToast(Context context, String message, int duration) {
+            Toast.makeText(context, message, duration).show();
+        }
+    }
 }

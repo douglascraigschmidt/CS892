@@ -362,9 +362,9 @@ public class GazingSimulationActivity
     @Override
     public void shutdownOccurred(final int numberOfSimulationThreads) {
         final Runnable runnable = () -> Utils.showToast(GazingSimulationActivity.this,
-                "Exception was thrown or stop button was pressed, so "
-                        + numberOfSimulationThreads
-                        + " simulation threads are being halted");
+                "Exception was thrown or stop button was pressed" );//, so "
+                        //+ numberOfSimulationThreads
+                        //+ " simulation threads are being halted");
 
         // Use the HaMeR framework to run runnable on the UI Thread.
         runOnUiThread(runnable);
