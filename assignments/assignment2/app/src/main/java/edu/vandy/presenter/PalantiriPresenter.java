@@ -111,13 +111,11 @@ public class PalantiriPresenter
      * A ThreadFactory object that spawns an appropriately named
      * Thread for each Being.
      */
-    private ThreadFactory mThreadFactory = 
-        // TODO -- you fill in here by replacing "return null" with a
+    private ThreadFactory mThreadFactory = null;
+    // TODO -- you fill in here by replacing "null" with a
         // ThreadFactory implementation that creates a new Thread each
         // time it's called.
 
-        return null;
-    };
     /**
      * Default constructor that's needed by the GenericActivity
      * framework.
