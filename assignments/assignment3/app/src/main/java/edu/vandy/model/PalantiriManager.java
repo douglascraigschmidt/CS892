@@ -39,7 +39,6 @@ public class PalantiriManager {
     // TODO -- you fill in here.  Ugrads use a ReaderWriterLock
     // synchronizer, whereas grad students must use a StampedLock.
 
-
     /**
      * Constructor creates a PalantiriManager for the List of @a
      * palantiri passed as a parameter and initializes the fields.
@@ -94,7 +93,6 @@ public class PalantiriManager {
      * Returns the number of available permits on the semaphore.
      */
     public int availablePermits() {
-        // TODO -- you fill in here.  Ugrads use a pessimistic read
-        // lock, whereas grads use an optimistic read lock.
+        // TODO -- you fill in here.
     }
 }
