@@ -149,21 +149,33 @@ public class Utils {
     }
 
     /**
-     * Show a toast message.
+     * Show a toast message using a string format
+     * and possible arguments.
      */
-    public static void showToast(Context context, String message) {
-        if (sToaster == null)
+    public static void showToast(Context context,
+                                 String message,
+                                 Object... args) {
+        if (sToaster == null) {
             sToaster = new ToasterImpl();
-        sToaster.showToast(context, message, Toast.LENGTH_SHORT);
+        }
+        sToaster.showToast(context,
+                           String.format(message, args),
+                           Toast.LENGTH_SHORT);
     }
 
     /**
-     * Show a toast message.
+     * Show a toast message using a resource string format
+     * and possible arguments.
      */
-    public static void showToast(Context context, @StringRes int id) {
-        if (sToaster == null)
+    public static void showToast(Context context,
+                                 @StringRes int id,
+                                 Object... args) {
+        if (sToaster == null) {
             sToaster = new ToasterImpl();
-        sToaster.showToast(context, context.getString(id), Toast.LENGTH_SHORT);
+        }
+        sToaster.showToast(context,
+                           context.getString(id, args),
+                           Toast.LENGTH_SHORT);
     }
 
     /**
@@ -177,7 +189,7 @@ public class Utils {
     }
 
     /**
-     * An implementation of the Toaster interface that transparency forwards
+     * An implementation of the Toaster interface that transparenty forwards
      * all toast messages to a Toast object.
      */
     public static class ToasterImpl implements Toaster {
