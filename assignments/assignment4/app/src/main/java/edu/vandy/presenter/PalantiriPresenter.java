@@ -84,7 +84,6 @@ public class PalantiriPresenter
         // TODO -- you fill in here by replacing "return null" with a
         // ThreadFactory implementation that uses a Java 8 lambda
         // expression to create a new Thread each time it's called.
-    };
 
     /**
      * Tracks whether a simulation is currently running or not.
