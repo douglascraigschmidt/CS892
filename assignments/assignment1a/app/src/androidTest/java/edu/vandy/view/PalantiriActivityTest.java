@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.vandy.R;
-import edu.vandy.common.Toaster;
-import edu.vandy.common.Utils;
+import edu.vandy.utils.Toaster;
+import edu.vandy.utils.UiUtils;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -68,7 +68,7 @@ public class PalantiriActivityTest {
     public void palantiriActivityTest() {
         // Create and install a mock Toaster implementation.
         MockToaster mockToaster = new MockToaster();
-        Utils.setMockToaster(mockToaster);
+        UiUtils.setMockToaster(mockToaster);
 
         // Force config change.
         setOrientationPortrait(CONFIG_TIMEOUT);
@@ -76,12 +76,12 @@ public class PalantiriActivityTest {
         // Setup start and stop button view matchers which are used
         // frequently throughout this test.
         ViewInteraction startButton = onView(
-                allOf(withId(R.id.button_simulation),
+                allOf(withId(R.id.start_fab),
                       withText(R.string.button_start_simulation),
                       isDisplayed()));
 
         ViewInteraction stopButton = onView(
-                allOf(withId(R.id.button_simulation),
+                allOf(withId(R.id.start_fab),
                       withText(R.string.button_stop_simulation),
                       isDisplayed()));
 
