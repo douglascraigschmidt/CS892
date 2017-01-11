@@ -50,14 +50,14 @@ public class PalantiriManager {
     public Palantir acquire() {
         // Use ConcurrentHashMap.search() to ensure thread-safety.
         return mPalantiriMap.search(1, (palantir, available) -> {
-                    // If the palantir is available mark it as being
-                    // not available and return the palantir.
-                    if (available) {
-                        mPalantiriMap.put(palantir, false);
-                        return palantir;
-                    } else
-                        return null;
-                });
+                // If the palantir is available mark it as being
+                // not available and return the palantir.
+                if (available) {
+                    mPalantiriMap.put(palantir, false);
+                    return palantir;
+                } else
+                    return null;
+            });
     }
 
     /**
@@ -67,19 +67,13 @@ public class PalantiriManager {
     public void release(final Palantir palantir) {
         // Put the "true" value back into HashMap for the palantir key
         // in a thread-safe manner.
-        // TODO -- you fill in here.
 
         // Do a simple sanity check!
-        if (palantir != null) {
-            // Hold the intrinsic lock for the duration of this call
-            // so it operates in a thread-safe manner.
-            synchronized (this) {
-                // Put the "true" value back into HashMap for the
-                // palantir key, which also atomically returns the
-                // boolean associated with the palantir.
-                mPalantiriMap.put(palantir, true);
-            }
-        }
+        if (palantir != null) 
+            // Put the "true" value back into HashMap for the palantir
+            // key, which also atomically returns the boolean
+            // associated with the palantir.
+            mPalantiriMap.put(palantir, true);
     }
 
     /*
