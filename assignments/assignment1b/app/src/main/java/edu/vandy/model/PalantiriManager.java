@@ -37,7 +37,7 @@ public class PalantiriManager {
      */
     public PalantiriManager(List<Palantir> palantiri) {
         // Create a new HashMap, iterate through the List of Palantiri
-        // and initialize each key in the HashMap with "true" to
+        // and initialize the value of each key in the HashMap with "true" to
         // indicate it's available, and initialize the Semaphore to
         // use a "fair" implementation that mediates concurrent access
         // to the given Palantiri.
