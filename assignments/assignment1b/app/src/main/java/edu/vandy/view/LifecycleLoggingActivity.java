@@ -1,15 +1,15 @@
 package edu.vandy.view;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 /**
  * This abstract class extends the Activity class and overrides lifecycle
  * callbacks for logging various lifecycle events.
  */
-public abstract class LifecycleLoggingActivity 
-       extends Activity {
+public abstract class LifecycleLoggingActivity
+        extends AppCompatActivity {
     /**
      * Debugging tag used by the Android logger.
      */
@@ -129,9 +129,9 @@ public abstract class LifecycleLoggingActivity
      * configuration.
      */
     @Override
-    public Object onRetainNonConfigurationInstance() {
+    public Object onRetainCustomNonConfigurationInstance() {
         Log.d(TAG, "onRetainNonConfigurationInstance()");
-        return super.onRetainNonConfigurationInstance();
+        return super.onRetainCustomNonConfigurationInstance();
     }
 
     /**

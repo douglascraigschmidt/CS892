@@ -75,15 +75,11 @@ public class PalantiriActivityTest {
 
         // Setup start and stop button view matchers which are used
         // frequently throughout this test.
-        ViewInteraction startButton = onView(
-                allOf(withId(R.id.start_fab),
-                      withText(R.string.button_start_simulation),
-                      isDisplayed()));
+        ViewInteraction startButton =
+                onView(allOf(withId(R.id.start_fab), isDisplayed()));
 
-        ViewInteraction stopButton = onView(
-                allOf(withId(R.id.start_fab),
-                      withText(R.string.button_stop_simulation),
-                      isDisplayed()));
+        ViewInteraction stopButton =
+                onView(allOf(withId(R.id.start_or_stop_fab), isDisplayed()));
 
         //
         // Create a list of widget resource id / input value pairs
@@ -136,7 +132,7 @@ public class PalantiriActivityTest {
                 mockToaster.hasAnyMessage(
                         String.format(activityTestRule.getActivity().getString(
                                 R.string.toast_simulation_stopped, BEINGS),
-                                      0)));
+                                      1000)));
 
         // Now check for the toast that is displayed once the shutdown
         // sequence has completed. Note that this can take a few seconds
@@ -148,7 +144,7 @@ public class PalantiriActivityTest {
         mockToaster.clear();
 
         // Start a new simulation.
-        startButton.perform(click());
+        stopButton.perform(click());
 
         // Force a config change.
         setOrientationPortrait(CONFIG_TIMEOUT);

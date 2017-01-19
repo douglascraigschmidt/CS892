@@ -9,9 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import edu.vandy.R;
-import edu.vandy.utils.UiUtils;
 import edu.vandy.presenter.PalantiriPresenter;
 import edu.vandy.utils.Options;
+import edu.vandy.utils.UiUtils;
 import edu.vandy.view.DotArrayAdapter.DotColor;
 
 /**
@@ -28,8 +28,8 @@ import edu.vandy.view.DotArrayAdapter.DotColor;
  * PalantiriPresenter object, which plays the "Presenter" role in the
  * MVP pattern.
  */
-public class GazingSimulationActivity 
-       extends LifecycleLoggingActivity {
+public class GazingSimulationActivity
+        extends LifecycleLoggingActivity {
     /**
      * Name of the intent action that starts this activity.
      */
@@ -110,7 +110,7 @@ public class GazingSimulationActivity
 
         // Set mPalantiriPresenter to the object that was stored by
         // onRetainNonConfigurationInstance().
-        setPresenter((PalantiriPresenter) getLastNonConfigurationInstance());
+        setPresenter((PalantiriPresenter) getLastCustomNonConfigurationInstance());
 
         // Check to see if this is the first time in.
         if (getPresenter() == null) 
@@ -133,8 +133,8 @@ public class GazingSimulationActivity
             // detect and test for the correct sequence of events.
             UiUtils.showToast(this,
                               R.string.toast_simulation_resume);
-        } else
-            // Start running the simulation.
+        } else if (!getPresenter().configurationChangeOccurred())
+            // Run the simulation if this is the first time in.
             runSimulation();
     }
 
@@ -145,10 +145,7 @@ public class GazingSimulationActivity
      * configuration.
      */
     @Override
-    public Object onRetainNonConfigurationInstance() {
-        // Call the super class.
-        super.onRetainNonConfigurationInstance();
-
+    public Object onRetainCustomNonConfigurationInstance() {
         // Returns mPalantiriPresenter so that it will be saved across
         // runtime configuration changes.
         return getPresenter();
