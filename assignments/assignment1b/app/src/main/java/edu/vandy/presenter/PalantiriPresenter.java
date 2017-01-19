@@ -224,26 +224,6 @@ public class PalantiriPresenter {
         // Generate beingCount number of threads that are stored in a
         // list and then start all the threads in the List.
         // TODO - You fill in here.
-
-        // Create the list of threads.
-        mBeingThreads = new ArrayList<>(beingCount);
-
-        for (int i = 0; i < beingCount; ++i) {
-            // Create a new thread that runs the new BeingRunnable.
-            Thread thr = new Thread(new BeingRunnable(this));
-            Log.d(TAG,
-                  "creating new thread " + thr);
-
-            // Set the exception handler to aid debugging.
-            thr.setUncaughtExceptionHandler
-                ((thread, ex) ->
-                 // Call shutdown().
-                 shutdown());
-            mBeingThreads.add(thr);
-        }
-
-        // Start all the threads in the List of Threads.
-        mBeingThreads.forEach(Thread::start);
     }
 
     /**
@@ -255,20 +235,6 @@ public class PalantiriPresenter {
         // Threads to finish and then calls mView.get().done() to
         // inform the View layer that the simulation is done.
         // TODO -- you fill in here.
-        new Thread(() -> {
-                try {
-                    // Join with all the Threads.
-                    for (Thread thr : mBeingThreads)
-                        thr.join();
-                } catch (Exception e) {
-                    // If we get interrupted while waiting, stop
-                    // everything.
-                    shutdown();
-                }
-
-                // Tell the UI we're done.
-                mView.get().done();
-        }).start();
     }
 
     /**
@@ -280,8 +246,6 @@ public class PalantiriPresenter {
         synchronized(this) {
             // Interrupt all the Threads.
             // TODO -- you fill in here.
-            for (Thread thread : mBeingThreads)
-              thread.interrupt();
 
             // Inform the user that we're shutting down the
             // simulation.

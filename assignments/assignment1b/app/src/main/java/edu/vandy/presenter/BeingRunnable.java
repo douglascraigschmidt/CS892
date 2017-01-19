@@ -101,7 +101,7 @@ public class BeingRunnable
     private boolean gazeIntoPalantir(int beingId) {
         // Return if PalantiriPresenter instructs us to stop gazing.
         // TODO -- replace "false" with the appropriate call.
-        if (Thread.interrupted()) {
+        if (false) {
             Log.d(TAG,
                   "Thread.interrupted() is true for Being "
                   + beingId
@@ -122,7 +122,6 @@ public class BeingRunnable
                 // Get a Palantir from the Model layer - this call can
                 // block if there are no available Palantiri.
                 // TODO -- you fill in here.
-                palantir = mPresenter.getModel().acquirePalantir();
 
                 // Do a sanity check.
                 if (palantir == null) {
@@ -172,7 +171,6 @@ public class BeingRunnable
                 // Return the Palantir back to PalantiriManager in the
                 // Model layer.
                 // TODO -- you fill in here.
-                mPresenter.getModel().releasePalantir(palantir);
             }
             return true;
         }
@@ -199,24 +197,6 @@ public class BeingRunnable
     private boolean incrementGazingCountAndCheck(int beingId,
                                                  Palantir palantir) {
         // TODO - You fill in here.
-        final int numberOfGazingThreads =
-            mGazingThreads.incrementAndGet();
-
-        if ((numberOfGazingThreads > Options.instance().numberOfPalantiri())
-            && !Thread.currentThread().isInterrupted()) {
-            Log.d(TAG,
-                  "ERROR, number of gazing threads = "
-                  + numberOfGazingThreads
-                  + ", so Being "
-                  + beingId
-                  + " should NOT have acquired Palantir "
-                  + palantir.getId());
-
-            // Shutdown the app.
-            mPresenter.shutdown();
-            return false;
-        } else
-            return true;
     }
 
     /**
@@ -226,6 +206,5 @@ public class BeingRunnable
      */
     private void decrementGazingCount() {
         // TODO - You fill in here.
-        mGazingThreads.decrementAndGet();
     }
 }
