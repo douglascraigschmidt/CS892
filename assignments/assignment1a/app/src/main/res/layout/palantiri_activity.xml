@@ -1,77 +1,85 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:paddingBottom="@dimen/activity_vertical_margin"
-              android:paddingLeft="@dimen/activity_horizontal_margin"
-              android:paddingRight="@dimen/activity_horizontal_margin"
-              android:paddingTop="@dimen/activity_vertical_margin"
-              android:orientation="vertical">
-    
-     <LinearLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-       <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="@string/label_number_of_palantiri"/>
-       <EditText
-          android:id="@+id/edittext_number_of_palantiri" 
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:inputType="number"
-          android:hint="@string/edittext_hint_palantiri"/>
-     </LinearLayout> 
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="edu.vandy.view.PalantiriActivity">
 
-     <LinearLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container_view"
+        android:orientation="vertical">
 
-       <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="@string/label_number_of_beings"/>
-       <EditText 
-          android:id="@+id/edittext_number_of_beings"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:inputType="number"
-          android:hint="@string/edittext_hint_beings"/>
-     </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-     <LinearLayout 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-       <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="@string/label_gazing_iterations"/>
-       <EditText
-          android:id="@+id/edittext_gazing_iterations"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:inputType="number"
-          android:hint="@string/edittext_hint_iterations"/>
-     </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_number_of_palantiri"/>
 
-  <RelativeLayout
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content">
- 	
+            <EditText
+                android:id="@+id/edittext_number_of_palantiri"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/edittext_hint_palantiri"
+                android:inputType="number"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_number_of_beings"/>
+
+            <EditText
+                android:id="@+id/edittext_number_of_beings"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/edittext_hint_beings"
+                android:inputType="number"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_gazing_iterations"/>
+
+            <EditText
+                android:id="@+id/edittext_gazing_iterations"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/edittext_hint_iterations"
+                android:inputType="number"/>
+        </LinearLayout>
+    </LinearLayout>
+
     <android.support.design.widget.FloatingActionButton
-       android:id="@+id/start_fab"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentEnd="true"
-       android:layout_marginBottom="20dp"
-       android:layout_marginLeft="@dimen/fab_margin"
-       android:layout_marginRight="@dimen/fab_margin"
-       android:layout_margin="@dimen/fab_margin"
-       android:onClick="startSimulation"
-       android:src="@android:drawable/ic_media_play"
-       android:tint="@android:color/white"/>
-  </RelativeLayout>
-</LinearLayout>
+        android:id="@+id/start_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:onClick="startSimulation"
+        app:layout_anchor="@id/container_view"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@android:drawable/ic_media_play"/>
+
+</android.support.design.widget.CoordinatorLayout>

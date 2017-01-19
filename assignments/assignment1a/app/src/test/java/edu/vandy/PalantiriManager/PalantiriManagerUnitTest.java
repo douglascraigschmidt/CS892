@@ -131,4 +131,98 @@ public class PalantiriManagerUnitTest {
         assertEquals(exc, false);
         exc = true;
     }
+
+    @Test
+    public void testConcurrentAccess() {
+    	// The number of threads that will be trying to run at once.
+    	final int THREAD_COUNT = 6;
+
+    	// The number of threads that we want to let run at once.
+    	final int PERMIT_COUNT = 2;
+
+    	// The number of times each thread will try to access the
+    	// semaphore.
+    	final int ACCESS_COUNT = 10;
+
+    	final PalantiriManager palantiriManager =
+            makePalantiri(PERMIT_COUNT);
+
+    	assertTrue(THREAD_COUNT > PERMIT_COUNT);
+    	
+    	// The number of threads that currently have a permit.
+    	final AtomicLong runningThreads = new AtomicLong(0);
+
+    	// Keep track of the threads we have so we can wait for them
+    	// to finish later.
+    	Thread threads[] =
+            new Thread[THREAD_COUNT];
+    	
+    	for (int i = 0; i < THREAD_COUNT; ++i) {
+            final Thread t =
+                new Thread(() -> {
+                        final Random random = new Random();
+                        for (int j = 0;
+                             j < ACCESS_COUNT;
+                             ++j) {
+                            Palantir palantir;
+                            try { 
+                                // Acquire a permit from the Manager.
+                                while ((palantir = palantiriManager.acquire()) == null)
+                                    // Sleep a bit.
+                                    Thread.sleep(100);
+
+                            } catch (Exception e) {
+                                mInterrupted = true;
+                                return;
+                            }
+		                    
+                            // Increment the number of threads that have a permit.
+                            long running = runningThreads.incrementAndGet();
+	                        
+                            // If there are more threads running than
+                            // are supposed to be, throw an error.
+                            if (running > PERMIT_COUNT)
+                                throw new RuntimeException();
+	                        
+                            // Wait for an indeterminate amount of time.
+                            try {
+                                Thread.sleep(random.nextInt(140) + 10);
+                            } catch (InterruptedException e) {}
+	                        
+                            // Decrement the number of threads that have a permit.
+                            runningThreads.decrementAndGet();
+	                        
+                            // Release the permit
+                            palantiriManager.release(palantir);
+                        }
+                    });
+    		
+            // If any of the threads throw an exception, then we
+            // failed.
+            t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread t, Throwable e) {
+                    System.out.println("uncaughtException in testConcurrentAccess()" + e);
+                    mFailed = true;
+                }});
+
+            // Keep track of the thread to start/join it later.
+            threads[i] = t;
+    	}
+
+    	for (final Thread t : threads)    		
+            t.start();
+    	
+    	for (final Thread t : threads)
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                fail("The main thread was interrupted for some reason.");
+            }
+    	
+    	assertFalse(mFailed);
+    	assertFalse("One of the threads was interrupted while calling acquire(). "
+                    + "This shouldn't happen (even if your Semaphore is wrong).", 
+                    mInterrupted);
+    }
 }

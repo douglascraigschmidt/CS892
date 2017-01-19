@@ -3,6 +3,7 @@ package edu.vandy.view;
 import java.util.List;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,25 +95,29 @@ public class DotArrayAdapter
             convertView.setTag(holder);
         }
 
-        // Set the appropriate drawable. 
+        // Set the appropriate drawable.
+        int color;
+
         switch (item) {
-        case GREEN:
-            holder.dot.setImageDrawable(getContext().getResources()
-					.getDrawable(R.drawable.green_dot));
-            break;
-        case GRAY:
-            holder.dot.setImageDrawable(getContext().getResources()
-					.getDrawable(R.drawable.gray_dot));
-            break;
-        case YELLOW:
-            holder.dot.setImageDrawable(getContext().getResources()
-					.getDrawable(R.drawable.yellow_dot));
-            break;
-        case RED:
-            holder.dot.setImageDrawable(getContext().getResources()
-					.getDrawable(R.drawable.red_dot));
-            break;
+            case GREEN:
+                color = R.drawable.green_dot;
+                break;
+            case GRAY:
+                color = R.drawable.gray_dot;
+                break;
+            case YELLOW:
+                color = R.drawable.yellow_dot;
+                break;
+            case RED:
+                color = R.drawable.red_dot;
+                break;
+            default:
+                throw new IllegalStateException("Invalid item color");
         }
+
+        holder.dot.setImageDrawable(
+                ContextCompat.getDrawable(getContext(), color));
+
         return convertView;
     }
 
