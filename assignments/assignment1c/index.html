@@ -1,0 +1,163 @@
+<html>
+
+<title>Java Threads and Synchronizers (Assignment 1)</title>
+
+<BODY text = "#000000"
+link="#000fff"
+vlink="#ff0f0f"
+bgcolor="#ffffff">
+
+<HR>
+<h3>Java Threads and Synchronizers (Assignment 1)</h3>
+
+<HR width=50% align=left><P>
+<H4>Overview of the Assignment</H4>
+
+In this assignment, you will use the Java Thread, Runnable, and
+AtomicLong classes, as well as Java build-in monitor objects and/or
+ReentrantLocks/ConditionObjects, to develop an Android app containing
+a resource manager that restricts the number of Beings from
+Middle-Earth who can concurrently gaze into a fixed number of
+Palantiri.  If you're not yet a fan of Tolkein's Lord of the Ring's
+trilogy (and how could that be by this point? ;-)), you can learn more
+about Palantiri <A
+HREF="http://en.wikipedia.org/wiki/Palantir">here</a>. <P>
+
+<P><HR width=50% align=left><P>
+<H4>Assignment Structure and Functionality</H4>
+
+The assignment is split into the following three directories:
+
+<UL> 
+
+<LI> <A HREF="app/src/main">app/src/main</A>, which conains the
+skeletons you'll need to fill in, as described <A
+HREF="#description">below</A>.  You'll need to open this project in
+Android Studio. <P>
+
+<LI> <A HREF="app/src/test">app/src/test</A>, which is a JUnit test that
+exercises all the PalantiriManager features and can be used to help
+test the functionality created in the assignment. <P>
+
+<LI> <A HREF="app/src/androidTest">app/src/androidTest</A>, which is
+an Android Studio test that runs your app automatically.  You'll
+automatically import this project into Android Studio. <P>
+
+</UL>
+
+To compile this code you need to use the provided Android Studio
+project.  You can run this project by clicking the green "Run 'app'"
+button in the Android Studio IDE, which should automatically select an
+Android Emulator to run, assuming you have one created. If you do not
+have one created you can create it by clicking on the "AVD Manager"
+button in the Android Studio IDE. <P>
+
+<P><HR width=50% align=left><P>
+<A name="description">
+<H4>Program Description and "TODO" Tasks</H4>
+
+In the <CODE>app/src/main/java/edu/vandy</CODE> directory you'll find
+a number of files, all of which you should read.  In particular, this
+Android program is structured in accordance with the <A
+HREf="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter">Model-View-Presenter</A>
+(MVP) pattern.  The classes in the View layer are provided to you.
+The main PalantiriActivity first prompts the user to enter various
+configuration parameters, such as the number of Palantiri and Beings.
+It then starts the GazingSimulationActivity, which initializes the
+Presenter layer and then starts the Presenter layer's processing
+logic.  The bulk of the concurrent processing is performed by the
+Presenter and Model layers.  If you correctly complete the
+implementation of skeletons in these layers the Palantiri app should
+successfully run to completion without throwing any exceptions. <P>
+
+In addition to reading the existing code, you'll need to modify
+several files containing the skeleton Java code by completing the
+"TODO - You fill in here" tasks to provide a working solution.  DO NOT
+CHANGE THE OVERALL STRUCTURE OF THE SKELETON - just fill in the
+"TODO.." portions!!!  In particular, you'll need to do the following:
+<P>
+
+<UL>
+
+<LI> Finish implementing the class methods defined by the Presenter
+layer residing in
+<CODE>app/src/main/java/edu/vandy/presenter/PalantiriPresenter.java</CODE>
+and
+<CODE>app/src/main/java/edu/vandy/presenter/BeingRunnable.java</CODE>
+using your implementation from <A
+HREF="https://github.com/douglascraigschmidt/CS892/tree/master/assignments/assignment1a/">part
+a</a> of this assignment.
+
+<LI> Finish implementing the Model layer in
+<CODE>app/src/main/java/edu/vandy/model/</CODE>.  In particular,
+you'll implement a counting semaphore in the
+<CODE>SimpleSemaphore.java</CODE> class and use this SimpleSemaphore
+to complete the <CODE>PalantiriManager.java</CODE> class, which
+revises your implementation from <A
+HREF="https://github.com/douglascraigschmidt/CS892/tree/master/assignments/assignment1b/">part
+b</a> of this assignment to use the SimpleSemaphore, HashMap, and Java
+ReentrantLock classes to mediate concurrent access to the Palantiri
+resources and keep track of which Palantiri are currently free and
+which are in use.<P>
+
+Undergraduates should implement the SimpleSemaphore using Java
+built-in monitor objects, which are described <A
+HREF="https://www.youtube.com/watch?v=JisaeZHO5As&list=PLZ9NgFYEMxp4KSJPUyaQCj7x--NQ6kvcX&index=18">here</a>
+and <A
+HREF="https://www.youtube.com/watch?v=Rv4YM2PmA8c&list=PLZ9NgFYEMxp4KSJPUyaQCj7x--NQ6kvcX&index=19">here</a>,
+respectively.  In contrast, graduates (or those taking the class for
+graduate credit) should implement the SimpleSemaphore using Java
+ReentrantLocks and ConditionObjects, which are described <A
+HREF="https://www.youtube.com/watch?v=IW5YsMU1730&list=PLZ9NgFYEMxp4KSJPUyaQCj7x--NQ6kvcX&index=21">here</a>
+and <A
+HREF="https://www.youtube.com/watch?v=_t9BOgQNkJ8&list=PLZ9NgFYEMxp4KSJPUyaQCj7x--NQ6kvcX&index=24">here</a>,
+respectively. <P> </UL>
+
+Your app will be considered "correct" if it successfully completes an
+Espresso-based simulation of N Palantiri and M Beings without crashing
+or throwing any exceptions. The Palantir and Beings are color coded to
+represent their state: <P>
+
+<UL>
+
+<LI> <B>Beings</B> - Yellow means the Being is idle, Red means it's
+waiting to acquire a Palantir, Green means it's gazing into a
+Palantir, and Purple means the gazing was interrupted due to the lease
+expiring.<P>
+
+<LI> <B>Palantiri</B> - Gray means the Palantir is inactive, Green
+means it is available for use, and Red means it is in use (i.e., a
+Being is currently gazing into it).<P>
+
+</UL>
+
+A "correct" simulation should restrict the number of gazing Beings to
+the number of Palantiri.  In other words, if there are four Palantiri
+in the simulation, then only four Being dots should ever be Green on
+the screen at a time. <P>
+
+<P><HR width=50% align=left><P>
+<H4>Skeleton Code</H4>
+
+Skeleton code for this assignment is available from my <A
+HREF="https://github.com/douglascraigschmidt/CS892/tree/master/assignments/assignment1c/">GitHub</a>
+account.  Once you've setup your <A
+HREF="https://about.gitlab.com/">GitLab</a> account you can pull this
+skeleton code in your repository, read it carefully, and complete the
+"TODO" markers. The additional work required by graduate students is
+clearly marked. <P>
+
+<HR width=50% align=left><P>
+<H4>Concluding Remarks</H4>
+
+This assignment is designed to help you get familiar with writing
+multi-threaded programs using the Android Studio IDE, core Java
+concurrency and synchronization mechanisms, and some Java 8 features.
+It doesn't require you to program any Android concurrency or
+communication frameworks, which we'll cover in upcoming assignments.
+I recommend you watch the videos listed above and look at the code to
+ensure you understand how to program Java threads and synchronizers.
+Naturally, we'll cover these topics in class, as well. <P>
+
+</body>
+</html>
