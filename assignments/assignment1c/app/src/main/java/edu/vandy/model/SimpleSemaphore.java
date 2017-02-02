@@ -37,7 +37,7 @@ public class SimpleSemaphore {
      * Acquire one permit from the semaphore in a manner that can be
      * interrupted.
      */
-    public void acquire(long timeout)
+    public void acquire()
         throws InterruptedException {
         // TODO -- you fill in here.
     }
