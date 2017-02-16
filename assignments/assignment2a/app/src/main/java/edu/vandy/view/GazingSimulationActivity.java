@@ -276,7 +276,7 @@ public class GazingSimulationActivity
      * Mark a Palantir at location @a index the given @a color.
      */
     private Runnable markPalantir(final int index,
-                              final DotColor color) {
+                                  final DotColor color) {
         return () -> {
             // Set the appropriate value
             getPresenter().getPalantiriColors().set(index,
