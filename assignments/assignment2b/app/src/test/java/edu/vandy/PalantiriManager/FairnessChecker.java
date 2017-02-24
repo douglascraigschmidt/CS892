@@ -50,7 +50,6 @@ public class FairnessChecker {
 
             // Add the current thread id to the fairness queue in a
             // thread-safe manner.
-            // TODO -- you fill in here.
             mFairnessQueue.add(tid);
         }
     }
@@ -76,7 +75,6 @@ public class FairnessChecker {
 
             // Add the current thread id to the fairness queue in a
             // thread-safe manner.
-            // TODO -- you fill in here.
             mFairnessQueue.add(tid);
         }
     }
@@ -88,8 +86,6 @@ public class FairnessChecker {
     public void removeCurrentThread() {
         // Remove the current thread id from the fairness queue in a
         // thread-safe manner.
-        // TODO -- you fill in here.
-
         long tid = Thread.currentThread().getId();
         synchronized (this) {
             mFairnessQueue.remove(tid);
@@ -115,8 +111,6 @@ public class FairnessChecker {
         // Check to see if the thread id removed from the front of the
         // queue matches the current thread id in a thread-safe
         // manner.
-        // TODO -- you fill in here.
-
         long tid = Thread.currentThread().getId();
         synchronized (this) {
             long firstThreadId = mFairnessQueue.remove(0);
