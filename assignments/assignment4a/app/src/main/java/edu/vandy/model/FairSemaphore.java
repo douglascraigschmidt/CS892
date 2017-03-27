@@ -130,12 +130,7 @@ class FairSemaphore {
     private boolean tryToGetPermitUnlocked() {
         // We must wait if there are already conditions in the queue
         // or if there are no permits available.
-        if (mWaitQueue.isEmpty() && mAvailablePermits > 0) {
-            // No need to wait, so decrement and return.
-            mAvailablePermits--;
-            return true;
-        } else
-            return false;
+        // TODO -- you fill in here.
     }
 
     /**
