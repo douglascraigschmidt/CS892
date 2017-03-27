@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import edu.vandy.model.Palantir;
 import edu.vandy.model.PalantiriModel;
 import edu.vandy.utils.Options;
+import edu.vandy.utils.UiUtils;
 import edu.vandy.view.GazingSimulationActivity;
 
 /**
