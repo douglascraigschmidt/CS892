@@ -36,8 +36,7 @@ public class PalantiriManager {
     /**
      * Java synchronizer that protects the Palantiri state.
      */
-    // TODO -- you fill in here.  Ugrads use a ReaderWriterLock
-    // synchronizer, whereas grad students must use a StampedLock.
+    // TODO -- you fill in here.  
     private final StampedLock mStampedLock;
 
     /**
