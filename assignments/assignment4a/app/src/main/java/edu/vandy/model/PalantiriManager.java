@@ -29,7 +29,16 @@ public class PalantiriManager {
      * A map that associates the @a Palantiri key to the @a boolean
      * values that keep track of whether the key is available.
      */
-    private final ConcurrentHashMap<Palantir, Boolean> mPalantiriMap;
+     * The Map interface is used here to work around an Android
+     * version conflict between Java 7 and Java 8. In Java 7, keySet()
+     * returns a Set<K>, while Java 8 was changed to return
+     * ConcurrentHashMap.KeySetView<K,V>. The compiler will mismatch
+     * the signature of the keySet() call when the invoked object is
+     * of type ConcurrentHashMap but not if the invoked object is of
+     * type Map<K,V>. This is only an issue when compiling with
+     * targetCompatibility set to 1.7.
+     */
+    private final Map<Palantir, Boolean> mPalantiriMap;
 
     /**
      * Constructor creates a PalantiriManager for the List of @a
